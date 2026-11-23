@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -34,7 +36,21 @@ jobs:
           python -m pip install -r eu-ai-act/requirements-test.txt
           python -m playwright install --with-deps chromium
       - name: Run pytest retrieval and browser suites
-        run: python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.sha || 'be57f2a71820a1b1a8832b96e8db6a56ffecb083' }}
+        run: |
+          baseline=$(mktemp -d)
+          git archive "$BASE_REF" public/eu-ai-act | tar -x -C "$baseline"
+          EU_AI_ACT_VISUAL_BASELINE="$baseline/public/eu-ai-act" python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
+      - uses: grafana/setup-k6-action@v1
+      - name: Check static delivery with k6
+        run: |
+          mkdir -p quality-results
+          python -m http.server 8184 --bind 127.0.0.1 --directory public/eu-ai-act > quality-results/server.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          curl --retry 10 --retry-connrefused --retry-delay 1 --fail --silent http://127.0.0.1:8184/index.html >/dev/null
+          k6 run eu-ai-act/performance.js
       - name: Upload benchmark results
         if: always()
         uses: actions/upload-artifact@v4
@@ -43,3 +59,9 @@ jobs:
           path: |
             public/eu-ai-act/evaluation.json
             pytest-results.xml
+      - name: Upload visual and performance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eu-ai-act-quality-evidence
+          path: quality-results/

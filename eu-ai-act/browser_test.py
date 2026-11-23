@@ -1,62 +1,6 @@
 """Browser tests for the same static files deployed to Vercel."""
 
-import os
-import threading
-from functools import partial
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
-
-import pytest
-from playwright.sync_api import expect, sync_playwright
-
-ROOT = Path(__file__).resolve().parents[1] / "public" / "eu-ai-act"
-
-
-class QuietHandler(SimpleHTTPRequestHandler):
-    def log_message(self, format, *args):
-        pass
-
-
-@pytest.fixture(scope="session")
-def base_url():
-    handler = partial(QuietHandler, directory=ROOT)
-    with ThreadingHTTPServer(("127.0.0.1", 0), handler) as server:
-        thread = threading.Thread(target=server.serve_forever, daemon=True)
-        thread.start()
-        try:
-            yield f"http://127.0.0.1:{server.server_port}"
-        finally:
-            server.shutdown()
-            thread.join()
-
-
-@pytest.fixture(scope="session")
-def browser():
-    with sync_playwright() as playwright:
-        instance = playwright.chromium.launch(
-            executable_path=os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE")
-        )
-        try:
-            yield instance
-        finally:
-            instance.close()
-
-
-@pytest.fixture
-def open_page(browser, base_url):
-    contexts = []
-
-    def open_path(path="/", *, mobile=False):
-        viewport = {"width": 320, "height": 740} if mobile else {"width": 1440, "height": 900}
-        context = browser.new_context(viewport=viewport, is_mobile=mobile, has_touch=mobile)
-        contexts.append(context)
-        page = context.new_page()
-        page.goto(base_url + path)
-        return page
-
-    yield open_path
-    for context in contexts:
-        context.close()
+from playwright.sync_api import expect
 
 
 def assert_no_page_overflow(page):

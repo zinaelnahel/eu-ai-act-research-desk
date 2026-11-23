@@ -36,6 +36,13 @@ python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
 
 Pytest runs every labeled question through the same JavaScript search engine the browser uses. It checks ranking, citation text, required phrases, irrelevant or duplicate sources, and abstention. The Playwright fixtures serve the deployed files over an ephemeral local HTTP server and cover desktop and mobile navigation, keyboard interaction, source links, quiz progress persistence, and the report. GitHub Actions runs both suites and uploads the JUnit XML alongside the public benchmark report. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium installation or `EU_AI_ACT_NODE` to point to a Node executable outside your PATH.
 
+## Performance and visual regression evidence
+
+The [CI workflow](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/eu-ai-act.yml) uploads `eu-ai-act-quality-evidence` with viewport screenshots, pixel diffs, and a k6 summary and JSON report.
+
+- Playwright captures the desktop research desk and mobile quiz from the candidate and its Git baseline in the same Chromium session. CI uses the pull request base commit, or the pinned release commit on pushes. Intentional design changes require reviewing the screenshots before updating the pinned baseline. To run locally, set `EU_AI_ACT_VISUAL_BASELINE` to an extracted baseline's `public/eu-ai-act` directory and run `python -m pytest eu-ai-act/test_visual.py -v`.
+- k6 sends 144 asset requests across four virtual users to a loopback server. It checks response status, expected contents, and p95 request duration. The results describe the test runner's static file delivery and provide a bounded regression check.
+
 ## Rebuild the corpus
 
 Install Beautiful Soup with `python -m pip install beautifulsoup4`. Download the official XHTML from the EU Publications Office in English using headers `Accept: application/xhtml+xml` and `Accept-Language: en`.

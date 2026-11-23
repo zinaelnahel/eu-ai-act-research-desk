@@ -21,6 +21,9 @@
       <h3>Python and pytest verification</h3>
       <p>Pytest runs each labeled question against the site’s search engine and checks the cited evidence. Playwright tests exercise keyboard, desktop and mobile flows, and quiz progress.</p>
       <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/eu-ai-act.yml">View the CI runs and pytest results</a></p>
+      <h3>Visual regression and static delivery</h3>
+      <p>Playwright compares baseline and candidate screenshots of the desktop desk and mobile quiz. k6 checks static asset responses and request latency on a local server in CI.</p>
+      <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk#performance-and-visual-regression-evidence">Find the screenshots, diffs and k6 results</a></p>
       <p class="legal-note">The consolidated edition is a documentation tool without legal effect. For authentic texts, consult the <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng">original Act</a> and <a href="https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng">2026 amendment</a> in the Official Journal. <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng">Consolidated reading copy</a></p>
       <h3>Learning mode</h3>
       <p>Automated checks also verify that every scenario cites an indexed provision and that replaying quizzes updates the best score without awarding duplicate XP.</p>
