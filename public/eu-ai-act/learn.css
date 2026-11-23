@@ -11,7 +11,7 @@
 .learn-hero .secondary:hover { background: #2c4b7b; }
 .scoreboard { padding: 22px; border: 1px solid #8badd26b; border-radius: 14px; background: #172843; }
 .scoreboard p { margin: 4px 0 12px; }
-.scoreboard #points { color: #c9ed83; font: 2.55rem Georgia, serif; }
+.scoreboard #points { color: #c9ed83; font: 700 2.25rem/1.15 var(--reference); }
 .scoreboard progress { width: 100%; accent-color: #c9ed83; }
 .scoreboard .storage-note { color: #d0e0f4; font-size: .875rem; margin-bottom: 0; }
 .map-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 20px; flex-wrap: wrap; padding-top: 10px; margin-bottom: 16px; }

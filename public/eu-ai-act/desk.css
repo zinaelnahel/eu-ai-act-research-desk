@@ -1,5 +1,12 @@
 * { box-sizing: border-box; }
-:root { color: #18273d; background: #f4f5f7; font-family: system-ui, sans-serif; line-height: 1.55; }
+:root {
+  --display: Arial, 'Helvetica Neue', sans-serif;
+  --reference: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  color: #18273d;
+  background: #f4f5f7;
+  font-family: system-ui, sans-serif;
+  line-height: 1.55;
+}
 body { margin: 0; }
 .wrap { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
 .masthead { background: #142139; color: #fff; border-bottom: 3px solid #d6ae55; }
@@ -7,12 +14,12 @@ body { margin: 0; }
 .top { min-height: 68px; padding-block: 10px; }
 a { color: #244b79; text-underline-offset: 4px; }
 .masthead a { color: inherit; }
-.wordmark { font-family: Georgia, serif; font-size: 1.3rem; text-decoration: none; }
+.wordmark { font: 800 1.25rem/1.2 var(--display); letter-spacing: -.03em; text-decoration: none; }
 .wordmark span { color: #f0ce83; }
 nav a { font-size: .9rem; }
 .intro { padding-block: clamp(36px, 6vw, 78px) 36px; border-bottom: 1px solid #cbd2da; }
-.kicker { font-size: .8rem; font-weight: 750; letter-spacing: .11em; color: #69501a; }
-h1, h2, h3 { font-family: Georgia, serif; font-weight: 500; line-height: 1.13; margin: 0; }
+.kicker { font-family: var(--reference); font-size: .8rem; font-weight: 700; letter-spacing: .09em; color: #69501a; }
+h1, h2, h3 { font-family: var(--display); font-weight: 800; line-height: 1.1; letter-spacing: -.035em; margin: 0; }
 h1 { font-size: clamp(2.8rem, 7vw, 5.6rem); letter-spacing: -.04em; }
 h2 { font-size: clamp(1.55rem, 3vw, 2.1rem); }
 h3 { font-size: 1.25rem; }
