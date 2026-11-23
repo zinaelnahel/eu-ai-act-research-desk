@@ -1,6 +1,6 @@
 # EU AI Act Research Desk
 
-[Open the desk](https://portfoliozinaelnahel.vercel.app/eu-ai-act/index.html) · [Read the evaluation](https://portfoliozinaelnahel.vercel.app/eu-ai-act/evaluation.html)
+[Portfolio](https://portfoliozinaelnahel.vercel.app/#work) · [Evaluation cases](eu-ai-act/cases.json)
 
 Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. The desk runs in the browser. Direct lookups resolve provision IDs, common questions use reviewed mappings, and other questions use weighted passage retrieval. Every result includes an extract from the law and a link to its official source. For open-ended questions the desk distinguishes possible source matches from reviewed answers.
 
@@ -33,3 +33,7 @@ Install Beautiful Soup with `python -m pip install beautifulsoup4`. Download the
 - Amendment `https://publications.europa.eu/resource/celex/32026R1744`
 
 Run `python eu-ai-act/build_corpus.py consolidated.xhtml original.xhtml amendment.xhtml` and re-run the evaluation. The importer preserves provision IDs, normalizes whitespace, and removes inline edition markers. Update the edition, fixture expectations and source anchors as part of a source refresh.
+
+## Deploy on Vercel
+
+Import this repository as a separate Vercel project. The repository's `vercel.json` serves `public/eu-ai-act` at the domain root with no install or build step.
