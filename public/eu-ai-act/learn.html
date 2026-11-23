@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Learn the EU AI Act with scenario quizzes, source explanations and progress saved on your device.">
+  <title>Learn | EU AI Act Research Desk</title>
+  <link rel="stylesheet" href="./desk.css">
+  <link rel="stylesheet" href="./learn.css">
+  <script type="module" src="./learn.mjs"></script>
+</head>
+<body class="learning">
+  <header class="masthead">
+    <div class="wrap top">
+      <a class="wordmark" href="./index.html">EU AI Act <span>Research Desk</span></a>
+      <nav aria-label="Main navigation"><a href="./learn.html" aria-current="page">Learn</a><a href="./index.html">Ask &amp; browse</a><a href="./evaluation.html">Testing evidence</a></nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="learn-hero" aria-labelledby="learn-title">
+      <div>
+        <p class="kicker">INTERACTIVE LEARNING</p>
+        <h1 id="learn-title">Learn the EU AI Act by making the call.</h1>
+        <p>Make decisions in realistic scenarios, then see how the Act answers them. Start anywhere or work through the chapter map.</p>
+        <div class="learn-actions"><button id="start" type="button">Start learning</button><button id="challenge" type="button" class="secondary">Mixed challenge</button></div>
+      </div>
+      <div class="scoreboard" aria-label="Your progress">
+        <p id="level">Level 1</p>
+        <p id="points">0 XP</p>
+        <label for="progress">Chapters practised</label>
+        <progress id="progress" value="0" max="12"></progress>
+        <p id="stats">0 of 12 topics practised</p>
+        <p class="storage-note" id="storage-note">Progress is saved on this device.</p>
+      </div>
+    </section>
+
+    <section id="quiz" class="quiz" aria-labelledby="quiz-title" hidden></section>
+    <section id="topics" aria-labelledby="map-title">
+      <div class="map-header">
+        <div><h2 id="map-title" tabindex="-1">Chapter map</h2><p id="map-detail">Short lessons and decisions across the Act.</p></div>
+        <a href="./index.html#library">Browse every provision</a>
+      </div>
+      <div id="cards" class="topic-grid"></div>
+      <p class="edition-note">Questions use the <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng">27 July 2026 consolidated English edition</a>. Consult the official text for specific legal decisions.</p>
+    </section>
+  </main>
+  <footer class="wrap"><a href="https://portfoliozinaelnahel.vercel.app/#work">Zina El Nahel · Portfolio</a><a href="./evaluation.html">Testing evidence</a></footer>
+</body>
+</html>

@@ -1,8 +1,10 @@
 # EU AI Act Research Desk
 
-[Open the desk](https://eu-ai-act-research-desk.vercel.app/) · [Read the evaluation](https://eu-ai-act-research-desk.vercel.app/evaluation.html)
+[Open the desk](https://eu-ai-act-research-desk.vercel.app/) · [Try learning mode](https://eu-ai-act-research-desk.vercel.app/learn.html) · [Read the evaluation](https://eu-ai-act-research-desk.vercel.app/evaluation.html)
 
 Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. The desk runs in the browser. Direct lookups resolve provision IDs, common questions use reviewed mappings, and other questions use weighted passage retrieval. Every result includes an extract from the law and a link to its official source. For open-ended questions the desk distinguishes possible source matches from reviewed answers.
+
+Learning mode has 12 topics spanning the Act’s chapters, 27 sourced scenarios and a mixed challenge. Read the explanation and linked provision after each decision. Chapter completions, best scores and XP are saved in browser storage on the current device.
 
 ## Source editions
 
@@ -18,7 +20,7 @@ Use Node.js 22 and Python 3.12. From the repository root:
 ```sh
 python -m http.server --directory public 8000
 # Open http://localhost:8000/eu-ai-act/index.html
-node --test eu-ai-act/desk.test.mjs
+node --test eu-ai-act/*.test.mjs
 node eu-ai-act/evaluate.mjs --write
 ```
 
