@@ -21,6 +21,15 @@
       <h3>Python and pytest verification</h3>
       <p>Pytest runs each labeled question against the site’s search engine and checks the cited evidence. Playwright tests exercise keyboard, desktop and mobile flows, and quiz progress.</p>
       <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/eu-ai-act.yml">View the CI runs and pytest results</a></p>
+      <h3 id="framework-results">Evaluation frameworks</h3>
+      <ul>
+        <li><strong>LangSmith:</strong> 43 of 43 passed for first-ranked provisions and abstention.</li>
+        <li><strong>DeepEval:</strong> 36 of 36 answerable cases passed verbatim citation checks.</li>
+        <li><strong>Promptfoo:</strong> 43 of 43 passed the required-source, citation and abstention regression gate.</li>
+        <li><strong>Ragas:</strong> 36 of 36 answerable cases met the ID-based context precision and recall targets.</li>
+      </ul>
+      <p>These offline runs reuse the same labeled dataset. The local Ollama smoke run evaluates citation selection separately.</p>
+      <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk#langsmith-deepeval-promptfoo-and-ragas">View framework code and reproduction steps</a> · <a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/eu-ai-act.yml">Download per-case CI results</a></p>
       <h3>Model safety and live evaluation</h3>
       <p>Eight offline checks verify that synthetic instruction-bearing or restricted evidence stays outside the model context, and that the output is limited to a verified citation. An optional local Ollama smoke run checks citation selection and abstention using the desk’s actual retrieval results.</p>
       <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/MODEL_EVALUATION.md">Read the model safety and Ollama report</a></p>

@@ -36,6 +36,29 @@ python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
 
 Pytest runs every labeled question through the same JavaScript search engine the browser uses. It checks ranking, citation text, required phrases, irrelevant or duplicate sources, and abstention. The Playwright fixtures serve the deployed files over an ephemeral local HTTP server and cover desktop and mobile navigation, keyboard interaction, source links, quiz progress persistence, and the report. GitHub Actions runs both suites and uploads the JUnit XML alongside the public benchmark report. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium installation or `EU_AI_ACT_NODE` to point to a Node executable outside your PATH.
 
+## LangSmith, DeepEval, Promptfoo and Ragas
+
+The [framework adapters](eu-ai-act/frameworks) run against the Research Desk’s bundled search engine and reuse its labeled EU AI Act dataset. They use deterministic checks and do not require API keys. The local LangSmith experiment does not upload results.
+
+| Framework | What it checks | Verified results |
+| --- | --- | ---: |
+| LangSmith | First-ranked provision and correct abstention behavior in a local dataset experiment. | 43/43 |
+| DeepEval | A custom metric checks that citation text and links match the indexed legal provision. | 36/36 |
+| Promptfoo | A custom provider runs the real search engine and gates on citations, required sources, unexpected sources, and abstention. | 43/43 |
+| Ragas | ID-based context precision and recall for answerable questions. | 36/36 |
+
+Python 3.12 and Node.js 22.23.5 reproduce the CI checks from the repository root:
+
+```sh
+python -m pip install -r eu-ai-act/frameworks/requirements.txt
+python eu-ai-act/frameworks/evaluate_frameworks.py --output framework-results/python-frameworks.json
+cd eu-ai-act/frameworks
+npx --yes promptfoo@0.126.0 eval -c promptfooconfig.yaml --no-cache -o ../../framework-results/promptfoo.json
+node check_promptfoo.mjs ../../framework-results/promptfoo.json
+```
+
+GitHub Actions uploads the per-case results as `eu-ai-act-framework-results`. The checks are complementary views of the same benchmark. Ragas scores source IDs on answerable cases, and the local Ollama smoke run is reported separately.
+
 ## Model safety and local Ollama evaluation
 
 The [model safety tests](eu-ai-act/test_model_security.py) use the same retrieval engine as the Research Desk. They simulate instruction-bearing draft text, restricted records, unexpected model responses and insufficient evidence. The model adapter sends only excerpts that match the pinned corpus and accepts one approved source ID. Eight deterministic checks run in CI with mocked model responses.

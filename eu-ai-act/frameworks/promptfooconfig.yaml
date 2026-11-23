@@ -1,0 +1,10 @@
+description: EU AI Act provision and abstention regression
+prompts:
+  - '{{question}}'
+providers:
+  - file://desk-provider.mjs
+tests: file://desk-tests.mjs
+defaultTest:
+  assert:
+    - type: javascript
+      value: file://desk-assertion.mjs

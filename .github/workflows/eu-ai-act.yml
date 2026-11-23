@@ -65,3 +65,33 @@ jobs:
         with:
           name: eu-ai-act-quality-evidence
           path: quality-results/
+
+  evaluation-frameworks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.5'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run LangSmith, DeepEval and Ragas offline
+        run: |
+          python -m pip install -r eu-ai-act/frameworks/requirements.txt
+          python eu-ai-act/frameworks/evaluate_frameworks.py --output framework-results/python-frameworks.json
+      - name: Run Promptfoo provision and abstention checks
+        working-directory: eu-ai-act/frameworks
+        env:
+          PROMPTFOO_DISABLE_TELEMETRY: '1'
+        run: |
+          mkdir -p ../../framework-results
+          npx --yes promptfoo@0.126.0 eval -c promptfooconfig.yaml --no-cache -o ../../framework-results/promptfoo.json
+          node check_promptfoo.mjs ../../framework-results/promptfoo.json
+      - name: Upload framework results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eu-ai-act-framework-results
+          path: framework-results/
