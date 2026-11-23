@@ -1,0 +1,33 @@
+name: EU AI Act evaluation
+
+on:
+  push:
+    paths:
+      - 'public/eu-ai-act/**'
+      - 'eu-ai-act/**'
+      - '.github/workflows/eu-ai-act.yml'
+  pull_request:
+    paths:
+      - 'public/eu-ai-act/**'
+      - 'eu-ai-act/**'
+      - '.github/workflows/eu-ai-act.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify sources, retrieval and published evidence
+        run: node --test eu-ai-act/desk.test.mjs
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: eu-ai-act-evaluation
+          path: public/eu-ai-act/evaluation.json

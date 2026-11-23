@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore the EU AI Act and check source-grounded answers against the official regulation.">
+  <title>EU AI Act Research Desk</title>
+  <link rel="stylesheet" href="./desk.css">
+  <script type="module" src="./desk.mjs"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap top">
+      <a class="wordmark" href="./index.html">EU AI Act <span>Research Desk</span></a>
+      <nav aria-label="On this page"><a href="#library">Browse the Act</a><a href="#verification">Testing evidence</a></nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="intro" aria-labelledby="desk-title">
+      <p class="kicker">REGULATION (EU) 2024/1689</p>
+      <h1 id="desk-title">Ask the EU AI Act.</h1>
+      <p>Find the passages that answer your question and check them against the official text.</p>
+      <form id="question-form">
+        <label for="question">Your question</label>
+        <div class="question-row"><input id="question" name="question" type="search" maxlength="600" required placeholder="What does the Act say about…"><button type="submit" id="ask" disabled>Find evidence</button></div>
+      </form>
+      <div class="examples" aria-label="Example questions">
+        <button type="button" disabled>Is emotion recognition allowed at work?</button>
+        <button type="button" disabled>When must a chatbot disclose it is AI?</button>
+        <button type="button" disabled>What are the obligations for GPAI providers?</button>
+      </div>
+    </section>
+    <div class="workbench">
+      <section class="research" aria-labelledby="answer-title">
+        <h2 id="answer-title" tabindex="-1">Source-grounded answers</h2>
+        <p id="status" role="status">Loading the official text…</p>
+        <div id="answer"></div>
+        <p class="legal-note">For research and education. Consult the official wording and get legal advice for decisions about a specific system.</p>
+      </section>
+      <aside aria-labelledby="library">
+        <h2 id="library">Browse the Act</h2>
+        <p id="edition"></p>
+        <label for="kind">Source type</label>
+        <select id="kind"><option value="article">Articles</option><option value="annex">Annexes</option><option value="recital">Recitals</option></select>
+        <label for="provision">Provision</label>
+        <select id="provision" disabled><option value="">Choose a provision</option></select>
+        <a class="source-link" id="official-source" href="https://eur-lex.europa.eu/eli/reg/2024/1689">Read on EUR-Lex</a>
+      </aside>
+    </div>
+    <section id="verification" class="verification" aria-labelledby="verification-title">
+      <div>
+        <p class="kicker">QUALITY ENGINEERING</p>
+        <h2 id="verification-title">How the desk was tested</h2>
+        <p>Review the labeled questions, citation checks, and cases where the desk should abstain.</p>
+      </div>
+      <a class="source-link" href="./evaluation.html">Open the evaluation report</a>
+    </section>
+  </main>
+  <footer class="wrap"><a href="/">Zina El Nahel · Portfolio</a><span>Independent research tool · English edition</span></footer>
+</body>
+</html>

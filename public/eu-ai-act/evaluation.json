@@ -1,0 +1,385 @@
+{
+  "edition": "Consolidated edition · 27 July 2026",
+  "passed": 42,
+  "total": 42,
+  "results": [
+    {
+      "name": "workplace emotion",
+      "question": "Is emotion recognition allowed at work?",
+      "expected": "art_5, art_50",
+      "actual": "art_5, art_50",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "school emotion",
+      "question": "Could a school use AI to infer pupils’ emotions?",
+      "expected": "art_5",
+      "actual": "art_5, art_50",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "direct disclosure",
+      "question": "When must a chatbot disclose it is AI?",
+      "expected": "art_50",
+      "actual": "art_50",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "obvious context",
+      "question": "Does a chatbot need to tell me it is AI if it is obvious?",
+      "expected": "art_50",
+      "actual": "art_50",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "deepfakes",
+      "question": "How does the Act handle deepfakes?",
+      "expected": "art_50",
+      "actual": "art_50, art_3",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "AI literacy",
+      "question": "Does AI literacy require everyone to reach the same level?",
+      "expected": "art_4",
+      "actual": "art_4, art_3",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "GPAI and open source",
+      "question": "Are open-source GPAI providers exempt from obligations?",
+      "expected": "art_53, art_55",
+      "actual": "art_53, art_55",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "GPAI penalties",
+      "question": "Can a GPAI provider receive a fine?",
+      "expected": "art_101",
+      "actual": "art_101",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "hiring",
+      "question": "Is an AI tool for screening candidates covered?",
+      "expected": "anx_III, art_6",
+      "actual": "anx_III, art_6",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "sandbox",
+      "question": "What does the Act say about regulatory sandboxes?",
+      "expected": "art_57, art_58",
+      "actual": "art_57, art_58",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "risk management",
+      "question": "What does a risk management system cover?",
+      "expected": "art_9",
+      "actual": "art_9, art_60a, anx_VII",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "training data",
+      "question": "What are the data governance requirements for training datasets?",
+      "expected": "art_10",
+      "actual": "art_10",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "documentation",
+      "question": "How does technical documentation for high-risk systems work?",
+      "expected": "art_11",
+      "actual": "art_11, anx_XI, anx_VII",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "human oversight",
+      "question": "What does human oversight require?",
+      "expected": "art_14",
+      "actual": "art_14",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "importers",
+      "question": "What obligations do importers have?",
+      "expected": "art_23",
+      "actual": "art_23",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "distributors",
+      "question": "What are distributors responsible for?",
+      "expected": "art_24",
+      "actual": "art_24",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "impact assessment",
+      "question": "Who performs a fundamental rights impact assessment?",
+      "expected": "art_27",
+      "actual": "art_27",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "notification",
+      "question": "How are notified bodies designated?",
+      "expected": "art_30, art_31",
+      "actual": "art_30, art_31",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "standards",
+      "question": "Which standards give presumption of conformity?",
+      "expected": "art_40",
+      "actual": "art_40",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "registration",
+      "question": "Where must providers register their high-risk AI?",
+      "expected": "art_49, art_71",
+      "actual": "art_49, art_71",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "EU database",
+      "question": "What is the EU database for high-risk AI?",
+      "expected": "art_71",
+      "actual": "art_71",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "monitoring",
+      "question": "What are the requirements for post-market monitoring?",
+      "expected": "art_72",
+      "actual": "art_72",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "serious incidents",
+      "question": "How do providers report serious incidents?",
+      "expected": "art_73",
+      "actual": "art_73",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "national authorities",
+      "question": "What are national contact points?",
+      "expected": "art_70",
+      "actual": "art_70",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "complaints",
+      "question": "Who can file a complaint?",
+      "expected": "art_85",
+      "actual": "art_85",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "explanation",
+      "question": "What is the right to explanation of a decision?",
+      "expected": "art_86",
+      "actual": "art_86",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "social scoring",
+      "question": "What are prohibited social scoring practices?",
+      "expected": "art_5",
+      "actual": "art_5",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "application",
+      "question": "When does the EU AI Act apply?",
+      "expected": "art_113, art_111",
+      "actual": "art_113, art_111",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "article paragraph",
+      "question": "What does Article 50(5) say?",
+      "expected": "art_50",
+      "actual": "art_50",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "multiple articles",
+      "question": "Compare Articles 4 and 50",
+      "expected": "art_4, art_50",
+      "actual": "art_4, art_50",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "new article",
+      "question": "What does Article 4a require?",
+      "expected": "art_4a",
+      "actual": "art_4a",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "new annex",
+      "question": "What is in Annex XIV?",
+      "expected": "anx_XIV",
+      "actual": "anx_XIV",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "original recital",
+      "question": "What does Recital 12 say?",
+      "expected": "rct_12",
+      "actual": "rct_12",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "scope lookup",
+      "question": "Article 2(3)",
+      "expected": "art_2",
+      "actual": "art_2",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "technical annex",
+      "question": "Annex IV",
+      "expected": "anx_IV",
+      "actual": "anx_IV",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "out of scope",
+      "question": "How do I bake banana bread?",
+      "expected": "abstain",
+      "actual": "abstain",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "unrelated facts",
+      "question": "What is the capital of Canada?",
+      "expected": "abstain",
+      "actual": "abstain",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "unknown local policy",
+      "question": "What is the seasonal parking fee?",
+      "expected": "abstain",
+      "actual": "abstain",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "unknown article",
+      "question": "What does Article 900 say?",
+      "expected": "abstain",
+      "actual": "abstain",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "missing facts",
+      "question": "Does my product comply with the AI Act?",
+      "expected": "abstain",
+      "actual": "abstain",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "edition freshness",
+      "question": "What is the latest version?",
+      "expected": "version",
+      "actual": "version",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    },
+    {
+      "name": "empty",
+      "question": "   ",
+      "expected": "abstain",
+      "actual": "abstain",
+      "citationQuality": true,
+      "phraseQuality": true,
+      "passed": true
+    }
+  ]
+}

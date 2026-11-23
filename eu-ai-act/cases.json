@@ -1,0 +1,376 @@
+[
+  {
+    "name": "workplace emotion",
+    "question": "Is emotion recognition allowed at work?",
+    "sources": [
+      "art_5",
+      "art_50"
+    ],
+    "phrases": [
+      "medical or safety reasons"
+    ]
+  },
+  {
+    "name": "school emotion",
+    "question": "Could a school use AI to infer pupils’ emotions?",
+    "sources": [
+      "art_5"
+    ],
+    "phrases": [
+      "medical or safety reasons"
+    ]
+  },
+  {
+    "name": "direct disclosure",
+    "question": "When must a chatbot disclose it is AI?",
+    "sources": [
+      "art_50"
+    ],
+    "phrases": [
+      "unless this is obvious",
+      "authorised by law"
+    ]
+  },
+  {
+    "name": "obvious context",
+    "question": "Does a chatbot need to tell me it is AI if it is obvious?",
+    "sources": [
+      "art_50"
+    ],
+    "phrases": [
+      "unless this is obvious"
+    ]
+  },
+  {
+    "name": "deepfakes",
+    "question": "How does the Act handle deepfakes?",
+    "sources": [
+      "art_50"
+    ],
+    "phrases": [
+      "artistic, creative, satirical"
+    ]
+  },
+  {
+    "name": "AI literacy",
+    "question": "Does AI literacy require everyone to reach the same level?",
+    "sources": [
+      "art_4"
+    ],
+    "phrases": [
+      "does not require"
+    ]
+  },
+  {
+    "name": "GPAI and open source",
+    "question": "Are open-source GPAI providers exempt from obligations?",
+    "sources": [
+      "art_53",
+      "art_55"
+    ],
+    "phrases": [
+      "points (a) and (b)",
+      "systemic risks"
+    ]
+  },
+  {
+    "name": "GPAI penalties",
+    "question": "Can a GPAI provider receive a fine?",
+    "sources": [
+      "art_101"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "hiring",
+    "question": "Is an AI tool for screening candidates covered?",
+    "sources": [
+      "anx_III",
+      "art_6"
+    ],
+    "phrases": [
+      "recruitment or selection"
+    ]
+  },
+  {
+    "name": "sandbox",
+    "question": "What does the Act say about regulatory sandboxes?",
+    "sources": [
+      "art_57",
+      "art_58"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "risk management",
+    "question": "What does a risk management system cover?",
+    "sources": [
+      "art_9"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "training data",
+    "question": "What are the data governance requirements for training datasets?",
+    "sources": [
+      "art_10"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "documentation",
+    "question": "How does technical documentation for high-risk systems work?",
+    "sources": [
+      "art_11"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "human oversight",
+    "question": "What does human oversight require?",
+    "sources": [
+      "art_14"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "importers",
+    "question": "What obligations do importers have?",
+    "sources": [
+      "art_23"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "distributors",
+    "question": "What are distributors responsible for?",
+    "sources": [
+      "art_24"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "impact assessment",
+    "question": "Who performs a fundamental rights impact assessment?",
+    "sources": [
+      "art_27"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "notification",
+    "question": "How are notified bodies designated?",
+    "sources": [
+      "art_30",
+      "art_31"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "standards",
+    "question": "Which standards give presumption of conformity?",
+    "sources": [
+      "art_40"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "registration",
+    "question": "Where must providers register their high-risk AI?",
+    "sources": [
+      "art_49",
+      "art_71"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "EU database",
+    "question": "What is the EU database for high-risk AI?",
+    "sources": [
+      "art_71"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "monitoring",
+    "question": "What are the requirements for post-market monitoring?",
+    "sources": [
+      "art_72"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "serious incidents",
+    "question": "How do providers report serious incidents?",
+    "sources": [
+      "art_73"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "national authorities",
+    "question": "What are national contact points?",
+    "sources": [
+      "art_70"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "complaints",
+    "question": "Who can file a complaint?",
+    "sources": [
+      "art_85"
+    ],
+    "phrases": [
+      "market surveillance authority"
+    ]
+  },
+  {
+    "name": "explanation",
+    "question": "What is the right to explanation of a decision?",
+    "sources": [
+      "art_86"
+    ],
+    "phrases": [
+      "exception of systems listed under point 2"
+    ]
+  },
+  {
+    "name": "social scoring",
+    "question": "What are prohibited social scoring practices?",
+    "sources": [
+      "art_5"
+    ],
+    "phrases": [
+      "social behaviour"
+    ]
+  },
+  {
+    "name": "application",
+    "question": "When does the EU AI Act apply?",
+    "sources": [
+      "art_113",
+      "art_111"
+    ],
+    "phrases": [
+      "2 December 2027",
+      "2 August 2028"
+    ]
+  },
+  {
+    "name": "article paragraph",
+    "question": "What does Article 50(5) say?",
+    "sources": [
+      "art_50"
+    ],
+    "phrases": [
+      "first interaction or exposure"
+    ]
+  },
+  {
+    "name": "multiple articles",
+    "question": "Compare Articles 4 and 50",
+    "sources": [
+      "art_4",
+      "art_50"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "new article",
+    "question": "What does Article 4a require?",
+    "sources": [
+      "art_4a"
+    ],
+    "phrases": [
+      "bias detection and correction"
+    ]
+  },
+  {
+    "name": "new annex",
+    "question": "What is in Annex XIV?",
+    "sources": [
+      "anx_XIV"
+    ],
+    "phrases": [
+      "AIA Code"
+    ]
+  },
+  {
+    "name": "original recital",
+    "question": "What does Recital 12 say?",
+    "sources": [
+      "rct_12"
+    ],
+    "phrases": []
+  },
+  {
+    "name": "scope lookup",
+    "question": "Article 2(3)",
+    "sources": [
+      "art_2"
+    ],
+    "phrases": [
+      "military, defence or national security"
+    ]
+  },
+  {
+    "name": "technical annex",
+    "question": "Annex IV",
+    "sources": [
+      "anx_IV"
+    ],
+    "phrases": [
+      "technical documentation"
+    ]
+  },
+  {
+    "name": "out of scope",
+    "question": "How do I bake banana bread?",
+    "sources": [],
+    "phrases": [],
+    "kind": "abstain"
+  },
+  {
+    "name": "unrelated facts",
+    "question": "What is the capital of Canada?",
+    "sources": [],
+    "phrases": [],
+    "kind": "abstain"
+  },
+  {
+    "name": "unknown local policy",
+    "question": "What is the seasonal parking fee?",
+    "sources": [],
+    "phrases": [],
+    "kind": "abstain"
+  },
+  {
+    "name": "unknown article",
+    "question": "What does Article 900 say?",
+    "sources": [],
+    "phrases": [],
+    "kind": "abstain"
+  },
+  {
+    "name": "missing facts",
+    "question": "Does my product comply with the AI Act?",
+    "sources": [],
+    "phrases": [],
+    "kind": "abstain"
+  },
+  {
+    "name": "edition freshness",
+    "question": "What is the latest version?",
+    "sources": [],
+    "phrases": [],
+    "kind": "version"
+  },
+  {
+    "name": "empty",
+    "question": "   ",
+    "sources": [],
+    "phrases": [],
+    "kind": "abstain"
+  }
+]
