@@ -26,15 +26,15 @@ node eu-ai-act/evaluate.mjs --write
 
 The 43 labeled cases check first-ranked provisions, required supporting sources, verbatim evidence, exceptions and abstention. Irrelevant and duplicate provisions fail the case even when every required source is present. Optional sources require a documented rationale. The report shows micro-averaged provision precision across returned citations and marks abstentions separately. The suite checks direct lookup for all 360 corpus entries and verifies that the report matches a fresh run.
 
-Run the Playwright browser suite with Python 3.12:
+Run the Python and pytest suites with Python 3.12 and Node.js 22:
 
 ```sh
-python -m pip install -r eu-ai-act/requirements-browser.txt
+python -m pip install -r eu-ai-act/requirements-test.txt
 python -m playwright install chromium
-python -m unittest discover -s eu-ai-act -p browser_test.py -v
+python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
 ```
 
-The tests use an ephemeral local HTTP server and cover desktop and mobile navigation, keyboard interaction, source links, quiz progress persistence, and the evaluation report. GitHub Actions runs both suites. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium installation.
+Pytest runs every labeled question through the same JavaScript search engine the browser uses. It checks ranking, citation text, required phrases, irrelevant or duplicate sources, and abstention. The Playwright fixtures serve the deployed files over an ephemeral local HTTP server and cover desktop and mobile navigation, keyboard interaction, source links, quiz progress persistence, and the report. GitHub Actions runs both suites and uploads the JUnit XML alongside the public benchmark report. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium installation or `EU_AI_ACT_NODE` to point to a Node executable outside your PATH.
 
 ## Rebuild the corpus
 

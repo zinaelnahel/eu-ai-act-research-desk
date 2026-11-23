@@ -24,19 +24,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify sources, retrieval, evidence and learning progress
+      - name: Verify corpus, report generation and learning progress
         run: node --test eu-ai-act/*.test.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install Playwright and Chromium
+      - name: Install pytest, Playwright and Chromium
         run: |
-          python -m pip install -r eu-ai-act/requirements-browser.txt
+          python -m pip install -r eu-ai-act/requirements-test.txt
           python -m playwright install --with-deps chromium
-      - name: Verify desktop, mobile and keyboard flows
-        run: python -m unittest discover -s eu-ai-act -p browser_test.py -v
+      - name: Run pytest retrieval and browser suites
+        run: python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
       - name: Upload benchmark results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: eu-ai-act-evaluation
-          path: public/eu-ai-act/evaluation.json
+          path: |
+            public/eu-ai-act/evaluation.json
+            pytest-results.xml

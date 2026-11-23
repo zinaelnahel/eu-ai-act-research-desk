@@ -26,12 +26,6 @@ test('resolves every corpus item explicitly', () => {
   }
 });
 
-for (const result of runEvaluation().results) {
-  test(result.name, () => {
-    assert.ok(result.passed, JSON.stringify(result));
-  });
-}
-
 test('a valid but irrelevant Article 50 citation fails the school emotion case', () => {
   const fixture = cases.find(item => item.name === 'school emotion');
   const answer = desk.ask(fixture.question);
