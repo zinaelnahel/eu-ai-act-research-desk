@@ -1,6 +1,6 @@
 # EU AI Act Research Desk
 
-[Portfolio](https://portfoliozinaelnahel.vercel.app/#work) · [Evaluation cases](eu-ai-act/cases.json)
+[Open the desk](https://eu-ai-act-research-desk.vercel.app/) · [Read the evaluation](https://eu-ai-act-research-desk.vercel.app/evaluation.html)
 
 Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. The desk runs in the browser. Direct lookups resolve provision IDs, common questions use reviewed mappings, and other questions use weighted passage retrieval. Every result includes an extract from the law and a link to its official source. For open-ended questions the desk distinguishes possible source matches from reviewed answers.
 
