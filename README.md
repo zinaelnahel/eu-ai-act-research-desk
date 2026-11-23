@@ -11,7 +11,7 @@ Learning mode has 12 topics spanning the Act’s chapters, 27 sourced scenarios 
 - [27 July 2026 consolidated English edition](https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng), including 119 articles and 14 annexes.
 - [Original Official Journal edition](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng) and [2026 amending regulation](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng), which supply 227 recitals.
 
-The snapshot is pinned. Questions about newer versions are redirected to EUR-Lex. The desk supplies evidence for research, uses no live language model, and does not decide how the law applies to a particular system.
+The snapshot is pinned. Questions about newer versions are redirected to EUR-Lex. The consolidated edition is a documentation tool without legal effect. The authentic texts are published in the Official Journal. The desk supplies evidence for research, uses no live language model, and does not decide how the law applies to a particular system.
 
 ## Run and verify
 
@@ -24,7 +24,17 @@ node --test eu-ai-act/*.test.mjs
 node eu-ai-act/evaluate.mjs --write
 ```
 
-The 42 labeled cases check first-ranked provisions, supporting sources, verbatim evidence, exceptions and abstention. The suite also checks direct lookup for all 360 corpus entries and verifies that the published report matches a fresh run. The labeled cases are a regression benchmark, and their results apply to the tested questions and pinned text.
+The 43 labeled cases check first-ranked provisions, required supporting sources, verbatim evidence, exceptions and abstention. Irrelevant and duplicate provisions fail the case even when every required source is present. Optional sources require a documented rationale. The report shows micro-averaged provision precision across returned citations and marks abstentions separately. The suite checks direct lookup for all 360 corpus entries and verifies that the report matches a fresh run.
+
+Run the Playwright browser suite with Python 3.12:
+
+```sh
+python -m pip install -r eu-ai-act/requirements-browser.txt
+python -m playwright install chromium
+python -m unittest discover -s eu-ai-act -p browser_test.py -v
+```
+
+The tests use an ephemeral local HTTP server and cover desktop and mobile navigation, keyboard interaction, source links, quiz progress persistence, and the evaluation report. GitHub Actions runs both suites. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium installation.
 
 ## Rebuild the corpus
 

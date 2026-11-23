@@ -2,10 +2,11 @@ const STOP = new Set('a an and are as at be by can could do does for from had ha
 const ROMAN = ['','i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv'];
 const TOPICS = [
   [/\b(fines?|penalt(?:y|ies)|sanctions?)\b.*\b(gpai|general[ -]purpose.{0,12}models?)\b|\b(gpai|general[ -]purpose.{0,12}models?)\b.*\b(fines?|penalt(?:y|ies)|sanctions?)\b/i, [['art_101', /fines/i]]],
-  [/\b(emotions?|moods?|feelings)\b.*\b(work|workplace|workers?|schools?|employees?|education)\b|\b(work|workplace|workers?|schools?|employees?|education)\b.*\b(emotions?|moods?|feelings)\b/i, [['art_5', /\(f\).*?infer emotions/is], ['art_50', /emotion recognition/i]]],
+  [/\b(emotions?|moods?|feelings)\b.*\b(disclos\w*|inform\w*|notic\w*|transparen\w*)\b|\b(disclos\w*|inform\w*|notic\w*|transparen\w*)\b.*\b(emotions?|moods?|feelings)\b/i, [['art_50', /emotion recognition/i]]],
+  [/\b(emotions?|moods?|feelings)\b.*\b(work|workplace|workers?|schools?|employees?|education)\b|\b(work|workplace|workers?|schools?|employees?|education)\b.*\b(emotions?|moods?|feelings)\b/i, [['art_5', /\(f\).*?infer emotions/is]]],
   [/\b(chatbots?|interact(?:ing|ion)?)\b.*\b(disclos\w*|inform\w*|tell|notic\w*|transparen\w*|label\w*)\b|\b(disclos\w*|inform\w*|tell|notic\w*|transparen\w*|label\w*)\b.*\b(chatbots?|interact(?:ing|ion)?)\b/i, [['art_50', /interact directly/i]]],
   [/\b(deep[ -]?fakes?|synthetic media)\b/i, [['art_50', /deep fake/i], ['art_3', /deep fake/i]]],
-  [/\b(literacy|train(?:ing)? staff|employees?.{0,35}training)\b/i, [['art_4', /literacy/i], ['art_3', /literacy/i]]],
+  [/\b(literacy|train(?:ing)? staff|employees?.{0,35}training)\b/i, [['art_4', /literacy/i]]],
   [/\b(gpai|general[ -]purpose.{0,12}models?)\b.*\b(obligation\w*|provider\w*|duties|copyright|open[ -]source)\b|\b(obligation\w*|provider\w*|duties|copyright|open[ -]source)\b.*\b(gpai|general[ -]purpose.{0,12}models?)\b/i, [['art_53', /providers of general-purpose/i], ['art_55', /systemic risk/i]]],
   [/\b(hir(?:e|ing)|recruit(?:ment|ing)?|job applicants?|screen(?:ing)? candidates?)\b/i, [['anx_III', /recruitment or selection/i], ['art_6', /Annex III/i]]],
   [/\b(fines?|penalt(?:y|ies)|sanctions?)\b/i, [['art_99', /administrative fines/i], ['art_101', /fines/i]]],
@@ -20,6 +21,8 @@ const TOPICS = [
   [/\bregister\b.*\bhigh[ -]risk\b|\bregistration\b.*\bhigh[ -]risk\b|\bhigh[ -]risk\b.*\b(register|registration)\b/i, [['art_49', /register/i], ['art_71', /database/i]]],
   [/\b(standards?|harmoni[sz]ed)\b.*\bpresumption\b|\bpresumption\b.*\bstandards?\b/i, [['art_40', /presumed/i]]],
   [/\bnotified bodies\b.*\b(designat\w*|application)\b|\b(designat\w*|application)\b.*\bnotified bodies\b/i, [['art_30', /notifying authority/i], ['art_31', /notified body/i]]],
+  [/\brisk management system\b/i, [['art_9', /continuous iterative process|risk management system/i]]],
+  [/\btechnical documentation\b.*\bhigh[ -]risk\b|\bhigh[ -]risk\b.*\btechnical documentation\b/i, [['art_11', /technical documentation/i], ['anx_IV', /general description/i]]],
 ];
 const CURRENT = /\b(as of today|currently in force|latest (?:version|amendments?)|changed since .{0,10}2026)\b/i;
 const TIMING = /\b(application dates?|when (?:does|will|did) (?:the )?(?:eu ai act|ai act|act|regulation|rules?) (?:start|apply|enter)|(?:start|become) applicable|transition(?:al)? dates?)\b/i;
@@ -118,7 +121,7 @@ export function createDesk(corpus) {
       const primary = evidence[0];
       let summary = NOTES[primary.id];
       if (primary.id === 'art_5') {
-        summary = 'The Act prohibits AI used to infer emotions in workplaces and educational institutions, with an exception for uses intended for medical or safety reasons. Article 50 separately addresses informing people exposed to an emotion recognition system.';
+        summary = 'The Act prohibits AI used to infer emotions in workplaces and educational institutions, with an exception for uses intended for medical or safety reasons.';
       }
       if (primary.id === 'art_50' && /interact directly/i.test(primary.quote)) {
         summary = 'Providers of AI intended to interact directly with people generally must inform them that they are interacting with AI, unless that is obvious in context. Article 50(1) also specifies an exception for certain law-enforcement systems.';

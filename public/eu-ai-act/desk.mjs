@@ -26,7 +26,7 @@ function renderEvidence(item, doc, showContext = true) {
   const section = element('section', '', 'evidence');
   section.append(element('h3', [item.label, item.title].filter(Boolean).join(' · ')));
   section.append(element('p', item.quote));
-  section.append(sourceLink('Open this provision on EUR-Lex', item.url));
+  section.append(sourceLink(doc.kind === 'recital' ? 'Read the Official Journal recital' : 'Read the consolidated provision', item.url));
   if (showContext && item.quote !== doc.blocks.join('\n\n') && doc.blocks.length > 1) {
     const detail = element('details');
     detail.append(element('summary', 'Read the full provision'));

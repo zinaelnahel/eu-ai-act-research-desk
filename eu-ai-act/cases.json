@@ -3,12 +3,17 @@
     "name": "workplace emotion",
     "question": "Is emotion recognition allowed at work?",
     "sources": [
-      "art_5",
-      "art_50"
+      "art_5"
     ],
     "phrases": [
       "medical or safety reasons"
     ]
+  },
+  {
+    "name": "emotion recognition disclosure",
+    "question": "Must a deployer inform people exposed to emotion recognition?",
+    "sources": ["art_50"],
+    "phrases": ["shall inform the natural persons exposed"]
   },
   {
     "name": "school emotion",
@@ -47,6 +52,9 @@
     "sources": [
       "art_50"
     ],
+    "optionalSources": {
+      "art_3": "The definition of a deep fake helps explain the scope of the disclosure rule."
+    },
     "phrases": [
       "artistic, creative, satirical"
     ]
@@ -121,7 +129,8 @@
     "name": "documentation",
     "question": "How does technical documentation for high-risk systems work?",
     "sources": [
-      "art_11"
+      "art_11",
+      "anx_IV"
     ],
     "phrases": []
   },

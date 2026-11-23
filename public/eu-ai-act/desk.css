@@ -35,6 +35,10 @@ aside { align-self: start; }
 aside p, #status, .legal-note { color: #4e5d70; }
 aside select { display: block; width: 100%; margin-bottom: 15px; }
 .source-link { display: inline-block; font-weight: 650; }
+.source-status { border-top: 1px solid #ccd4df; margin-top: 18px; padding-top: 14px; }
+.source-status p { margin: 8px 0; font-size: .9rem; }
+.source-status ul { margin: 8px 0 0; padding-left: 20px; }
+.source-status li + li { margin-top: 6px; }
 .legal-note { font-size: .87rem; margin: 18px 0 0; }
 .evidence { margin: 15px 0; padding: 16px; border-left: 3px solid #ba9349; background: #f4f6f9; }
 .evidence p, .provision-text { white-space: pre-line; overflow-wrap: anywhere; }
