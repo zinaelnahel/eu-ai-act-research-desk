@@ -9,7 +9,9 @@ from playwright.sync_api import expect
 
 def screenshot(page, path, mobile):
     if mobile:
-        page.get_by_role("button", name="Start learning").evaluate("(button) => button.click()")
+        start = page.get_by_role("button", name="Start learning")
+        expect(start).to_be_enabled()
+        start.evaluate("(button) => button.click()")
         expect(page.get_by_role("button", name="Check answer")).to_be_visible()
         page.evaluate("document.fonts.ready")
         page.locator("#quiz").screenshot(path=path, animations="disabled")

@@ -179,3 +179,5 @@ start.addEventListener('click', () => {
 });
 get('challenge').addEventListener('click', mixed);
 updateMap();
+start.disabled = false;
+get('challenge').disabled = false;

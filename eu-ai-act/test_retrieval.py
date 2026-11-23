@@ -1,11 +1,10 @@
 """Exercise the shipped JavaScript search engine against the labeled cases in pytest."""
 
 import json
-import os
-import subprocess
 from pathlib import Path
 
 import pytest
+from model_evaluation import ask_desk
 
 HERE = Path(__file__).resolve().parent
 PUBLIC = HERE.parent / "public" / "eu-ai-act"
@@ -24,13 +23,7 @@ def documents(corpus):
 
 @pytest.fixture(scope="module")
 def answers():
-    completed = subprocess.run(
-        [os.environ.get("EU_AI_ACT_NODE", "node"), str(HERE / "query-desk.mjs")],
-        input=json.dumps([case["question"] for case in CASES]),
-        encoding="utf-8", capture_output=True, timeout=20,
-    )
-    assert completed.returncode == 0, completed.stderr
-    responses = json.loads(completed.stdout)
+    responses = ask_desk([case["question"] for case in CASES])
     return dict(zip((case["name"] for case in CASES), responses, strict=True))
 
 

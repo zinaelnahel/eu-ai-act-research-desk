@@ -48,8 +48,10 @@ def test_mobile_quiz_keyboard_feedback_and_saved_xp(open_page):
     assert_no_page_overflow(page)
     page.get_by_role("link", name="Learn with scenario quizzes").press("Enter")
     assert_no_page_overflow(page)
-    page.get_by_role("button", name="Start learning").press("Enter")
-    expect(page.get_by_role("heading", name="Who is covered?", exact=True).first).to_be_focused()
+    start = page.get_by_role("button", name="Start learning")
+    expect(start).to_be_enabled()
+    start.press("Enter")
+    expect(page.get_by_role("heading", name="Who is covered?", exact=True, level=2)).to_be_focused()
     page.keyboard.press("Tab")
     wrong = page.get_by_role("radio").first
     expect(wrong).to_be_focused()

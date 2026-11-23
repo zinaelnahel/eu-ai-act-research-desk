@@ -36,6 +36,20 @@ python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
 
 Pytest runs every labeled question through the same JavaScript search engine the browser uses. It checks ranking, citation text, required phrases, irrelevant or duplicate sources, and abstention. The Playwright fixtures serve the deployed files over an ephemeral local HTTP server and cover desktop and mobile navigation, keyboard interaction, source links, quiz progress persistence, and the report. GitHub Actions runs both suites and uploads the JUnit XML alongside the public benchmark report. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium installation or `EU_AI_ACT_NODE` to point to a Node executable outside your PATH.
 
+## Model safety and local Ollama evaluation
+
+The [model safety tests](eu-ai-act/test_model_security.py) use the same retrieval engine as the Research Desk. They simulate instruction-bearing draft text, restricted records, unexpected model responses and insufficient evidence. The model adapter sends only excerpts that match the pinned corpus and accepts one approved source ID. Eight deterministic checks run in CI with mocked model responses.
+
+The optional Ollama run tests citation selection behind that boundary. It includes four questions with approved sources and two abstentions. Each scenario runs twice. The public site uses deterministic retrieval.
+
+To reproduce the local run, start Ollama with `qwen3:4b` installed and run:
+
+```sh
+EU_AI_ACT_OLLAMA_MODEL=qwen3:4b python -m pytest eu-ai-act/test_model_security.py -v --junitxml=model-smoke.xml
+```
+
+In PowerShell, set `$env:EU_AI_ACT_OLLAMA_MODEL = 'qwen3:4b'` before running the pytest command. See the [local smoke report](MODEL_EVALUATION.md) for the observed outcomes and scope.
+
 ## Performance and visual regression evidence
 
 The [CI workflow](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/eu-ai-act.yml) uploads `eu-ai-act-quality-evidence` with viewport screenshots, pixel diffs, and a k6 summary and JSON report.
