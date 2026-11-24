@@ -108,8 +108,13 @@ try {
     modelRequest?.abort();
     modelRequest = undefined;
     provision.value = '';
-    const result = desk.ask(question.value);
     answer.replaceChildren();
+    if (event.submitter !== evidenceOnly && /^(?:hi|hello|hey)(?:\s+there)?[!.,?]*$/i.test(question.value.trim())) {
+      status.textContent = 'Hi! I can help you explore the EU AI Act. Ask about a rule, an obligation, or an exception, or try one of the example questions above.';
+      byId('answer-title').focus();
+      return;
+    }
+    const result = desk.ask(question.value);
     status.textContent = result.reason || {
       lookup: 'Requested source',
       evidence: 'Relevant provisions. Read each excerpt and its surrounding context.',

@@ -7,6 +7,16 @@ def assert_no_page_overflow(page):
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
 
 
+def test_ask_ai_greeting_from_library(open_page):
+    page = open_page("/index.html#library", mobile=True)
+    search = page.get_by_role("searchbox", name="Your question")
+    expect(page.get_by_role("button", name="Ask AI")).to_be_enabled()
+    search.fill("Hi!")
+    search.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("Hi! I can help you explore the EU AI Act.")
+    expect(page.get_by_role("heading", name="Source-grounded answers")).to_be_focused()
+
+
 def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
     page = open_page(mobile=True)
     requests = []
