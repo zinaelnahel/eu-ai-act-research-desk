@@ -12,7 +12,7 @@ def test_risk_guide_examples_and_overlapping_duties(open_page):
     page.get_by_role("link", name="Understand AI risk").click()
     guide = page.get_by_role("region", name="Understand AI risk")
     expect(guide.locator("details")).to_have_count(4)
-    guide.get_by_text("High risk", exact=True).press("Enter")
+    guide.locator(".risk-high summary").press("Enter")
     expect(guide.get_by_role("link", name="Read Annex III")).to_be_visible()
     expect(guide.get_by_text("both sets of rules can apply", exact=False)).to_be_visible()
     expect(guide.get_by_role("link", name="Chatbot disclosure")).to_have_attribute(
