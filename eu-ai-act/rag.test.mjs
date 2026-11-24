@@ -1,7 +1,7 @@
 import {strict as assert} from 'node:assert';
 import {test} from 'node:test';
 import {answerRag, scoreLegalClaims, verifiedContext} from './rag.mjs';
-import {cases, feedbackCases, retrievalFeedbackCases, boundaryFeedbackCases, starterCases, semanticCases, scoreRag} from './rag-eval.mjs';
+import {cases, feedbackCases, retrievalFeedbackCases, boundaryFeedbackCases, starterCases, semanticCases, scoreRag, safeguardsOutcomes} from './rag-eval.mjs';
 import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 import {createAnswerHandler} from '../api/answer.mjs';
@@ -136,6 +136,32 @@ test('hosted smoke status uses the latest expanded run on main and preserves fai
   assert.deepEqual(await (await handler(request)).json(), {latest: null});
   const unavailable = createSmokeStatusHandler(async () => new Response(null, {status: 429}));
   assert.equal((await unavailable(request)).status, 503);
+});
+
+test('safeguards diagnostics distinguish recovery and fallback without draft text', async () => {
+  const fixture = semanticCases.find(item => item.id === 'chatbot-disclosure-safeguards');
+  const expected = [
+    'art_50-missing-third-party-safeguards',
+    'art_50-missing-public-reporting-limit',
+  ];
+  const run = async mode => {
+    let draftCalls = 0;
+    const result = await answerRag(fixture.question, {complete: async (stage, _, data) => {
+      if (stage === 'review') return {approved: true};
+      const draft = draftFor(fixture, data.passages);
+      draftCalls++;
+      if (mode === 'first-pass' || (mode === 'recovery' && draftCalls === 2)) return draft;
+      draft.claims[0].text = draft.claims[0].text.replace(/ subject to safeguards.+\.$/, '.');
+      return draft;
+    }});
+    return scoreRag(fixture, result);
+  };
+  const [first, recovered, fallback] = await Promise.all(['first-pass', 'recovery', 'fallback'].map(run));
+  assert.deepEqual(recovered.attempts, [{outcome: 'invalid-draft', codes: expected}, {outcome: 'approved'}]);
+  assert.deepEqual(fallback.attempts, Array(2).fill({outcome: 'invalid-draft', codes: expected}));
+  assert.deepEqual(safeguardsOutcomes([first, recovered, fallback]), {
+    firstAttemptPasses: 1, retryRecoveries: 1, finalFallbacks: 1, scoringFailures: 0, requestFailures: 0, missingDiagnostics: 0,
+  });
 });
 
 test('accepts multiple supported claims from different provisions', async () => {

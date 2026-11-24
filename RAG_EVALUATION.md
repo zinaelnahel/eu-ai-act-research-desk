@@ -72,6 +72,12 @@ The Node RAG suite tests 23 supported and altered answer pairs with valid citati
 node eu-ai-act/rag-eval.mjs --hosted starter-smoke.json --weekly-smoke
 ```
 
+The weekly workflow also runs the Article 50 safeguards question three times and uploads a separate diagnostics report. It counts first-attempt passes, retry recoveries, final fallbacks, scoring failures and request failures. Each trial records the outcome and any fixed validation codes for each model attempt. The diagnostics report excludes question and answer text. The API does not log questions or rejected drafts.
+
+```sh
+node eu-ai-act/rag-eval.mjs --hosted safeguards-probe.json --safeguards-probe
+```
+
 - Required provisions, irrelevant citations, verbatim source evidence and abstention in the existing retrieval benchmark.
 - Expected citation IDs and legal terms in generated answers, and zero model calls for out-of-scope questions, individual compliance verdicts, direct browse, unsupported editions and empty input.
 - Server-owned quotes and URLs, unknown source IDs, unsupported numbers, invalid responses, excluded test-only context and rejected review.

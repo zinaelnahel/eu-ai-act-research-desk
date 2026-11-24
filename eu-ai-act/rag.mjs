@@ -130,14 +130,17 @@ function normalizedNumbers(value) {
   return (value.match(/\d+(?:[.,]\d+)*/g) || []).map(number => number.replaceAll(',', ''));
 }
 
-function missingDisclosureSafeguards(claims) {
+function disclosureViolations(claims) {
   const applicable = claims.filter(({sourceId, quote}) =>
     sourceId === 'art_50' && /safeguards for the rights and freedoms of third parties/i.test(quote));
   const text = applicable.map(claim => claim.text).join(' ');
-  return /criminal.offen|law.enforcement/i.test(text) &&
-    (!(/safeguard/i.test(text) && /third.part/i.test(text) && /public.{0,60}report|report.{0,60}public/i.test(text)) ||
-      /\b(?:without|no need for) (?:any )?safeguards?\b/i.test(text) ||
-      /\bonly if [^.]{0,70}\bare available for public reporting\b/i.test(text));
+  if (!/criminal.offen|law.enforcement/i.test(text)) return [];
+  const violations = [];
+  if (!(/safeguard/i.test(text) && /third.part/i.test(text))) violations.push('art_50-missing-third-party-safeguards');
+  if (!/public.{0,60}report|report.{0,60}public/i.test(text)) violations.push('art_50-missing-public-reporting-limit');
+  if (/\b(?:without|no need for) (?:any )?safeguards?\b/i.test(text)) violations.push('art_50-negated-safeguards');
+  if (/\bonly if [^.]{0,70}\bare available for public reporting\b/i.test(text)) violations.push('art_50-reversed-public-reporting-limit');
+  return violations;
 }
 
 function legalViolations(claims, requirements) {
@@ -145,12 +148,11 @@ function legalViolations(claims, requirements) {
   for (const {id, paragraph, patterns, forbidden = []} of requirements) {
     const text = claims.filter(claim => claim.passageId === id && (!paragraph || claim.quote.startsWith(paragraph + '. ')))
       .map(claim => claim.text).join(' ');
-    if (patterns.some(pattern => !pattern.test(text)) || forbidden.some(pattern => pattern.test(text))) {
-      violations.push(id + (paragraph ? ' paragraph ' + paragraph : ''));
-    }
+    const rule = paragraph && !id.endsWith('_p' + paragraph) ? id + '_p' + paragraph : id;
+    if (patterns.some(pattern => !pattern.test(text))) violations.push(rule + '-missing-required-wording');
+    if (forbidden.some(pattern => pattern.test(text))) violations.push(rule + '-contradictory-wording');
   }
-  if (missingDisclosureSafeguards(claims)) violations.push('art_50 criminal-offence safeguards');
-  return violations;
+  return [...violations, ...disclosureViolations(claims)];
 }
 
 export function scoreLegalClaims(claims, context) {
@@ -161,24 +163,26 @@ export function scoreLegalClaims(claims, context) {
 
 function validateDraft(draft, context) {
   if (!keysAre(draft, ['claims']) || !Array.isArray(draft.claims) ||
-    draft.claims.length > MAX_CLAIMS) return null;
+    draft.claims.length > MAX_CLAIMS) return {code: 'invalid-draft-shape'};
   const passages = new Map(context.map(item => [item.id, item]));
   const seen = new Set();
   const claims = [];
   for (const claim of draft.claims) {
     if (!keysAre(claim, ['text', 'sourceId']) || typeof claim.text !== 'string' ||
-      !claim.text.trim() || claim.text.length > MAX_CLAIM_CHARS || seen.has(claim.text.trim())) return null;
+      !claim.text.trim()) return {code: 'invalid-claim-shape'};
+    if (claim.text.length > MAX_CLAIM_CHARS) return {code: 'claim-too-long'};
+    if (seen.has(claim.text.trim())) return {code: 'duplicate-claim'};
     const source = passages.get(claim.sourceId);
-    if (!source) return null;
+    if (!source) return {code: 'unknown-source'};
     if (source.id === 'art_5' && /\bexcept\b/i.test(source.quote) &&
-        /\b(?:is|are) (?:allowed|permitted)\b[\s\S]*\b(?:except|unless)\b/i.test(claim.text)) return null;
+        /\b(?:is|are) (?:allowed|permitted)\b[\s\S]*\b(?:except|unless)\b/i.test(claim.text)) return {code: 'art_5-contradictory-wording'};
     const evidenceNumbers = new Set(normalizedNumbers(source.quote));
-    if (normalizedNumbers(claim.text).some(number => !evidenceNumbers.has(number))) return null;
+    if (normalizedNumbers(claim.text).some(number => !evidenceNumbers.has(number))) return {code: 'unsupported-number'};
     seen.add(claim.text.trim());
     claims.push({text: claim.text.trim(), passageId: source.id, sourceId: source.sourceId, quote: source.quote,
       label: source.label, url: source.url, ...(source.clause ? {clause: source.clause} : {})});
   }
-  return claims;
+  return {claims};
 }
 
 export async function answerRag(question, {complete, retrieve = desk.ask, documents = desk.documents}) {
@@ -186,9 +190,10 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
   const retrieval = retrieve(question);
   const context = verifiedContext(retrieval, documents);
   let modelCalls = 0;
+  const attempts = [];
   const result = (status, claims = [], reason) => ({
     status, claims, reason, retrievedIds: [...new Set(context.map(item => item.sourceId))], edition: corpus.version,
-    metrics: {modelCalls, latencyMs: Math.round(performance.now() - started)},
+    metrics: {modelCalls, latencyMs: Math.round(performance.now() - started), attempts},
   });
   if (retrieval.kind !== 'evidence' && retrieval.kind !== 'matches') return result('abstained');
   if (!context.length) return result('abstained');
@@ -219,24 +224,37 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
     const legalGuidance = requirements.map(rule => rule.guidance || '').join('');
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
+      const diagnostic = {outcome: 'draft-provider-error'};
+      attempts.push(diagnostic);
       modelCalls++;
       const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters. Include dates or quantities supported by the excerpt, and omit unnecessary cross-references.' : '';
       const draft = await complete('draft', draftInstructions + legalGuidance + retry, {question, passages}, draftSchema);
-      const claims = validateDraft(draft, context);
-      const missingLegalCondition = claims?.length && legalViolations(claims, requirements).length;
-      const missingCompensation = compensationQuestion && claims?.length &&
-        !claims.some(claim => claim.sourceId === 'art_85' && /\bcompensation\b/i.test(claim.text));
-      if (!claims || missingLegalCondition || missingCompensation || (gpaiOverview && claims.length && !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id)))) {
+      const {claims, code} = validateDraft(draft, context);
+      const codes = code ? [code] : claims.length ? legalViolations(claims, requirements) : [];
+      if (claims?.length && compensationQuestion &&
+        !claims.some(claim => claim.sourceId === 'art_85' && /\bcompensation\b/i.test(claim.text))) codes.push('art_85-missing-compensation-distinction');
+      if (claims?.length && gpaiOverview &&
+        !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id))) codes.push('missing-gpai-obligation-source');
+      if (codes.length) {
         reason = 'invalid-draft';
+        Object.assign(diagnostic, {outcome: reason, codes});
         continue;
       }
-      if (!claims.length) return result('abstained', [], 'empty-draft');
+      if (!claims.length) {
+        diagnostic.outcome = 'empty-draft';
+        return result('abstained', [], 'empty-draft');
+      }
+      diagnostic.outcome = 'review-provider-error';
       modelCalls++;
       const review = await complete('review', instructions.review, {
         question, passages, claims: claims.map(({text, passageId, quote}) => ({text, sourceId: passageId, quote})),
       }, reviewSchema);
-      if (keysAre(review, ['approved']) && review.approved === true) return result('answered', claims.map(({passageId, ...claim}) => claim));
+      if (keysAre(review, ['approved']) && review.approved === true) {
+        diagnostic.outcome = 'approved';
+        return result('answered', claims.map(({passageId, ...claim}) => claim));
+      }
       reason = 'review-rejected';
+      diagnostic.outcome = reason;
     }
     return result('rejected', [], reason);
   } catch {

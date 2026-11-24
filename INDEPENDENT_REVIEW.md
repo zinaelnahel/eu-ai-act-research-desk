@@ -4,10 +4,10 @@
 
 ## Prepare a blind review
 
-Export the prompts without the repository’s expected provisions:
+Export the prompts with neutral IDs for the reviewer. The export contains only the IDs and questions.
 
 ```sh
-node -e "console.log(JSON.stringify(require('./eu-ai-act/challenge-cases.json').map(({name,question})=>({id:name,question})),null,2))" > reviewer-prompts.json
+node -e "const prompts = require('./eu-ai-act/challenge-cases.json').map(({question}, index) => ({id: index + 1, question})); require('node:fs').writeFileSync('reviewer-prompts.json', JSON.stringify(prompts, null, 2))"
 ```
 
 1. Give the reviewer the prompts, the official edition, and the blank scoring fields below. Ask them to write a reference conclusion, required provisions and material qualifications without seeing the desk’s answers or author labels. Ask them to add at least three original difficult questions, including a cross-provision case and an ambiguous fact pattern.

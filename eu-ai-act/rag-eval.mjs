@@ -68,7 +68,7 @@ export function scoreRag(fixture, result) {
       sourceIds.every(id => allowed.has(id) && retrievedIds.includes(id)) && methodPassed
     : status === 'abstained' && claims.length === 0 && metrics.modelCalls === 0;
   return {case: fixture.id, expectedSources: required, status, answerMode: result.answerMode, reason: result.reason, sourceIds, missing, contradictions, invalidCitations, legalViolations,
-    passed, latencyMs: metrics.latencyMs, modelCalls: metrics.modelCalls};
+    passed, latencyMs: metrics.latencyMs, modelCalls: metrics.modelCalls, attempts: metrics.attempts};
 }
 
 export async function runLive(complete, fixtures = cases) {
@@ -82,7 +82,7 @@ export async function runLive(complete, fixtures = cases) {
   return results;
 }
 
-async function runHosted(fixtures) {
+async function runHosted(fixtures, {includeClaims = true} = {}) {
   const url = 'https://eu-ai-act-research-desk.vercel.app/api/answer';
   try {
     const ready = await fetch(url, {signal: AbortSignal.timeout(10_000)});
@@ -100,8 +100,9 @@ async function runHosted(fixtures) {
         body: JSON.stringify({question: fixture.question}), signal: AbortSignal.timeout(58_000),
       });
       const body = response.ok ? await response.json() : null;
-      row = response.ok ? {...scoreRag(fixture, body), generatedClaims: body.claims.map(claim => claim.text)}
+      row = response.ok ? scoreRag(fixture, body)
         : {case: fixture.id, reason: 'http-' + response.status, passed: fixture.id === 'empty' && response.status === 400};
+      if (response.ok && includeClaims) row.generatedClaims = body.claims.map(claim => claim.text);
       row.http = response.status;
     } catch (error) {
       row = {case: fixture.id, reason: error.name === 'TimeoutError' ? 'request-timeout' : 'invalid-or-unavailable-response', passed: false};
@@ -112,26 +113,47 @@ async function runHosted(fixtures) {
   return results;
 }
 
+export function safeguardsOutcomes(results) {
+  const counts = {firstAttemptPasses: 0, retryRecoveries: 0, finalFallbacks: 0, scoringFailures: 0, requestFailures: 0, missingDiagnostics: 0};
+  for (const row of results) {
+    if (!row.status) counts.requestFailures++;
+    else if (row.status !== 'answered') counts.finalFallbacks++;
+    else if (!row.passed) counts.scoringFailures++;
+    else if (row.attempts?.at(-1)?.outcome !== 'approved') counts.missingDiagnostics++;
+    else if (row.attempts.length > 1) counts.retryRecoveries++;
+    else counts.firstAttemptPasses++;
+  }
+  return counts;
+}
+
 async function main() {
   const hosted = process.argv[2] === '--hosted';
   const complete = createProvider();
   if (!hosted && (!complete || !process.env.EU_AI_ACT_OLLAMA_MODEL || process.env.VERCEL)) {
     throw new Error('Start Ollama and set EU_AI_ACT_OLLAMA_MODEL before running the local evaluation.');
   }
-  const fixtures = process.argv.includes('--weekly-smoke') ? [...starterCases, ...semanticCases.filter(fixture =>
+  const safeguardsProbe = process.argv.includes('--safeguards-probe');
+  const safeguardsFixture = semanticCases.find(fixture => fixture.id === 'chatbot-disclosure-safeguards');
+  const fixtures = safeguardsProbe ? Array(3).fill(safeguardsFixture)
+    : process.argv.includes('--weekly-smoke') ? [...starterCases, ...semanticCases.filter(fixture =>
     !starterCases.some(starter => starter.id === fixture.id))]
     : process.argv.includes('--boundary-feedback') ? [...retrievalFeedbackCases.slice(0, 1), ...boundaryFeedbackCases]
     : process.argv.includes('--retrieval-feedback') ? retrievalFeedbackCases
     : process.argv.includes('--feedback') ? feedbackCases
     : process.argv.includes('--starters') ? starterCases : cases;
-  const results = hosted ? await runHosted(fixtures) : await runLive(complete, fixtures);
+  const results = hosted ? await runHosted(fixtures, {includeClaims: !safeguardsProbe}) : await runLive(complete, fixtures);
   const report = {mode: hosted ? 'production-http' : 'local-ollama', checkedAt: new Date().toISOString(),
     model: hosted ? undefined : process.env.EU_AI_ACT_OLLAMA_MODEL,
     passed: results.filter(row => row.passed).length, total: results.length, results};
+  if (safeguardsProbe) {
+    report.results = results.map(({generatedClaims, ...row}, index) => ({trial: index + 1, ...row}));
+    report.outcomes = safeguardsOutcomes(results);
+    console.log(JSON.stringify(report.outcomes));
+  }
   const output = process.argv[hosted ? 3 : 2];
   if (output) writeFileSync(output, JSON.stringify(report, null, 2) + '\n');
   console.log(`${report.passed}/${report.total} RAG scenarios passed.`);
-  if (report.passed !== report.total) process.exitCode = 1;
+  if (report.passed !== report.total || report.outcomes?.missingDiagnostics) process.exitCode = 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
