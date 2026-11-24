@@ -1,0 +1,281 @@
+{
+  "mode": "production-http",
+  "passed": 14,
+  "total": 15,
+  "results": [
+    {
+      "case": "workplace-exception",
+      "expectedSources": [
+        "art_5"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_5"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2191,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "No: AI systems may not be used to infer a natural person’s emotions in workplace areas or education institutions.",
+        "Exception: this prohibition does not apply where the AI system is intended to be put in place or placed on the market for medical reasons or safety reasons."
+      ],
+      "http": 200
+    },
+    {
+      "case": "chatbot-disclosure",
+      "expectedSources": [
+        "art_50"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_50"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2174,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Providers must inform people interacting directly with an AI system that they are interacting with AI, unless that is obvious from the perspective of a reasonably well-informed, observant and circumspect person in context.",
+        "This disclosure duty does not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, provided there are appropriate safeguards for third parties’ rights and freedoms, unless those systems are available for the public to report a criminal offence.",
+        "The notice must be clear, distinguishable, and accessible, and be given no later than the first interaction or exposure."
+      ],
+      "http": 200
+    },
+    {
+      "case": "literacy-level",
+      "expectedSources": [
+        "art_4"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_4"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1580,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "No. The obligation is to support AI literacy development based on staff or other persons’ technical knowledge, experience, education and training, and the context of use; it does not require providers or deployers to guarantee any specific level of AI literacy for any individual."
+      ],
+      "http": 200
+    },
+    {
+      "case": "complaints",
+      "expectedSources": [
+        "art_85"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_85"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1571,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Any natural or legal person who has grounds to consider that there has been an infringement of the Regulation may submit a complaint to the relevant market surveillance authority."
+      ],
+      "http": 200
+    },
+    {
+      "case": "hiring",
+      "expectedSources": [
+        "anx_III"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "anx_III",
+        "art_6"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2462,
+      "modelCalls": 3,
+      "generatedClaims": [
+        "The Act lists AI for recruitment or selection of people, including filtering job applications and evaluating candidates, in the employment, workers’ management, and access to self-employment category.",
+        "These systems are treated as high risk because AI systems listed in the Annex are considered high-risk."
+      ],
+      "http": 200
+    },
+    {
+      "case": "deepfake",
+      "expectedSources": [
+        "art_50"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_50"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2317,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Baseline rule: deployers of an AI system that generates or manipulates image, audio or video content constituting a deep fake must disclose that the content has been artificially generated or manipulated.",
+        "Exception: this disclosure duty does not apply where the use is authorised by law to detect, prevent, investigate or prosecute a criminal offence; if the deep-fake content is part of an evidently artistic, creative, satirical, fictional or analogous work or programme, disclosure is limited to stating that such generated or manipulated content exists, in an appropriate manner that does not hamper display or enjoyment.",
+        "For text published to inform the public on matters of public interest, deployers must disclose that the text has been artificially generated or manipulated, unless the use is authorised by law to detect, prevent, investigate or prosecute criminal offences or the content has undergone human review or editorial control and a natural or legal person holds editorial responsibility."
+      ],
+      "http": 200
+    },
+    {
+      "case": "gpai-obligations",
+      "expectedSources": [
+        "art_53",
+        "art_55"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_53",
+        "art_55"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2563,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "GPAI providers must draw up and keep up to date technical documentation for the model, including training and testing processes and evaluation results, and provide it on request to the AI Office and national competent authorities.",
+        "They must also draw up, keep up to date, and make available documentation for providers integrating the model, put in place a copyright-compliance policy, and make publicly available a sufficiently detailed summary of the content used for training.",
+        "For GPAI models with systemic risk, providers must also perform state-of-the-art model evaluation and adversarial testing, assess and mitigate systemic risks, report serious incidents without undue delay, and ensure adequate cybersecurity protection."
+      ],
+      "http": 200
+    },
+    {
+      "case": "school-exception",
+      "expectedSources": [
+        "art_5"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_5"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1992,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Baseline rule: AI systems may not be used to infer the emotions of a natural person in education institutions.",
+        "Exception: that prohibition does not apply where the AI system is intended to be put in place or on the market for medical reasons.",
+        "Exception: that prohibition does not apply where the AI system is intended to be put in place or on the market for safety reasons."
+      ],
+      "http": 200
+    },
+    {
+      "case": "open-source-exception",
+      "expectedSources": [
+        "art_53"
+      ],
+      "status": "rejected",
+      "reason": "review-rejected",
+      "sourceIds": [],
+      "missing": [
+        "open.source|free.{0,15}open",
+        "licen[cs]",
+        "technical documentation",
+        "integrat",
+        "copyright",
+        "training",
+        "systemic.risk"
+      ],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": false,
+      "latencyMs": 5601,
+      "modelCalls": 4,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "out-of-scope",
+      "expectedSources": [],
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 3,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "edition",
+      "expectedSources": [],
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 0,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "unknown-provision",
+      "expectedSources": [],
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "browse",
+      "expectedSources": [],
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "individual-verdict",
+      "expectedSources": [],
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "empty",
+      "reason": "http-400",
+      "passed": true,
+      "http": 400
+    }
+  ]
+}

@@ -41,7 +41,8 @@
       <h3 id="generated-answer-evaluation">Generated answer evaluation</h3>
       <p>The RAG benchmark checks nine answerable questions and six out-of-scope, abstention or validation inputs. It checks legal qualifiers and required citations, including claims that must be supported by different provisions. Playwright exercises a keyboard-operated answer, its expandable quotation and the evidence fallback.</p>
       <p>The local Qwen3 4B run passed 10 of 12 cases: four of six answerable cases and six of six abstentions. The complaint answer omitted the authority and the deepfake question fell back to the evidence.</p>
-      <p>The deployed OpenAI model passed 15 of 15 cases in the latest smoke run: nine cited answers, five abstentions and empty input validation.</p>
+      <p>The latest hosted run passed 14 of 15 cases, including all three starter questions. The open-source exemption question fell back to its retrieved evidence after review. A previous run passed 15 of 15.</p>
+      <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml">Weekly live starter checks</a> · <a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/eu-ai-act/rag-starter-report.json">Latest per-case results</a></p>
       <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/RAG_EVALUATION.md">Read the generated-answer findings and reproduction steps</a></p>
       <p><a href="./architecture.html">See the architecture infographic</a> · <a href="./architecture.pdf" download>Download the one-page PDF</a></p>
       <h3>Visual regression and static delivery</h3>
