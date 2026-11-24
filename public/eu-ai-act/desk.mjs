@@ -5,9 +5,11 @@ const form = byId('question-form');
 const question = byId('question');
 const status = byId('status');
 const answer = byId('answer');
+const generate = byId('generate');
 const kind = byId('kind');
 const provision = byId('provision');
 const examples = [...document.querySelectorAll('.examples button')];
+let modelRequest;
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -36,6 +38,53 @@ function renderEvidence(item, doc, showContext = true) {
   answer.append(section);
 }
 
+function renderGenerated(claims) {
+  const section = element('section', '', 'generated-answer');
+  section.append(element('h3', 'AI-generated research answer'));
+  const list = element('ol');
+  for (const claim of claims) {
+    const item = element('li', claim.text + ' ');
+    item.append(sourceLink(claim.label, claim.url));
+    const details = element('details');
+    details.append(element('summary', 'Read supporting quote'), element('p', claim.quote));
+    item.append(details);
+    list.append(item);
+  }
+  section.append(list);
+  answer.prepend(section);
+}
+
+async function requestGeneratedAnswer(text) {
+  const controller = new AbortController();
+  modelRequest = controller;
+  status.textContent = 'Preparing a cited answer. Retrieved evidence is shown below.';
+  try {
+    const response = await fetch('/api/answer', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({question: text}),
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(52_000)]),
+    });
+    if (!response.ok) throw new Error('Generation unavailable');
+    const result = await response.json();
+    if (modelRequest !== controller) return;
+    if (result.status === 'answered' && result.claims.length) {
+      renderGenerated(result.claims);
+      status.textContent = 'Generated answer with supporting citations. Check the official wording before relying on it.';
+    } else {
+      status.textContent = 'A supported generated answer was unavailable. Review the retrieved evidence below.';
+    }
+  } catch {
+    if (modelRequest === controller) status.textContent = 'Generation is temporarily unavailable. Review the retrieved evidence below.';
+  } finally {
+    if (modelRequest === controller) modelRequest = undefined;
+  }
+}
+
+fetch('/api/answer', {signal: AbortSignal.timeout(3500)})
+  .then(response => response.ok ? response.json() : null)
+  .then(settings => { if (settings?.available) generate.hidden = false; })
+  .catch(() => {});
+
 try {
   const response = await fetch('./corpus.json');
   if (!response.ok) throw new Error('Corpus response failed');
@@ -45,6 +94,7 @@ try {
   byId('official-source').href = corpus.currentSource;
   status.textContent = 'Ask a question above or select a provision to read.';
   byId('ask').disabled = false;
+  generate.disabled = false;
   for (const button of examples) {
     button.disabled = false;
     button.addEventListener('click', () => {
@@ -55,6 +105,8 @@ try {
 
   form.addEventListener('submit', event => {
     event.preventDefault();
+    modelRequest?.abort();
+    modelRequest = undefined;
     provision.value = '';
     const result = desk.ask(question.value);
     answer.replaceChildren();
@@ -67,6 +119,9 @@ try {
     for (const item of result.evidence) renderEvidence(item, desk.documents.get(item.id));
     if (result.kind === 'version') answer.append(sourceLink('Check for current versions on EUR-Lex', 'https://eur-lex.europa.eu/eli/reg/2024/1689'));
     byId('answer-title').focus();
+    if (event.submitter === generate && ['evidence', 'matches'].includes(result.kind)) {
+      void requestGeneratedAnswer(question.value);
+    }
   });
 
   function populate() {
@@ -80,6 +135,8 @@ try {
   provision.addEventListener('change', () => {
     const doc = desk.documents.get(provision.value);
     if (!doc) return;
+    modelRequest?.abort();
+    modelRequest = undefined;
     status.textContent = 'Browsing the source edition.';
     answer.replaceChildren();
     renderEvidence({...doc, quote: doc.blocks.join('\n\n')}, doc, false);

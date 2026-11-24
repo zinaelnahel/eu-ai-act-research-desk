@@ -2,7 +2,7 @@
 
 [Open the desk](https://eu-ai-act-research-desk.vercel.app/) · [Try learning mode](https://eu-ai-act-research-desk.vercel.app/learn.html) · [Read the evaluation](https://eu-ai-act-research-desk.vercel.app/evaluation.html)
 
-Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. The desk runs in the browser. Direct lookups resolve provision IDs, common questions use reviewed mappings, and other questions use weighted passage retrieval. Every result includes an extract from the law and a link to its official source. For open-ended questions the desk distinguishes possible source matches from reviewed answers.
+Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. Direct lookups resolve provision IDs, common questions use reviewed mappings, and other questions use weighted passage retrieval. The evidence view runs in the browser. With a model configured, the desk can also draft a cited answer from retrieved passages.
 
 Learning mode has 12 topics spanning the Act’s chapters, 27 sourced scenarios and a mixed challenge. Read the explanation and linked provision after each decision. Chapter completions, best scores and XP are saved in browser storage on the current device.
 
@@ -11,7 +11,25 @@ Learning mode has 12 topics spanning the Act’s chapters, 27 sourced scenarios 
 - [27 July 2026 consolidated English edition](https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng), including 119 articles and 14 annexes.
 - [Original Official Journal edition](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng) and [2026 amending regulation](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng), which supply 227 recitals.
 
-The snapshot is pinned. Questions about newer versions are redirected to EUR-Lex. The consolidated edition is a documentation tool without legal effect. The authentic texts are published in the Official Journal. The desk supplies evidence for research, uses no live language model, and does not decide how the law applies to a particular system.
+The snapshot is pinned. Questions about newer versions are redirected to EUR-Lex. The consolidated edition is a documentation tool without legal effect. The authentic texts are published in the Official Journal. The desk supplies evidence for research and leaves determinations about individual systems to qualified professionals.
+
+## Cited answer generation
+
+The server retrieves from the same pinned corpus used by the evidence view. It gives the model verified passages and their titles, checks selected source IDs, attaches the original quotations and official links itself, then asks the model to review the draft for grounding and material exceptions. Unsupported or unreviewed drafts fall back to the evidence view. Both passes use the configured model, so the review can repeat the drafting model's mistakes.
+
+With Ollama running locally and the model installed, run these commands from the repository root:
+
+```sh
+export EU_AI_ACT_OLLAMA_MODEL=qwen3:4b
+node eu-ai-act/serve.mjs
+# Open http://127.0.0.1:8080 and select Generate cited answer.
+# In a separate terminal with the same environment variable:
+node eu-ai-act/rag-eval.mjs rag-live-results.json
+```
+
+In PowerShell use `$env:EU_AI_ACT_OLLAMA_MODEL = 'qwen3:4b'`. On Vercel, the API can use a structured-output model through server-side `EU_AI_ACT_OPENAI_KEY` and `EU_AI_ACT_OPENAI_MODEL`. Without a configured provider, the hosted desk serves its evidence and quiz features.
+
+[Read the generated-answer evaluation](RAG_EVALUATION.md) for the offline regression checks, local model results and known failures.
 
 ## Run and verify
 

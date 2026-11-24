@@ -2,5 +2,8 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "",
   "installCommand": "",
-  "outputDirectory": "public/eu-ai-act"
+  "outputDirectory": "public/eu-ai-act",
+  "functions": {
+    "api/answer.mjs": {"includeFiles": "public/eu-ai-act/corpus.json", "maxDuration": 60}
+  }
 }

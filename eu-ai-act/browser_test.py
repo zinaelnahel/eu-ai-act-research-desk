@@ -7,6 +7,46 @@ def assert_no_page_overflow(page):
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
 
 
+def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
+    page = open_page(mobile=True)
+    requests = []
+    url = "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_5"
+
+    def answer(route):
+        if route.request.method == "GET":
+            route.fulfill(json={"available": True})
+            return
+        requests.append(route.request.post_data_json["question"])
+        if len(requests) == 1:
+            route.fulfill(json={"status": "answered", "claims": [{
+                "text": "The ban includes workplace emotion inference.",
+                "label": "Article 5", "url": url, "quote": "medical or safety reasons",
+            }]})
+        else:
+            route.fulfill(json={"status": "rejected", "claims": []})
+
+    page.route("**/api/answer", answer)
+    page.reload()
+    search = page.get_by_role("searchbox", name="Your question")
+    generate = page.get_by_role("button", name="Generate cited answer")
+    expect(generate).to_be_enabled()
+    search.fill("Is emotion recognition allowed at work?")
+    generate.press("Enter")
+    generated = page.locator(".generated-answer")
+    expect(generated.get_by_role("link", name="Article 5")).to_have_attribute("href", url)
+    generated.get_by_text("Read supporting quote").press("Enter")
+    expect(generated.get_by_text("medical or safety reasons")).to_be_visible()
+    assert_no_page_overflow(page)
+    generate.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("supported generated answer was unavailable")
+    expect(generated).to_have_count(0)
+    expect(page.get_by_role("link", name="Read the consolidated provision")).to_have_attribute("href", url)
+    search.fill("What is the capital of Canada?")
+    generate.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("did not find enough")
+    assert len(requests) == 2
+
+
 def test_desktop_keyboard_question_abstention_and_annex_browse(open_page):
     page = open_page()
     search = page.get_by_role("searchbox", name="Your question")

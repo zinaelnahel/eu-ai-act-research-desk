@@ -1,0 +1,167 @@
+{
+  "mode": "local-ollama",
+  "model": "qwen3:4b",
+  "passed": 10,
+  "total": 12,
+  "results": [
+    {
+      "case": "workplace-exception",
+      "expectedSource": "art_5",
+      "status": "answered",
+      "sourceIds": [
+        "art_5"
+      ],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 1938,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Emotion recognition is prohibited at work except when the AI system is intended for medical or safety purposes."
+      ]
+    },
+    {
+      "case": "chatbot-disclosure",
+      "expectedSource": "art_50",
+      "status": "answered",
+      "sourceIds": [
+        "art_50"
+      ],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 2115,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "A chatbot must disclose it is AI when it interacts directly with natural persons, unless the disclosure is obvious to a reasonably well-informed person."
+      ]
+    },
+    {
+      "case": "literacy-level",
+      "expectedSource": "art_4",
+      "status": "answered",
+      "sourceIds": [
+        "art_4"
+      ],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 2584,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "AI literacy development should be tailored to individual technical knowledge, experience, education, training, and context of AI system use.",
+        "AI literacy does not require providers or deployers to guarantee any specific level of AI literacy for any individual."
+      ]
+    },
+    {
+      "case": "complaints",
+      "expectedSource": "art_85",
+      "status": "answered",
+      "sourceIds": [
+        "art_85"
+      ],
+      "missing": [
+        "market surveillance authorit"
+      ],
+      "passed": false,
+      "latencyMs": 1768,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Any natural or legal person having grounds to consider that there has been an infringement of the provisions of this Regulation may file a complaint"
+      ]
+    },
+    {
+      "case": "hiring",
+      "expectedSource": "anx_III",
+      "status": "answered",
+      "sourceIds": [
+        "anx_III"
+      ],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 2626,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "The Act lists AI for screening candidates under high-risk AI systems in Annex III, section 4(a).",
+        "The Act also lists AI systems that make decisions affecting employment terms as high-risk AI systems in Annex III, section  4(b)."
+      ]
+    },
+    {
+      "case": "deepfake",
+      "expectedSource": "art_50",
+      "status": "rejected",
+      "sourceIds": [],
+      "missing": [
+        "disclos",
+        "artistic|satiri|creative"
+      ],
+      "passed": false,
+      "latencyMs": 2936,
+      "modelCalls": 1,
+      "generatedClaims": []
+    },
+    {
+      "case": "out-of-scope",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 9,
+      "modelCalls": 0,
+      "generatedClaims": []
+    },
+    {
+      "case": "edition",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 0,
+      "modelCalls": 0,
+      "generatedClaims": []
+    },
+    {
+      "case": "unknown-provision",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 1,
+      "modelCalls": 0,
+      "generatedClaims": []
+    },
+    {
+      "case": "browse",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 2,
+      "modelCalls": 0,
+      "generatedClaims": []
+    },
+    {
+      "case": "individual-verdict",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 4,
+      "modelCalls": 0,
+      "generatedClaims": []
+    },
+    {
+      "case": "empty",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "passed": true,
+      "latencyMs": 0,
+      "modelCalls": 0,
+      "generatedClaims": []
+    }
+  ]
+}

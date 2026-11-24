@@ -27,6 +27,9 @@ h3 { font-size: 1.25rem; }
 form { margin-top: 26px; }
 label { display: block; font-size: .88rem; font-weight: 650; margin-bottom: 5px; }
 .question-row { display: flex; max-width: 780px; gap: 8px; }
+.generate-answer { margin-top: 8px; }
+.generated-answer { border-left: 3px solid #446db0; padding-left: 16px; }
+.generated-answer li + li { margin-top: 12px; }
 input, select, button { font: inherit; border-radius: 4px; }
 input, select { min-height: 46px; border: 1px solid #79889a; color: inherit; background: #fff; padding: 10px 12px; }
 input { flex: 1; min-width: 0; }

@@ -5,11 +5,15 @@ on:
     paths:
       - 'public/eu-ai-act/**'
       - 'eu-ai-act/**'
+      - 'api/**'
+      - 'vercel.json'
       - '.github/workflows/eu-ai-act.yml'
   pull_request:
     paths:
       - 'public/eu-ai-act/**'
       - 'eu-ai-act/**'
+      - 'api/**'
+      - 'vercel.json'
       - '.github/workflows/eu-ai-act.yml'
   workflow_dispatch:
 
@@ -26,8 +30,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify corpus, report generation and learning progress
-        run: node --test eu-ai-act/*.test.mjs
+      - name: Verify corpus, learning progress and RAG contracts
+        run: node --test --test-reporter=spec --test-reporter=junit --test-reporter-destination=stdout --test-reporter-destination=node-results.xml eu-ai-act/*.test.mjs
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -59,6 +63,7 @@ jobs:
           path: |
             public/eu-ai-act/evaluation.json
             pytest-results.xml
+            node-results.xml
       - name: Upload visual and performance evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,0 +1,87 @@
+[
+  {
+    "id": "workplace-exception",
+    "question": "Is emotion recognition allowed at work?",
+    "source": "art_5",
+    "phrases": [
+      "at work|workplace|workers?",
+      "prohibit|ban|not (allowed|permitted)",
+      "medical",
+      "safety"
+    ],
+    "draft": "The Act prohibits AI used to infer emotions at work, with an exception for intended medical or safety uses."
+  },
+  {
+    "id": "chatbot-disclosure",
+    "question": "When must a chatbot disclose it is AI?",
+    "source": "art_50",
+    "phrases": [
+      "inform|disclos|notifi",
+      "obvious"
+    ],
+    "draft": "Providers generally must inform people they are interacting with AI unless that is obvious in context."
+  },
+  {
+    "id": "literacy-level",
+    "question": "Does AI literacy require everyone to reach the same level?",
+    "source": "art_4",
+    "phrases": [
+      "does not|do not|need not|not require|no specific|no uniform|rather than requir",
+      "literacy"
+    ],
+    "draft": "Providers and deployers must support AI literacy, but they need not guarantee a specific literacy level for each person."
+  },
+  {
+    "id": "complaints",
+    "question": "Who can file a complaint?",
+    "source": "art_85",
+    "phrases": [
+      "person|organi[sz]ation",
+      "market surveillance authorit"
+    ],
+    "draft": "A person or organisation with grounds to believe the Act was infringed may complain to the relevant market surveillance authority."
+  },
+  {
+    "id": "hiring",
+    "question": "Where does the Act list AI for screening candidates?",
+    "source": "anx_III",
+    "phrases": [
+      "recruit|employment|candidate"
+    ],
+    "draft": "The list of high-risk uses includes AI intended to filter job applications or evaluate candidates under employment and recruitment."
+  },
+  {
+    "id": "deepfake",
+    "question": "What disclosure rules apply to deepfakes?",
+    "source": "art_50",
+    "phrases": [
+      "disclos",
+      "artistic|satiri|creative"
+    ],
+    "draft": "Deployers generally disclose AI-generated or manipulated deepfakes. Evidently artistic or satirical works require appropriate disclosure that does not hamper enjoyment."
+  },
+  {
+    "id": "out-of-scope",
+    "question": "What is the capital of Canada?"
+  },
+  {
+    "id": "edition",
+    "question": "What is the latest version?"
+  },
+  {
+    "id": "unknown-provision",
+    "question": "What is Article 900?"
+  },
+  {
+    "id": "browse",
+    "question": "Article 50"
+  },
+  {
+    "id": "individual-verdict",
+    "question": "Does my product comply with the AI Act?"
+  },
+  {
+    "id": "empty",
+    "question": ""
+  }
+]
