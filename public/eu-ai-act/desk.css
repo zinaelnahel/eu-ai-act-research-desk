@@ -90,6 +90,7 @@ td, th { text-align: left; padding: 10px; border-bottom: 1px solid #ccd4df; vert
 .desk-secondary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 16px; font-size: .86rem; }
 .desk-secondary button, .desk-secondary a { color: #573665; background: transparent; text-decoration: underline; text-underline-offset: 4px; padding: 6px 0; border: 0; }
 .assistant-home .research, .assistant-home aside, .assistant-home .verification { border-color: #ded0e2; border-radius: 18px; }
+.assistant-home .research { align-self: start; }
 .assistant-home .asked-question, .assistant-home .generated-answer { border-color: #795193; background: #f7effa; border-radius: 8px; padding: 14px 18px; }
 @media (max-width: 790px) {
   .assistant-home .intro { grid-template-columns: minmax(0, 1fr); }
