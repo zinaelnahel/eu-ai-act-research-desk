@@ -40,6 +40,16 @@ test('accepts multiple supported claims from different provisions', async () => 
   assert.deepEqual(result.claims.map(claim => claim.sourceId), ['art_53', 'art_55']);
 });
 
+test('evaluation fails a changed citation or an exception with missing safeguards', async () => {
+  const fixture = cases.find(item => item.id === 'chatbot-disclosure');
+  const result = await answerRag(fixture.question, {complete: async (stage, _, data) =>
+    stage === 'draft' ? draftFor(fixture, data.passages) : {approved: true}});
+  const [claim] = result.claims;
+  assert.equal(scoreRag(fixture, {...result, claims: [{...claim, quote: 'Altered excerpt'}]}).invalidCitations, 1);
+  const incomplete = {...claim, text: claim.text + ' Systems authorised to investigate criminal offences are exempt.'};
+  assert.equal(scoreRag(fixture, {...result, claims: [incomplete]}).passed, false);
+});
+
 test('rejects altered quotations, unknown source IDs, and unsupported numbers before review', async () => {
   for (const alteration of [
     {quote: 'A synthetic placeholder'}, {sourceId: 'unknown'}, {text: 'There are 123 exceptions.'},
