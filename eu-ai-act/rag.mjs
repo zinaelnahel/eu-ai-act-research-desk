@@ -29,9 +29,10 @@ const openSourceGuidance = ' For the open-source exemption use three short claim
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
 
 const legalRequirements = [
-  {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /(?:exclud|except).{0,40}(?:point|section|item)?\s*(?:2|two)\b/i,
-    /legal effects?/i, /similarly significant/i, /adverse/i, /health/i, /safety/i, /fundamental rights/i],
-  guidance: ' For the explanation right preserve every condition: affected person, deployer decision based on Annex III high-risk AI outputs excluding Annex III point 2, legal effects or similarly significant impact, and perceived adverse impact on health, safety or fundamental rights. State what the deployer must explain.'},
+  {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /high.risk/i,
+    /(?:exclu|except|does not (?:include|cover|apply)).{0,40}(?:point|section|item)\s*(?:2|two)\b|(?:point|section|item)\s*(?:2|two)\b.{0,30}(?:excluded|exception)/i,
+    /legal effects?/i, /similarly significant/i, /adverse|negativ/i, /health/i, /safety/i, /fundamental rights/i],
+  guidance: ' Use up to three short claims citing art_86. First: the right concerns a deployer decision based on an Annex III high-risk AI system, excluding point two of Annex III. Second: the decision must produce legal effects or similarly significant effects that the affected person considers adverse to their health, safety or fundamental rights. Third: the affected person can obtain from the deployer a clear and meaningful explanation of the role of AI and the main elements of the decision.'},
   {id: 'art_73', paragraph: 4, patterns: [/(?:10|ten)[ -]days?\b/i, /immediat/i, /causal/i, /suspect/i, /aware/i],
   guidance: ' Cite art_73 for death: report immediately when a causal link is established or suspected, with a ten-day outer limit from awareness. Use art_73_p2 separately for the ordinary fifteen-day outer limit and the immediate-reporting trigger.'},
   {id: 'art_73_p2', paragraph: 2, patterns: [/(?:15|fifteen)[ -]days?\b/i, /immediat/i, /causal/i, /aware/i]},
