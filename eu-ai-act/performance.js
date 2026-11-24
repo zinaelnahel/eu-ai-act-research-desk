@@ -19,7 +19,7 @@ export default function () {
     ['GET', origin + '/corpus.json', null, {tags: {asset: 'corpus'}}],
     ['GET', origin + '/evaluation.json', null, {tags: {asset: 'report'}}],
   ]);
-  check(desk, {'research desk HTML loads': response => response.status === 200 && response.body.includes('Ask the EU AI Act.')});
+  check(desk, {'research desk HTML loads': response => response.status === 200 && response.body.includes('id="question-form"')});
   check(corpus, {'corpus loads with all 360 entries': response => response.status === 200 && response.json('documents').length === 360});
   check(report, {'benchmark JSON is complete': response => response.status === 200 && response.json('results').length === response.json('total')});
 }
