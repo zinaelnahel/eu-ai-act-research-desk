@@ -1,6 +1,6 @@
 import {readFileSync, writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
-import {answerRag, verifiedContext} from './rag.mjs';
+import {answerRag, missingDisclosureSafeguards, verifiedContext} from './rag.mjs';
 import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 
@@ -16,8 +16,7 @@ export function scoreRag(fixture, result) {
     const passage = passages.get(claim.sourceId);
     return !passage || passage.url !== claim.url || passage.label !== claim.label || passage.quote !== claim.quote;
   }).length;
-  if (fixture.id === 'chatbot-disclosure' && /criminal.offen|law.enforcement/i.test(text) &&
-      !(/safeguard/i.test(text) && /public.{0,60}report/i.test(text))) {
+  if (missingDisclosureSafeguards(claims)) {
     missing.push('safeguards and public reporting limitation when discussing criminal-offence systems');
   }
   const passed = fixture.source

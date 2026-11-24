@@ -48,6 +48,11 @@ test('evaluation fails a changed citation or an exception with missing safeguard
   assert.equal(scoreRag(fixture, {...result, claims: [{...claim, quote: 'Altered excerpt'}]}).invalidCitations, 1);
   const incomplete = {...claim, text: claim.text + ' Systems authorised to investigate criminal offences are exempt.'};
   assert.equal(scoreRag(fixture, {...result, claims: [incomplete]}).passed, false);
+  const unsafe = await answerRag(fixture.question, {complete: async (stage) => {
+    assert.equal(stage, 'draft');
+    return {claims: [{sourceId: incomplete.sourceId, text: incomplete.text}]};
+  }});
+  assert.equal(unsafe.status, 'rejected');
 });
 
 test('rejects altered quotations, unknown source IDs, and unsupported numbers before review', async () => {
