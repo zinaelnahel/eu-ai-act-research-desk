@@ -1,6 +1,6 @@
 {
   "mode": "production-http",
-  "passed": 10,
+  "passed": 12,
   "total": 12,
   "results": [
     {
@@ -13,11 +13,11 @@
       "missing": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 2165,
+      "latencyMs": 2351,
       "modelCalls": 2,
       "generatedClaims": [
-        "Baseline rule: AI systems used to infer a natural person’s emotions are prohibited in workplace areas.",
-        "Exception: this is allowed only where the AI system is intended to be placed on the market or put into service for medical or safety reasons."
+        "Baseline rule: using AI systems to infer a natural person’s emotions in workplaces is prohibited.",
+        "Exception: this is allowed only where the AI system is intended to be put in place or put on the market for medical or safety reasons."
       ],
       "http": 200
     },
@@ -31,12 +31,12 @@
       "missing": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 2201,
+      "latencyMs": 3028,
       "modelCalls": 2,
       "generatedClaims": [
-        "A chatbot that is intended to interact directly with natural persons must inform them that they are interacting with an AI system, unless that is obvious to a reasonably well-informed, observant and circumspect person in the given circumstances and context of use.",
-        "This disclosure obligation does not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, but only where appropriate safeguards protect the rights and freedoms of third parties.",
-        "That exemption does not apply if those criminal-offence systems are available for the public to report a criminal offence."
+        "A chatbot that is intended to interact directly with natural persons must inform them that they are interacting with an AI system, unless that is obvious from the viewpoint of a reasonably well-informed, observant and circumspect person in the relevant circumstances and context of use.",
+        "This disclosure obligation does not apply to AI systems authorised by law to detect, prevent, investigate, or prosecute criminal offences, provided appropriate safeguards for the rights and freedoms of third parties are in place.",
+        "That criminal-offence exception does not apply if the systems are available for the public to report a criminal offence."
       ],
       "http": 200
     },
@@ -50,10 +50,10 @@
       "missing": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 1668,
+      "latencyMs": 2041,
       "modelCalls": 2,
       "generatedClaims": [
-        "No. Providers and deployers must support AI literacy for staff and other persons using or operating AI systems on their behalf, but the obligation does not require them to guarantee any specific level of AI literacy for any individual."
+        "No. The rule requires providers and deployers to support AI literacy based on staff and other persons’ technical knowledge, experience, education and training, and the context of use, and it does not require them to guarantee any specific level of AI literacy for any individual."
       ],
       "http": 200
     },
@@ -67,42 +67,46 @@
       "missing": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 1474,
+      "latencyMs": 1412,
       "modelCalls": 2,
       "generatedClaims": [
-        "Any natural or legal person who has grounds to consider that there has been an infringement of the Regulation may file a complaint with the relevant market surveillance authority."
+        "Any natural or legal person who has grounds to consider that there has been an infringement of the Regulation may submit a complaint to the relevant market surveillance authority."
       ],
       "http": 200
     },
     {
       "case": "hiring",
       "expectedSource": "anx_III",
-      "status": "rejected",
-      "sourceIds": [],
-      "missing": [
-        "recruit|employment|candidate"
+      "status": "answered",
+      "sourceIds": [
+        "anx_III"
       ],
+      "missing": [],
       "invalidCitations": 0,
-      "passed": false,
-      "latencyMs": 1232,
-      "modelCalls": 1,
-      "generatedClaims": [],
+      "passed": true,
+      "latencyMs": 1856,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "The Act lists AI systems intended for recruitment or selection of natural persons, including systems used to analyse and filter job applications and evaluate candidates, in Annex III, point 4(a)."
+      ],
       "http": 200
     },
     {
       "case": "deepfake",
       "expectedSource": "art_50",
-      "status": "rejected",
-      "sourceIds": [],
-      "missing": [
-        "disclos",
-        "artistic|satiri|creative"
+      "status": "answered",
+      "sourceIds": [
+        "art_50"
       ],
+      "missing": [],
       "invalidCitations": 0,
-      "passed": false,
-      "latencyMs": 1852,
-      "modelCalls": 1,
-      "generatedClaims": [],
+      "passed": true,
+      "latencyMs": 4176,
+      "modelCalls": 3,
+      "generatedClaims": [
+        "Deepfake image, audio or video content must be disclosed as artificially generated or manipulated. If it is artistic, creative, satirical, fictional or similar, only the existence of such content must be disclosed in a way that does not hamper enjoyment; the duty also does not apply when authorised by law for criminal enforcement.",
+        "Text published to inform the public on matters of public interest must be disclosed as artificially generated or manipulated. This duty does not apply when authorised by law for criminal enforcement, or when the content has human review or editorial control and an editor is responsible for publication."
+      ],
       "http": 200
     },
     {
@@ -139,7 +143,7 @@
       "missing": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 0,
+      "latencyMs": 1,
       "modelCalls": 0,
       "generatedClaims": [],
       "http": 200
@@ -152,7 +156,7 @@
       "missing": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 2,
+      "latencyMs": 1,
       "modelCalls": 0,
       "generatedClaims": [],
       "http": 200

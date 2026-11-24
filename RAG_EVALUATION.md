@@ -7,14 +7,14 @@ The RAG pipeline generates an answer from passages returned by the existing 360-
 | Check | Outcome |
 | --- | --- |
 | Existing labeled retrieval benchmark | 43 of 43 passed |
-| Deterministic RAG contract tests | 20 of 20 passed |
+| Deterministic RAG contract tests | 21 of 21 passed |
 | Local Python and Playwright suite | 59 passed, six optional citation-selection checks skipped |
 | Local Qwen3 4B generation smoke run | 10 of 12 passed |
-| Production OpenAI HTTP smoke run | 10 of 12 passed |
+| Production OpenAI HTTP smoke run | 12 of 12 passed |
 
 ## Production verification
 
-The hosted run with GPT-5.4 mini passed four of six answerable questions, all five abstention requests, and the empty input validation check. Hiring and deepfake disclosure drafts were withheld before model review. The regression check for chatbot disclosure passed: the generated answer included both the safeguards for third parties and the limitation for public reporting. A real Chrome mobile-viewport check verified that the complaint answer displayed the Article 85 link and expandable supporting quotation.
+The latest hosted run with GPT-5.4 mini passed all six answerable questions, all five abstention requests, and the empty input validation check. An earlier run withheld the hiring and deepfake drafts. The latest deepfake answer passed after the single retry for invalid drafts. A mobile Chrome check also verified that the GPAI starter question generated an answer with an Article 53 citation.
 
 Hosted scoring checks citation URLs, labels and quotations against the exact passages returned by the pinned corpus. It also checks relevant legal phrases and known omissions. The generated claims are retained for review since vocabulary checks cannot establish full legal completeness or correctness.
 
