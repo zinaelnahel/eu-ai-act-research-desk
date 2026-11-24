@@ -4,7 +4,7 @@
 
 Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. Direct lookups resolve provision IDs, reviewed mappings select answer-bearing paragraphs for common questions, and weighted passage retrieval handles other wording. The live Ask AI flow generates cited answers with OpenAI and keeps the supporting text available when generation falls back.
 
-Learning mode has 12 topics spanning the Act’s chapters, 27 sourced scenarios and a mixed challenge. Read the explanation and linked provision after each decision. Chapter completions, best scores and XP are saved in browser storage on the current device.
+Learn includes an [interactive risk guide](https://eu-ai-act-research-desk.vercel.app/learn.html#risk) and [three guided situations](https://eu-ai-act-research-desk.vercel.app/learn.html#situations) on workplace monitoring, chatbot disclosure, and asking for an explanation of a decision. Each walkthrough gives the rule in plain language, the facts that can change the answer, and the official provision. The quiz mode has 12 topics, 27 sourced scenarios and a mixed challenge. Progress is saved on the current device.
 
 ## Source editions
 
@@ -23,7 +23,9 @@ The server retrieves from the same pinned corpus used by the evidence view. It g
 
 If the first draft fails validation or review, the server attempts one shorter draft before falling back to the sources. Every published draft still goes through the same validation and review.
 
-[Starter prompt checks](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml) run the three built-in questions against the live deployment weekly. Each run records outcomes, fallback reasons and citations. These checks use the configured hosted model.
+The home page starts with three everyday questions under **At work**, **Using a chatbot**, and **A decision about me**. **Help me find a question** opens the guided situations. If retrieval comes up short, the desk suggests describing who uses the AI, what it does, and how it affects you. The evidence view explains terms such as provider and deployer when they appear in the passages.
+
+[Starter prompt checks](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml) run these same three questions against the live deployment weekly. Each run records outcomes, fallback reasons and citations. These checks use the configured hosted model.
 
 Ask AI keeps a short conversation on the current page. It shows the provision carried forward and asks for clarification when the reference is ambiguous. Expand an earlier question to revisit its answer, or select Start a new conversation to clear the page's history. For generated answers, the model receives a standalone question.
 

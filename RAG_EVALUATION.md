@@ -14,6 +14,10 @@ The RAG pipeline generates an answer from passages returned by the existing 360-
 
 ## Production verification
 
+### Current home-page starter questions
+
+All three [plain-language starter questions](eu-ai-act/rag-plain-starters-report.json) returned cited answers in the recorded hosted run. The weekly smoke check covers the current workplace, chatbot, and decision-explanation questions. This is a separate check from the 15-case timing benchmark.
+
 ### Role and cutoff boundaries
 
 The six-case [hosted boundary check](eu-ai-act/rag-boundary-report.json) passed. Model-generated answers cited all three routes in Article 25(1). The three Article 111(3) cases used a checked comparison of the placement date with the cutoff in the pinned passage and made zero model calls. The browser test verifies that each route and date leads with the deciding provision when model generation is unavailable.

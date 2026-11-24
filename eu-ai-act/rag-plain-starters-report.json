@@ -1,0 +1,72 @@
+{
+  "mode": "production-http",
+  "passed": 3,
+  "total": 3,
+  "results": [
+    {
+      "case": "workplace-exception",
+      "expectedSources": [
+        "art_5"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_5"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2858,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Baseline: AI systems to infer a natural person’s emotions are prohibited in workplace and education settings.",
+        "Exception: that prohibition does not apply where the AI system is intended for medical reasons or safety reasons."
+      ],
+      "http": 200
+    },
+    {
+      "case": "chatbot-disclosure",
+      "expectedSources": [
+        "art_50"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_50"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2653,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Providers must inform people that they are interacting with an AI system when the system is intended to interact directly with natural persons, unless that is obvious from the context.",
+        "This duty does not apply to AI systems authorised by law to detect, prevent, investigate, or prosecute criminal offences, but only if appropriate safeguards protect third-party rights and freedoms; the exception does not apply if the system is available for the public to report a criminal offence.",
+        "The notice must be given in a clear, distinguishable, and accessible way by the latest at the first interaction or exposure."
+      ],
+      "http": 200
+    },
+    {
+      "case": "adverse-explanation",
+      "expectedSources": [
+        "art_86"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_86"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2114,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "An affected person has a right to ask the deployer for a clear and meaningful explanation of the role of the AI system and the main elements of the decision.",
+        "This right applies only to a decision taken by the deployer on the basis of a high-risk AI system listed in Annex III, excluding point 2 of Annex III.",
+        "The decision must produce legal effects or similarly significantly affect the person in a way they consider adverse to their health, safety, or fundamental rights."
+      ],
+      "http": 200
+    }
+  ]
+}
