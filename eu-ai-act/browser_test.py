@@ -45,7 +45,7 @@ def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
     assert generate.bounding_box()["y"] < page.get_by_role("link", name="Learn with scenario quizzes").bounding_box()["y"]
     search.fill("Is emotion recognition allowed at work?")
     search.press("Enter")
-    generated = page.locator(".generated-answer")
+    generated = page.locator("#answer .generated-answer")
     expect(generated.get_by_role("link", name="Article 5")).to_have_attribute("href", url)
     generated.get_by_text("Read supporting quote").press("Enter")
     expect(generated.get_by_text("medical or safety reasons")).to_be_visible()
@@ -64,6 +64,47 @@ def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
     generate.press("Enter")
     expect(page.get_by_role("status")).to_contain_text("did not find enough")
     assert len(requests) == 3
+
+
+def test_conversation_keeps_citations_and_requires_clear_context(open_page):
+    page = open_page(mobile=True)
+    submitted = []
+    url = "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_5"
+
+    def answer(route):
+        submitted.append(route.request.post_data_json["question"])
+        route.fulfill(json={"status": "answered", "claims": [{
+            "text": "The prohibition includes education, with medical and safety exceptions.",
+            "sourceId": "art_5", "label": "Article 5", "url": url,
+            "quote": "medical or safety reasons",
+        }]})
+
+    page.route("**/api/answer", answer)
+    search = page.get_by_role("searchbox", name="Your question")
+    expect(page.get_by_role("button", name="Ask AI")).to_be_enabled()
+    search.fill("Does that also apply to schools?")
+    search.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("Which topic or provision")
+    assert not submitted
+    search.fill("Is emotion recognition allowed at work?")
+    search.press("Enter")
+    expect(page.locator("#answer .generated-answer")).to_be_visible()
+    search.fill("Does that also apply to schools?")
+    search.press("Enter")
+    expect(page.locator("#answer")).to_contain_text("Following up on Article 5")
+    expect(page.locator("#answer .generated-answer")).to_be_visible()
+    assert "Could a school use AI to infer" in submitted[-1]
+    quote = page.locator("#answer .generated-answer").get_by_text("Read supporting quote")
+    quote.click()
+    page.locator("#answer").get_by_text("Read the surrounding provision").first.click()
+    expect(page.locator("#answer").get_by_text("The following AI practices shall be prohibited", exact=False).first).to_be_visible()
+    history = page.get_by_role("region", name="Previous questions and answers")
+    history.get_by_text("Is emotion recognition allowed at work?", exact=True).click()
+    expect(history.get_by_role("link", name="Article 5", exact=True)).to_be_visible()
+    page.get_by_role("button", name="Start a new conversation").click()
+    expect(search).to_be_focused()
+    expect(history).to_have_count(0)
+    assert_no_page_overflow(page)
 
 
 def test_desktop_keyboard_question_abstention_and_annex_browse(open_page):

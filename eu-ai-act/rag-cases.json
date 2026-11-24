@@ -3,6 +3,7 @@
     "id": "workplace-exception",
     "question": "Is emotion recognition allowed at work?",
     "source": "art_5",
+    "forbidden": ["(?:is|are) (?:allowed|permitted) (?:at work|in the workplace).{0,35}(?:except|unless)"],
     "phrases": [
       "at work|workplace|workers?",
       "prohibit|ban|not (allowed|permitted)|may not be used",

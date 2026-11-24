@@ -1,16 +1,21 @@
 import {createDesk} from './search.mjs';
+import {resolveFollowUp} from './follow-up.mjs';
 
 const byId = id => document.getElementById(id);
 const form = byId('question-form');
 const question = byId('question');
 const status = byId('status');
 const answer = byId('answer');
+const history = byId('conversation-history');
+const reset = byId('reset-conversation');
 const ask = byId('ask');
 const evidenceOnly = byId('evidence-only');
 const kind = byId('kind');
 const provision = byId('provision');
 const examples = [...document.querySelectorAll('.examples button')];
 let modelRequest;
+let previous;
+let activeQuestion;
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -39,15 +44,23 @@ function renderEvidence(item, doc, showContext = true) {
   answer.append(section);
 }
 
-function renderGenerated(claims) {
+function renderGenerated(claims, documents) {
   const section = element('section', '', 'generated-answer');
   section.append(element('h3', 'AI-generated research answer'));
   const list = element('ol');
   for (const claim of claims) {
     const item = element('li', claim.text + ' ');
-    item.append(sourceLink(claim.label, claim.url));
+    const paragraph = /^(\d+)\.\s/.exec(claim.quote)?.[1];
+    const label = paragraph && /^Article /.test(claim.label) ? `${claim.label}(${paragraph})` : claim.label;
+    item.append(sourceLink(label, claim.url));
     const details = element('details');
     details.append(element('summary', 'Read supporting quote'), element('p', claim.quote));
+    const provision = documents.get(claim.sourceId);
+    if (provision && provision.blocks.join('\n\n') !== claim.quote) {
+      const context = element('details');
+      context.append(element('summary', 'Read the surrounding provision'), element('p', provision.blocks.join('\n\n')));
+      details.append(context);
+    }
     item.append(details);
     list.append(item);
   }
@@ -55,7 +68,7 @@ function renderGenerated(claims) {
   answer.querySelector('.asked-question').after(section);
 }
 
-async function requestGeneratedAnswer(text) {
+async function requestGeneratedAnswer(text, documents) {
   const controller = new AbortController();
   modelRequest = controller;
   status.textContent = 'Preparing a cited answer. Retrieved evidence is shown below.';
@@ -73,7 +86,10 @@ async function requestGeneratedAnswer(text) {
     const result = await response.json();
     if (modelRequest !== controller) return;
     if (result.status === 'answered' && result.claims.length) {
-      renderGenerated(result.claims);
+      renderGenerated(result.claims, documents);
+      if (previous) {
+        previous.ids = [...new Set(result.claims.map(claim => claim.sourceId).filter(id => documents.has(id)))];
+      }
       status.textContent = 'Generated answer with supporting citations. Check the official wording before relying on it.';
     } else {
       status.textContent = 'A supported generated answer was unavailable. Review the retrieved evidence below.';
@@ -95,6 +111,17 @@ try {
   status.textContent = 'Ask a question above or select a provision to read.';
   ask.disabled = false;
   evidenceOnly.disabled = false;
+  reset.addEventListener('click', () => {
+    modelRequest?.abort();
+    modelRequest = previous = activeQuestion = undefined;
+    answer.replaceChildren();
+    history.replaceChildren();
+    history.hidden = reset.hidden = true;
+    question.value = '';
+    provision.value = '';
+    status.textContent = 'Ask a question above or select a provision to read.';
+    question.focus();
+  });
   for (const button of examples) {
     button.disabled = false;
     button.addEventListener('click', () => {
@@ -108,13 +135,27 @@ try {
     modelRequest?.abort();
     modelRequest = undefined;
     provision.value = '';
-    answer.replaceChildren();
     if (event.submitter !== evidenceOnly && /^(?:hi|hello|hey)(?:\s+there)?[!.,?]*$/i.test(question.value.trim())) {
       status.textContent = 'Hi! I can help you explore the EU AI Act. Ask about a rule, an obligation, or an exception, or try one of the example questions above.';
       byId('answer-title').focus();
       return;
     }
-    const result = desk.ask(question.value);
+    const next = event.submitter === evidenceOnly ? {question: question.value} : resolveFollowUp(question.value, previous);
+    if (next.clarify) {
+      status.textContent = 'Which topic or provision do you mean? Name it in your question so I can find the right evidence.';
+      byId('answer-title').focus();
+      return;
+    }
+    if (activeQuestion && activeQuestion !== question.value.trim()) {
+      const turn = element('details', '', 'evidence conversation-turn');
+      turn.append(element('summary', activeQuestion), ...answer.childNodes);
+      history.prepend(turn);
+      if (history.children.length > 5) history.lastElementChild.remove();
+      history.hidden = false;
+    }
+    answer.replaceChildren();
+    activeQuestion = undefined;
+    const result = desk.ask(next.question);
     status.textContent = result.reason || {
       lookup: 'Requested source',
       evidence: 'Relevant provisions. Read each excerpt and its surrounding context.',
@@ -125,10 +166,16 @@ try {
     if (result.kind === 'version') answer.append(sourceLink('Check for current versions on EUR-Lex', 'https://eur-lex.europa.eu/eli/reg/2024/1689'));
     byId('answer-title').focus();
     if (event.submitter !== evidenceOnly && ['evidence', 'matches'].includes(result.kind)) {
+      activeQuestion = question.value.trim();
+      previous = {question: next.question, ids: result.evidence.map(item => item.id)};
+      reset.hidden = false;
       const prompt = element('p', '', 'asked-question');
-      prompt.append(element('strong', 'You asked: '), document.createTextNode(question.value.trim()));
+      prompt.append(element('strong', 'You asked: '), document.createTextNode(activeQuestion));
       answer.prepend(prompt);
-      void requestGeneratedAnswer(question.value);
+      if (next.reference) prompt.append(element('span', ` · Following up on ${next.reference}`));
+      void requestGeneratedAnswer(next.question, desk.documents);
+    } else {
+      previous = undefined;
     }
   });
 
@@ -146,6 +193,7 @@ try {
     modelRequest?.abort();
     modelRequest = undefined;
     status.textContent = 'Browsing the source edition.';
+    previous = activeQuestion = undefined;
     answer.replaceChildren();
     renderEvidence({...doc, quote: doc.blocks.join('\n\n')}, doc, false);
     byId('answer-title').focus();

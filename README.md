@@ -21,6 +21,8 @@ The server retrieves from the same pinned corpus used by the evidence view. It g
 
 If a draft fails deterministic validation, the server attempts one shorter draft before falling back to the sources. Every published draft still goes through the same validation and review.
 
+Ask AI keeps a short conversation on the current page. For example, ask about workplace emotion recognition, then ask whether the rule also applies to schools. The desk shows the provision it carried forward and asks for clarification when the topic is unclear. Expand an earlier question to revisit its answer, or select Start a new conversation to clear the page's history. The model receives a standalone question for each turn.
+
 With Ollama running locally and the model installed, run these commands from the repository root:
 
 ```sh

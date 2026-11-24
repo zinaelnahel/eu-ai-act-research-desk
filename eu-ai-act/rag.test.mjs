@@ -6,8 +6,20 @@ import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 import {createAnswerHandler} from '../api/answer.mjs';
 import {createAnswerLimit} from './answer-limit.mjs';
+import {resolveFollowUp} from '../public/eu-ai-act/follow-up.mjs';
 
 const example = cases[0];
+
+test('follow-ups resolve known references and clarify multi-source context', () => {
+  const reference = {question: example.question, ids: ['art_5']};
+  const school = resolveFollowUp('Does that also apply to schools?', reference);
+  assert.equal(school.reference, 'Article 5');
+  const exception = resolveFollowUp('What’s the exception?', {question: school.question, ids: ['art_5']});
+  assert.deepEqual(desk.ask(exception.question).evidence.map(item => item.id), ['art_5']);
+  assert.match(exception.question, /in schools/);
+  assert.deepEqual(resolveFollowUp('What is the exception?', {question: 'GPAI obligations', ids: ['art_53', 'art_55']}), {clarify: true});
+  assert.deepEqual(resolveFollowUp('Who can file a complaint?', reference), {question: 'Who can file a complaint?'});
+});
 function draftFor(fixture, passages) {
   const drafts = fixture.drafts || {[fixture.source]: fixture.draft};
   return {claims: Object.entries(drafts).map(([sourceId, text]) => {
@@ -53,6 +65,19 @@ test('scoring catches a correct citation attached to the wrong class of provider
   assert.equal(scoreRag(fixture, {...result, claims: [
     {...general, text: general.text + ' All GPAI providers must report serious incidents.'}, systemic,
   ]}).passed, false);
+});
+
+test('scoring rejects a reversed rule even when citation and expected keywords are present', async () => {
+  const fixture = cases.find(item => item.id === 'workplace-exception');
+  const result = await answerRag(fixture.question, {complete: async (stage, _, data) =>
+    stage === 'draft' ? draftFor(fixture, data.passages) : {approved: true}});
+  const [claim] = result.claims;
+  const wrong = {...claim, text: 'Emotion recognition is allowed at work except where prohibited for medical or safety reasons.'};
+  const score = scoreRag(fixture, {...result, claims: [wrong]});
+  assert.equal(score.invalidCitations, 0);
+  assert.deepEqual(score.missing, []);
+  assert.equal(score.contradictions.length, 1);
+  assert.equal(score.passed, false);
 });
 
 test('rate limit rejects excess requests before the model and resets', async () => {
