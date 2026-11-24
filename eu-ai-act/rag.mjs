@@ -81,11 +81,12 @@ function validateDraft(draft, context) {
     const evidenceNumbers = new Set(normalizedNumbers(source.quote));
     if (normalizedNumbers(claim.text).some(number => !evidenceNumbers.has(number))) return null;
     seen.add(claim.text.trim());
-    claims.push({text: claim.text.trim(), sourceId: source.sourceId, quote: source.quote,
+    claims.push({text: claim.text.trim(), passageId: source.id, sourceId: source.sourceId, quote: source.quote,
       label: source.label, url: source.url});
   }
+  const directDuty = claims.filter(claim => claim.passageId === 'art_50').map(claim => claim.text).join(' ');
   return missingDisclosureSafeguards(claims) || (context.some(item => item.id === 'art_50_p5') && claims.length &&
-    (!claims.some(claim => /^1\./.test(claim.quote) && /\bproviders?\b/i.test(claim.text) && /obvious/i.test(claim.text)) ||
+    (!/\bproviders?\b/i.test(directDuty) || !/obvious/i.test(directDuty) ||
      !claims.some(claim => /^5\./.test(claim.quote) && /first interaction/i.test(claim.text) &&
        /accessib/i.test(claim.text) && /clear/i.test(claim.text)))) ? null : claims;
 }
@@ -110,25 +111,28 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
       : passages.some(({id, quote}) => id === 'art_5' && /infer emotions.+workplace and education/i.test(quote))
         ? emotionGuidance : '';
     const timingGuidance = context.some(item => item.id === 'art_50_p5')
-      ? ' Use up to four claims. Cite art_50 for the provider duty, the obviousness exception and the qualified law-enforcement exception. Cite art_50_p5 separately for clear, distinguishable notice by the first interaction and accessibility.'
+      ? ' Use three short claims: (one) art_50: Providers must tell people interacting directly with AI unless it is obvious in context. (two) art_50: Explain the exception for legally authorised criminal-offence systems with third-party safeguards and the limitation for systems available for public reporting. (three) art_50_p5: State that clear, distinguishable and accessible notice must be given by the first interaction.'
       : '';
-    const draftInstructions = instructions.draft + guidance + timingGuidance;
+    const gpaiOverview = /obligations? for (?:gpai|general.purpose ai)(?: model)? providers?/i.test(question) &&
+      ['art_53', 'art_55'].every(id => context.some(item => item.id === id));
+    const gpaiGuidance = gpaiOverview ? ' Cite art_53 for general duties including technical and integrator documentation, copyright and training summary. Use a separate claim citing art_55 for additional systemic-risk duties, including evaluation, risk mitigation, serious incident reporting and cybersecurity.' : '';
+    const draftInstructions = instructions.draft + guidance + timingGuidance + gpaiGuidance;
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
       modelCalls++;
       const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters without digits or cross-references.' : '';
       const draft = await complete('draft', draftInstructions + retry, {question, passages}, draftSchema);
       const claims = validateDraft(draft, context);
-      if (!claims) {
+      if (!claims || (gpaiOverview && claims.length && !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id)))) {
         reason = 'invalid-draft';
         continue;
       }
       if (!claims.length) return result('abstained', [], 'empty-draft');
       modelCalls++;
       const review = await complete('review', instructions.review, {
-        question, passages, claims: claims.map(({text, sourceId, quote}) => ({text, sourceId, quote})),
+        question, passages, claims: claims.map(({text, passageId, quote}) => ({text, sourceId: passageId, quote})),
       }, reviewSchema);
-      if (keysAre(review, ['approved']) && review.approved === true) return result('answered', claims);
+      if (keysAre(review, ['approved']) && review.approved === true) return result('answered', claims.map(({passageId, ...claim}) => claim));
       reason = 'review-rejected';
     }
     return result('rejected', [], reason);

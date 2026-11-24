@@ -115,6 +115,23 @@ test('evaluation fails a changed citation or an exception with missing safeguard
   assert.equal(unsafe.status, 'rejected');
 });
 
+test('chatbot disclosure requires a timing claim and presents it separately to review', async () => {
+  const fixture = cases.find(item => item.id === 'chatbot-disclosure');
+  const noTiming = await answerRag(fixture.question, {complete: async (stage, _, data) => {
+    assert.equal(stage, 'draft');
+    return {claims: draftFor(fixture, data.passages).claims.slice(0, 1)};
+  }});
+  assert.equal(noTiming.reason, 'invalid-draft');
+  const complete = async (stage, _, data) => {
+    if (stage === 'draft') return draftFor(fixture, data.passages);
+    assert.deepEqual(data.claims.map(claim => claim.sourceId), ['art_50', 'art_50_p5']);
+    return {approved: true};
+  };
+  const result = await answerRag(fixture.question, {complete});
+  assert.deepEqual(result.claims.map(claim => claim.sourceId), ['art_50', 'art_50']);
+  assert.match(result.claims[1].quote, /^5\. /);
+});
+
 test('rejects altered quotations, unknown source IDs, and unsupported numbers before review', async () => {
   for (const alteration of [
     {quote: 'A synthetic placeholder'}, {sourceId: 'unknown'}, {text: 'There are 123 exceptions.'},
