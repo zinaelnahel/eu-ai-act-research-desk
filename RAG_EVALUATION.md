@@ -7,16 +7,18 @@ The RAG pipeline generates an answer from passages returned by the existing 360-
 | Check | Outcome |
 | --- | --- |
 | Existing labeled retrieval benchmark | 43 of 43 passed |
-| Deterministic RAG contract tests | 21 of 21 passed |
+| Deterministic RAG and endpoint contract tests | 26 of 26 passed |
 | Local Python and Playwright suite | 59 passed, six optional citation-selection checks skipped |
 | Local Qwen3 4B generation smoke run | 10 of 12 passed |
-| Production OpenAI HTTP smoke run | 12 of 12 passed |
+| Production OpenAI HTTP smoke run | 15 of 15 passed |
 
 ## Production verification
 
-The latest hosted run with GPT-5.4 mini passed all six answerable questions, all five abstention requests, and the empty input validation check. An earlier run withheld the hiring and deepfake drafts. The latest deepfake answer passed after the single retry for invalid drafts. A mobile Chrome check also verified that the GPAI starter question generated an answer with an Article 53 citation.
+The latest hosted run with GPT-5.4 mini passed nine answerable questions, five abstention requests and empty input validation. The expanded cases require both provisions when distinguishing general and systemic-risk GPAI obligations, preserve the medical and safety exception for schools, and check which duties survive the open-source exemption. Earlier runs exposed incomplete answers or withheld drafts. A passing run measures the labeled rubric for those cases.
 
 Hosted scoring checks citation URLs, labels and quotations against the exact passages returned by the pinned corpus. It also checks relevant legal phrases and known omissions. The generated claims are retained for review since vocabulary checks cannot establish full legal completeness or correctness.
+
+The hosted benchmark can run locally or through the opt-in hosted evaluation input in GitHub Actions. Offline regressions run on every relevant change. Browser tests also check that retrieved evidence stays visible when the API returns HTTP 429.
 
 ```sh
 node eu-ai-act/rag-eval.mjs --hosted rag-hosted-results.json

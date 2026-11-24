@@ -1,120 +1,208 @@
 {
   "mode": "production-http",
-  "passed": 12,
-  "total": 12,
+  "passed": 15,
+  "total": 15,
   "results": [
     {
       "case": "workplace-exception",
-      "expectedSource": "art_5",
+      "expectedSources": [
+        "art_5"
+      ],
       "status": "answered",
       "sourceIds": [
         "art_5"
       ],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 2351,
+      "latencyMs": 1709,
       "modelCalls": 2,
       "generatedClaims": [
-        "Baseline rule: using AI systems to infer a natural person’s emotions in workplaces is prohibited.",
-        "Exception: this is allowed only where the AI system is intended to be put in place or put on the market for medical or safety reasons."
+        "Emotion recognition/inference is generally prohibited in workplaces and education institutions.",
+        "There is an exception only where the AI system is intended to be put in place or marketed for medical or safety reasons."
       ],
       "http": 200
     },
     {
       "case": "chatbot-disclosure",
-      "expectedSource": "art_50",
+      "expectedSources": [
+        "art_50"
+      ],
       "status": "answered",
       "sourceIds": [
         "art_50"
       ],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 3028,
+      "latencyMs": 3223,
       "modelCalls": 2,
       "generatedClaims": [
-        "A chatbot that is intended to interact directly with natural persons must inform them that they are interacting with an AI system, unless that is obvious from the viewpoint of a reasonably well-informed, observant and circumspect person in the relevant circumstances and context of use.",
-        "This disclosure obligation does not apply to AI systems authorised by law to detect, prevent, investigate, or prosecute criminal offences, provided appropriate safeguards for the rights and freedoms of third parties are in place.",
+        "A chatbot that directly interacts with natural persons must inform them that they are interacting with an AI system, unless that is obvious to a reasonably well-informed, observant and circumspect person in the circumstances and context of use.",
+        "This disclosure obligation does not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, provided appropriate safeguards for the rights and freedoms of third parties are in place.",
         "That criminal-offence exception does not apply if the systems are available for the public to report a criminal offence."
       ],
       "http": 200
     },
     {
       "case": "literacy-level",
-      "expectedSource": "art_4",
+      "expectedSources": [
+        "art_4"
+      ],
       "status": "answered",
       "sourceIds": [
         "art_4"
       ],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 2041,
+      "latencyMs": 2016,
       "modelCalls": 2,
       "generatedClaims": [
-        "No. The rule requires providers and deployers to support AI literacy based on staff and other persons’ technical knowledge, experience, education and training, and the context of use, and it does not require them to guarantee any specific level of AI literacy for any individual."
+        "No. Providers and deployers must support AI literacy based on staff or other persons’ technical knowledge, experience, education and training, and the context of use, rather than ensuring a uniform level for everyone.",
+        "The rule expressly says it does not require providers or deployers to guarantee any specific level of AI literacy for any individual."
       ],
       "http": 200
     },
     {
       "case": "complaints",
-      "expectedSource": "art_85",
+      "expectedSources": [
+        "art_85"
+      ],
       "status": "answered",
       "sourceIds": [
         "art_85"
       ],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 1412,
+      "latencyMs": 1510,
       "modelCalls": 2,
       "generatedClaims": [
-        "Any natural or legal person who has grounds to consider that there has been an infringement of the Regulation may submit a complaint to the relevant market surveillance authority."
+        "Any natural or legal person with grounds to consider there has been an infringement may submit a complaint to the relevant market surveillance authority."
       ],
       "http": 200
     },
     {
       "case": "hiring",
-      "expectedSource": "anx_III",
+      "expectedSources": [
+        "anx_III"
+      ],
       "status": "answered",
       "sourceIds": [
         "anx_III"
       ],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 1856,
-      "modelCalls": 2,
+      "latencyMs": 3005,
+      "modelCalls": 3,
       "generatedClaims": [
-        "The Act lists AI systems intended for recruitment or selection of natural persons, including systems used to analyse and filter job applications and evaluate candidates, in Annex III, point 4(a)."
+        "The Act lists AI for recruitment or selection, including analysing and filtering job applications and evaluating candidates, in the employment and workers’ management category of the high-risk annex."
       ],
       "http": 200
     },
     {
       "case": "deepfake",
-      "expectedSource": "art_50",
+      "expectedSources": [
+        "art_50"
+      ],
       "status": "answered",
       "sourceIds": [
         "art_50"
       ],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 4176,
+      "latencyMs": 3528,
       "modelCalls": 3,
       "generatedClaims": [
-        "Deepfake image, audio or video content must be disclosed as artificially generated or manipulated. If it is artistic, creative, satirical, fictional or similar, only the existence of such content must be disclosed in a way that does not hamper enjoyment; the duty also does not apply when authorised by law for criminal enforcement.",
-        "Text published to inform the public on matters of public interest must be disclosed as artificially generated or manipulated. This duty does not apply when authorised by law for criminal enforcement, or when the content has human review or editorial control and an editor is responsible for publication."
+        "Deployers must disclose that deep fake image, audio, or video content has been artificially generated or manipulated.",
+        "That disclosure does not apply when the use is authorised by law to detect, prevent, investigate or prosecute criminal offences.",
+        "For artistic, creative, satirical, fictional, or similar works, disclosure is limited to stating that generated or manipulated content exists, in a way that does not hamper display or enjoyment of the work."
+      ],
+      "http": 200
+    },
+    {
+      "case": "gpai-obligations",
+      "expectedSources": [
+        "art_53",
+        "art_55"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_53",
+        "art_55"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1980,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "GPAI providers must keep technical documentation up to date, including training/testing process and evaluation results, and provide it on request to the AI Office and national competent authorities.",
+        "They must also keep up-to-date and make available documentation for integrating providers, put in place a copyright-compliance policy, and publish a sufficiently detailed training-data summary.",
+        "For GPAI models with systemic risk, providers must additionally do standardized model evaluation and adversarial testing, assess and mitigate systemic risks, report serious incidents and corrective measures without undue delay, and ensure adequate cybersecurity."
+      ],
+      "http": 200
+    },
+    {
+      "case": "school-exception",
+      "expectedSources": [
+        "art_5"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_5"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1665,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "No: AI systems must not be used to infer emotions of a natural person in education institutions.",
+        "Exception: this prohibition does not apply where the AI system is intended to be put in place or into the market for medical or safety reasons."
+      ],
+      "http": 200
+    },
+    {
+      "case": "open-source-exception",
+      "expectedSources": [
+        "art_53"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_53"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2084,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Baseline: providers of general-purpose AI models must keep technical documentation, provide integration documentation, follow a copyright-compliance policy, and publish a training-content summary.",
+        "Exception: the technical-documentation and integration-documentation duties do not apply to models released under a free and open-source licence that allows access, use, modification, and distribution, and whose parameters, weights, architecture information, and usage information are publicly available.",
+        "Limit: that open-source exception does not apply to general-purpose AI models with systemic risks; the copyright-policy and public training-summary duties remain."
       ],
       "http": 200
     },
     {
       "case": "out-of-scope",
-      "expectedSource": null,
+      "expectedSources": [],
       "status": "abstained",
       "sourceIds": [],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
       "latencyMs": 4,
@@ -124,10 +212,11 @@
     },
     {
       "case": "edition",
-      "expectedSource": null,
+      "expectedSources": [],
       "status": "abstained",
       "sourceIds": [],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
       "latencyMs": 0,
@@ -137,23 +226,25 @@
     },
     {
       "case": "unknown-provision",
-      "expectedSource": null,
+      "expectedSources": [],
       "status": "abstained",
       "sourceIds": [],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
-      "latencyMs": 1,
+      "latencyMs": 0,
       "modelCalls": 0,
       "generatedClaims": [],
       "http": 200
     },
     {
       "case": "browse",
-      "expectedSource": null,
+      "expectedSources": [],
       "status": "abstained",
       "sourceIds": [],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
       "latencyMs": 1,
@@ -163,10 +254,11 @@
     },
     {
       "case": "individual-verdict",
-      "expectedSource": null,
+      "expectedSources": [],
       "status": "abstained",
       "sourceIds": [],
       "missing": [],
+      "contradictions": [],
       "invalidCitations": 0,
       "passed": true,
       "latencyMs": 2,
