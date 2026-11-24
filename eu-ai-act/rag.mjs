@@ -29,6 +29,16 @@ const openSourceGuidance = ' For the open-source exemption use three short claim
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
 
 const legalRequirements = [
+  {id: 'art_5', when: context => context.some(item => item.id === 'art_5' && /^\(f\) /.test(item.quote)),
+    patterns: [/prohibit|\bban|not (?:allowed|permitted)|may not be used/i, /medical/i, /safety/i],
+    forbidden: [/\b(?:is|are) (?:allowed|permitted)\b[\s\S]*\b(?:except|unless)\b/i]},
+  {id: 'art_50', paragraph: 1, when: context => context.some(item => item.id === 'art_50_p5'),
+    patterns: [/\bproviders?\b/i, /\b(?:must|shall|required|obliged|have to)\b/i, /obvious/i],
+    forbidden: [/\bproviders?\b.{0,35}\b(?:need not|must not|are not required to)\b.{0,25}(?:inform|disclos|notif)/i]},
+  {id: 'art_50_p5', paragraph: 5, patterns: [/\b(?:by|at|before|prior to|during|no later than) (?:(?:the|their) )?(?:time of (?:the )?)?first interaction\b/i,
+    /accessib/i, /clear/i], forbidden: [/\bafter (?:the )?first interaction\b/i]},
+  {id: 'art_50', paragraph: 4, patterns: [/\bdeployers?\b/i],
+    forbidden: [/\bdeployers?\b.{0,35}\b(?:need not|must not|are not required to)\b.{0,25}disclos/i]},
   {id: 'art_25', paragraph: 1, when: context => context.some(item => item.clause === 'a'),
     patterns: [/distributor/i, /trademark|own name/i, /already.{0,35}(?:market|service)/i, /contract/i, /allocat/i],
     guidance: ' State the distributor becomes a provider under the Act if it puts its name or trademark on an already marketed or commissioned high-risk system. Preserve the qualification for contractual allocation of obligations.'},
@@ -38,18 +48,23 @@ const legalRequirements = [
   {id: 'art_25', paragraph: 1, when: context => context.some(item => item.clause === 'c'),
     patterns: [/provid/i, /intended purpose/i, /(?:not|non|previously).{0,50}high.risk/i, /(?:becom|render|makes?|reclassif|now).{0,22}high.risk/i, /market|service/i],
     guidance: ' Cover only point (c). Use one direct claim: the distributor becomes a provider by changing the intended purpose of a system already placed on the market or put into service, when a previously non-high-risk system becomes high-risk. Rebranding is unnecessary.'},
-  {id: 'art_27', paragraph: 2, patterns: [/deployer/i, /chang/i, /out.of.date|outdated|no longer up to date/i, /updat.{0,30}information/i],
+  {id: 'art_27', paragraph: 2, patterns: [/deployer/i, /chang/i, /out.of.date|outdated|no longer up to date/i, /updat.{0,30}information/i,
+    /\b(?:must|shall|required|obliged|has to|have to)\b/i],
+    forbidden: [/\b(?:may|need not|is not required to)\s+(?:take.{0,30}steps to )?update\b/i],
     guidance: ' State the deployer must take the necessary steps to update the information when an assessment element changes or is no longer up to date during use.'},
   {id: 'art_111', paragraph: 3,
-    patterns: [/provid/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
+    patterns: [/provid/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i,
+      /\b(?:must|shall|required|obliged|have to)\b/i],
+    forbidden: [/\b(?:on or before|on and before) (?:2 August|August 2)/i],
     guidance: ' State the transitional cutoff and compliance deadline clearly: providers of GPAI models placed on the market before 2 August 2025 must comply by 2 August 2027.'},
   {id: 'art_74', paragraph: 13, patterns: [/reasoned request/i, /necessar/i, /conform/i, /exhausted|insufficient/i],
     guidance: ' Answer only with the reasoned request and two cumulative conditions in this paragraph, including conformity assessment and exhaustion or insufficiency of other testing, auditing or checks.'},
-  {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /high.risk/i,
+  {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /\baffected (?:person|individual|people)s?\b/i, /annex\s+iii/i, /high.risk/i,
     /(?:exclu|except|does not (?:include|cover|apply)).{0,40}(?:point|section|item)\s*(?:2|two)\b|(?:point|section|item)\s*(?:2|two)\b.{0,30}(?:excluded|exception)/i,
     /legal effects?/i, /similarly significant/i, /adverse|negativ/i, /health/i, /safety/i, /fundamental rights/i],
   guidance: ' Use up to three short claims citing art_86. First: the right concerns a deployer decision based on an Annex III high-risk AI system, excluding point two of Annex III. Second: the decision must produce legal effects or similarly significant effects that the affected person considers adverse to their health, safety or fundamental rights. Third: the affected person can obtain from the deployer a clear and meaningful explanation of the role of AI and the main elements of the decision.'},
   {id: 'art_73', paragraph: 4, patterns: [/(?:10|ten)[ -]days?\b/i, /immediat/i, /causal/i, /suspect/i, /aware/i],
+    forbidden: [/\b(?:15|fifteen)[ -]days?\b/i],
   guidance: ' Cite art_73 for death: report immediately when a causal link is established or suspected, with a ten-day outer limit from awareness. Use art_73_p2 separately for the ordinary fifteen-day outer limit and the immediate-reporting trigger.'},
   {id: 'art_73_p2', paragraph: 2, patterns: [/(?:15|fifteen)[ -]days?\b/i, /immediat/i, /causal/i, /aware/i]},
   {id: 'art_73', paragraph: 3, patterns: [/(?:2|two)[ -]days?\b/i, /immediat/i, /aware/i],
@@ -58,7 +73,9 @@ const legalRequirements = [
   when: context => context.some(item => item.id === 'art_73' && /^3\. /.test(item.quote))},
   {id: 'art_73', paragraph: 5, patterns: [/necessar/i, /timely/i, /incomplete|partial/i, /complete report/i],
   guidance: ' State that an incomplete initial report is permitted where necessary for timely reporting and must be followed by a complete report.'},
-  {id: 'art_26', paragraph: 6, patterns: [/(?:6|six) months/i, /under (?:their|the deployer.?s) control|control limitation/i, /(?:union|eu).{0,35}national law/i],
+  {id: 'art_26', paragraph: 6, patterns: [/\bdeployers?\b/i, /\b(?:must|shall|required|obliged|have to)\b/i,
+    /(?:at least|minimum(?: of)?|no less than) (?:6|six) months/i,
+    /under (?:their|the deployer.?s) control|control limitation/i, /(?:union|eu).{0,35}national law/i],
   guidance: ' For retention name the deployer, distinguish logs under its control from other logs, give the six-month minimum and preserve exceptions under applicable Union or national law.'},
 ];
 
@@ -98,12 +115,33 @@ function normalizedNumbers(value) {
   return (value.match(/\d+(?:[.,]\d+)*/g) || []).map(number => number.replaceAll(',', ''));
 }
 
-export function missingDisclosureSafeguards(claims) {
+function missingDisclosureSafeguards(claims) {
   const applicable = claims.filter(({sourceId, quote}) =>
     sourceId === 'art_50' && /safeguards for the rights and freedoms of third parties/i.test(quote));
   const text = applicable.map(claim => claim.text).join(' ');
   return /criminal.offen|law.enforcement/i.test(text) &&
-    !(/safeguard/i.test(text) && /public.{0,60}report/i.test(text));
+    (!(/safeguard/i.test(text) && /third.part/i.test(text) && /public.{0,60}report|report.{0,60}public/i.test(text)) ||
+      /\b(?:without|no need for) (?:any )?safeguards?\b/i.test(text) ||
+      /\bonly if [^.]{0,70}\bare available for public reporting\b/i.test(text));
+}
+
+function legalViolations(claims, requirements) {
+  const violations = [];
+  for (const {id, paragraph, patterns, forbidden = []} of requirements) {
+    const text = claims.filter(claim => claim.passageId === id && (!paragraph || claim.quote.startsWith(paragraph + '. ')))
+      .map(claim => claim.text).join(' ');
+    if (patterns.some(pattern => !pattern.test(text)) || forbidden.some(pattern => pattern.test(text))) {
+      violations.push(id + (paragraph ? ' paragraph ' + paragraph : ''));
+    }
+  }
+  if (missingDisclosureSafeguards(claims)) violations.push('art_50 criminal-offence safeguards');
+  return violations;
+}
+
+export function scoreLegalClaims(claims, context) {
+  const withPassages = claims.map(claim => ({...claim, passageId: context.find(passage =>
+    passage.sourceId === claim.sourceId && passage.quote === claim.quote)?.id}));
+  return legalViolations(withPassages, requirementsFor(context));
 }
 
 function validateDraft(draft, context) {
@@ -125,11 +163,7 @@ function validateDraft(draft, context) {
     claims.push({text: claim.text.trim(), passageId: source.id, sourceId: source.sourceId, quote: source.quote,
       label: source.label, url: source.url, ...(source.clause ? {clause: source.clause} : {})});
   }
-  const directDuty = claims.filter(claim => claim.passageId === 'art_50').map(claim => claim.text).join(' ');
-  return missingDisclosureSafeguards(claims) || (context.some(item => item.id === 'art_50_p5') && claims.length &&
-    (!/\bproviders?\b/i.test(directDuty) || !/obvious/i.test(directDuty) ||
-     !claims.some(claim => /^5\./.test(claim.quote) && /first interaction/i.test(claim.text) &&
-       /accessib/i.test(claim.text) && /clear/i.test(claim.text)))) ? null : claims;
+  return claims;
 }
 
 export async function answerRag(question, {complete, retrieve = desk.ask, documents = desk.documents}) {
@@ -174,10 +208,7 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
       const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters. Include dates or quantities supported by the excerpt, and omit unnecessary cross-references.' : '';
       const draft = await complete('draft', draftInstructions + legalGuidance + retry, {question, passages}, draftSchema);
       const claims = validateDraft(draft, context);
-      const missingLegalCondition = claims?.length && requirements.some(rule => {
-        const text = claims.filter(claim => claim.passageId === rule.id).map(claim => claim.text).join(' ');
-        return rule.patterns.some(pattern => !pattern.test(text));
-      });
+      const missingLegalCondition = claims?.length && legalViolations(claims, requirements).length;
       const missingCompensation = compensationQuestion && claims?.length &&
         !claims.some(claim => claim.sourceId === 'art_85' && /\bcompensation\b/i.test(claim.text));
       if (!claims || missingLegalCondition || missingCompensation || (gpaiOverview && claims.length && !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id)))) {

@@ -1,4 +1,5 @@
-name: Ask AI starter smoke
+name: Ask AI hosted smoke
+run-name: Ask AI starters and semantic boundaries
 on:
   schedule:
     - cron: '43 8 * * 2'
@@ -8,14 +9,15 @@ permissions:
   contents: read
 
 jobs:
-  starters:
+  hosted:
     runs-on: ubuntu-latest
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node eu-ai-act/rag-eval.mjs --hosted starter-smoke.json --starters
+      - run: node eu-ai-act/rag-eval.mjs --hosted starter-smoke.json --weekly-smoke
       - uses: actions/upload-artifact@v4
         if: always()
         with:

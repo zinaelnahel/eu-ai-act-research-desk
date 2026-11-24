@@ -66,6 +66,12 @@ The first run also caught a workplace emotion recognition answer that reversed a
 
 ## What the automated checks cover
 
+The Node RAG suite tests 20 supported and altered answer pairs with valid citations. The deterministic draft checks reject actor swaps, reversed rules, missing conditions and safeguards, and timing or paragraph changes before model review. The hosted smoke workflow reuses those checks on selected provisions and cases. The blind legal review remains a separate assessment of completeness and correctness on unseen questions.
+
+```sh
+node eu-ai-act/rag-eval.mjs --hosted starter-smoke.json --weekly-smoke
+```
+
 - Required provisions, irrelevant citations, verbatim source evidence and abstention in the existing retrieval benchmark.
 - Expected citation IDs and legal terms in generated answers, and zero model calls for out-of-scope questions, individual compliance verdicts, direct browse, unsupported editions and empty input.
 - Server-owned quotes and URLs, unknown source IDs, unsupported numbers, invalid responses, excluded test-only context and rejected review.

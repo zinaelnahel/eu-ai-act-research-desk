@@ -378,3 +378,15 @@ def test_mobile_report_scrolls_without_overflowing_the_page(open_page):
     expect(region).to_be_focused()
     assert region.evaluate("(el) => el.scrollWidth > el.clientWidth")
     assert_no_page_overflow(page)
+
+
+def test_evaluation_links_to_latest_hosted_smoke_run(open_page):
+    page = open_page("/evaluation.html", mobile=True)
+    run_url = "https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/runs/4"
+    page.route("**/api/smoke-status", lambda route: route.fulfill(json={"latest": {
+        "date": "2026-11-24T08:43:00Z", "conclusion": "failure", "url": run_url,
+    }}))
+    page.reload()
+    link = page.get_by_role("link", name="Weekly hosted smoke · Nov 24, 2026 · Failed")
+    expect(link).to_have_attribute("href", run_url)
+    assert_no_page_overflow(page)

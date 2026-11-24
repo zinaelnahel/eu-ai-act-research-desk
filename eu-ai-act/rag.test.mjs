@@ -1,10 +1,11 @@
 import {strict as assert} from 'node:assert';
 import {test} from 'node:test';
-import {answerRag, verifiedContext} from './rag.mjs';
-import {cases, feedbackCases, retrievalFeedbackCases, boundaryFeedbackCases, starterCases, scoreRag} from './rag-eval.mjs';
+import {answerRag, scoreLegalClaims, verifiedContext} from './rag.mjs';
+import {cases, feedbackCases, retrievalFeedbackCases, boundaryFeedbackCases, starterCases, semanticCases, scoreRag} from './rag-eval.mjs';
 import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 import {createAnswerHandler} from '../api/answer.mjs';
+import {createSmokeStatusHandler} from '../api/smoke-status.mjs';
 import {createAnswerLimit} from './answer-limit.mjs';
 import {resolveFollowUp} from '../public/eu-ai-act/follow-up.mjs';
 
@@ -37,7 +38,59 @@ function draftFor(fixture, passages) {
   })};
 }
 
-for (const fixture of [...cases, ...feedbackCases, ...retrievalFeedbackCases, ...boundaryFeedbackCases, ...starterCases]) {
+const semanticPairs = [
+  ['workplace-exception', 'reversed prohibition', 'art_5', 'prohibits', 'permits'],
+  ['school-exception', 'missing safety exception', 'art_5', 'medical or safety', 'medical'],
+  ['chatbot-disclosure', 'provider replaced with deployer', 'art_50', 'Providers', 'Deployers'],
+  ['chatbot-disclosure', 'notice after first interaction', 'art_50_p5', 'by the first', 'after the first'],
+  ['chatbot-disclosure', 'timing attached to the wrong paragraph', 'art_50_p5', '', 'art_50'],
+  ['chatbot-disclosure-safeguards', 'omitted third-party safeguards', 'art_50', ' subject to safeguards for third parties', ''],
+  ['chatbot-disclosure-safeguards', 'omitted public reporting limitation', 'art_50', ' and only if they are not available for public reporting', ''],
+  ['chatbot-disclosure-safeguards', 'negated third-party safeguards', 'art_50', 'subject to safeguards', 'without safeguards'],
+  ['chatbot-disclosure-safeguards', 'inverted public reporting limitation', 'art_50', 'are not available for public reporting', 'are available for public reporting'],
+  ['deepfake', 'deployer replaced with provider', 'art_50', 'Deployers', 'Providers'],
+  ['deployer-logs', 'minimum changed to maximum', 'art_26', 'at least', 'at most'],
+  ['incident-death', 'wrong reporting deadline', 'art_73', 'ten days', 'fifteen days'],
+  ['incident-infrastructure', 'omitted irreversible threshold', 'art_3', ' and irreversible', ''],
+  ['incident-incomplete', 'omitted timely-reporting condition', 'art_73', 'Where necessary to ensure timely reporting, the', 'The'],
+  ['adverse-explanation', 'wrong affected person', 'art_86', 'An affected person', 'An unaffected bystander'],
+  ['adverse-explanation', 'omitted Annex III exclusion', 'art_86', ', excluding point 2,', ''],
+  ['distributor-trademark', 'omitted contractual qualification', 'art_25', ', without prejudice to contractual arrangements allocating those obligations differently', ''],
+  ['fria-update', 'obligation changed to permission', 'art_27', 'must take', 'may take'],
+  ['request-source-code', 'omitted necessity for conformity assessment', 'art_74', 'Access must be necessary to assess conformity, and testing', 'Testing'],
+  ['gpai-transition-cutoff', 'inclusive placement cutoff', 'art_111', 'before 2 August', 'on or before 2 August'],
+];
+
+for (const [id, name, sourceId, from, to] of semanticPairs) {
+  test('Legal meaning: ' + name, async () => {
+    const fixture = semanticCases.find(item => item.id === id);
+    const passages = verifiedContext(desk.ask(fixture.question));
+    const supported = draftFor(fixture, passages);
+    const altered = {claims: supported.claims.map(claim => {
+      if (claim.sourceId !== sourceId) return claim;
+      if (!from) return {...claim, sourceId: to};
+      assert.ok(claim.text.includes(from));
+      return {...claim, text: claim.text.replace(from, to)};
+    })};
+    assert.notDeepEqual(altered, supported);
+    const run = (draft, review) => answerRag(fixture.question, {complete: async stage =>
+      stage === 'draft' ? draft : review()});
+    const accepted = await run(supported, () => ({approved: true}));
+    assert.ok(scoreRag(fixture, accepted).passed);
+    const citedAlteration = altered.claims.map(claim => {
+      const passage = passages.find(item => item.id === claim.sourceId);
+      return {...passage, text: claim.text};
+    });
+    assert.ok(scoreLegalClaims(citedAlteration, passages).length);
+    const rejected = await run(altered, () => assert.fail('Altered draft reached model review'));
+    assert.equal(rejected.status, 'rejected');
+    assert.equal(rejected.reason, 'invalid-draft');
+    assert.deepEqual(rejected.claims, []);
+  });
+}
+
+for (const fixture of [...cases, ...feedbackCases, ...retrievalFeedbackCases, ...boundaryFeedbackCases, ...starterCases,
+  semanticCases.find(item => item.id === 'chatbot-disclosure-safeguards')]) {
   test('RAG contract: ' + fixture.question, async () => {
     const complete = async (stage, _, data) => stage === 'draft'
       ? draftFor(fixture, data.passages) : {approved: true};
@@ -51,6 +104,31 @@ for (const fixture of [...cases, ...feedbackCases, ...retrievalFeedbackCases, ..
     }
   });
 }
+
+test('hosted smoke status uses the latest expanded run on main and preserves failures', async () => {
+  const date = '2026-11-24T08:43:00Z';
+  const runs = [
+    {id: 5, display_title: 'Ask AI starter smoke', conclusion: 'success'},
+    {id: 4, display_title: 'Ask AI starters and semantic boundaries', conclusion: 'failure', run_started_at: date},
+    {id: 3, display_title: 'Ask AI starters and semantic boundaries', conclusion: 'success', run_started_at: date},
+  ];
+  const request = new Request('https://example.test/api/smoke-status');
+  const handler = createSmokeStatusHandler(async url => {
+    const {searchParams} = new URL(url);
+    assert.equal(searchParams.get('status'), 'completed');
+    assert.equal(searchParams.get('branch'), 'main');
+    return Response.json({workflow_runs: runs});
+  });
+  const response = await handler(request);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {latest: {
+    date, conclusion: 'failure', url: 'https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/runs/4',
+  }});
+  runs.length = 1;
+  assert.deepEqual(await (await handler(request)).json(), {latest: null});
+  const unavailable = createSmokeStatusHandler(async () => new Response(null, {status: 429}));
+  assert.equal((await unavailable(request)).status, 503);
+});
 
 test('accepts multiple supported claims from different provisions', async () => {
   const result = await answerRag('What are the obligations for GPAI providers?', {complete: async (stage, _, data) => {

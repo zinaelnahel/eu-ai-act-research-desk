@@ -1,6 +1,6 @@
 import {readFileSync, writeFileSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
-import {answerRag, missingDisclosureSafeguards, verifiedContext} from './rag.mjs';
+import {answerRag, scoreLegalClaims, verifiedContext} from './rag.mjs';
 import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 
@@ -12,6 +12,24 @@ export const starterCases = [
   {...cases.find(item => item.id === 'workplace-exception'), question: 'Can my employer use AI to tell how I’m feeling?'},
   {...cases.find(item => item.id === 'chatbot-disclosure'), question: 'When does a chatbot have to tell me it’s AI?'},
   {...feedbackCases.find(item => item.id === 'adverse-explanation'), question: 'Can I ask for an explanation of an AI-assisted decision?'},
+];
+const semanticFixtureIds = new Set([
+  'workplace-exception', 'school-exception', 'chatbot-disclosure', 'deepfake', 'deployer-logs',
+  'incident-death', 'incident-infrastructure', 'incident-incomplete', 'adverse-explanation',
+  'distributor-trademark', 'fria-update', 'request-source-code', 'gpai-transition-cutoff',
+  'distributor-substantial-modification', 'distributor-intended-purpose',
+]);
+const chatbot = cases.find(item => item.id === 'chatbot-disclosure');
+export const semanticCases = [
+  ...[...cases, ...feedbackCases, ...retrievalFeedbackCases, ...boundaryFeedbackCases]
+    .filter(fixture => semanticFixtureIds.has(fixture.id) || fixture.answerMode === 'source-rule'),
+  {
+    ...chatbot, id: 'chatbot-disclosure-safeguards',
+    question: 'When does a chatbot have to tell me it is AI, and what safeguards and public reporting limits apply to the criminal-offence exception?',
+    sourcePhrases: {art_50: ['criminal.offen|law.enforcement', 'safeguard', 'third.part', 'public.{0,60}report|report.{0,60}public']},
+    drafts: {...chatbot.drafts, art_50: chatbot.drafts.art_50 +
+      ' Legally authorised criminal-offence systems are exempt subject to safeguards for third parties and only if they are not available for public reporting.'},
+  },
 ];
 
 export function scoreRag(fixture, result) {
@@ -42,21 +60,20 @@ export function scoreRag(fixture, result) {
     /^5\./.test(claim.quote) && /first interaction/i.test(claim.text) && /accessib/i.test(claim.text))) {
     missing.push('first interaction and accessibility cited to Article 50(5)');
   }
-  if (missingDisclosureSafeguards(claims)) {
-    missing.push('safeguards and public reporting limitation when discussing criminal-offence systems');
-  }
+  const legalViolations = status === 'answered' && result.answerMode !== 'source-rule'
+    ? scoreLegalClaims(claims, passages) : [];
   const passed = required.length
     ? status === 'answered' && required.every(id => sourceIds.includes(id)) &&
-      missing.length === 0 && contradictions.length === 0 && invalidCitations === 0 &&
+      missing.length === 0 && contradictions.length === 0 && invalidCitations === 0 && legalViolations.length === 0 &&
       sourceIds.every(id => allowed.has(id) && retrievedIds.includes(id)) && methodPassed
     : status === 'abstained' && claims.length === 0 && metrics.modelCalls === 0;
-  return {case: fixture.id, expectedSources: required, status, answerMode: result.answerMode, reason: result.reason, sourceIds, missing, contradictions, invalidCitations,
+  return {case: fixture.id, expectedSources: required, status, answerMode: result.answerMode, reason: result.reason, sourceIds, missing, contradictions, invalidCitations, legalViolations,
     passed, latencyMs: metrics.latencyMs, modelCalls: metrics.modelCalls};
 }
 
-export async function runLive(complete) {
+export async function runLive(complete, fixtures = cases) {
   const results = [];
-  for (const fixture of cases) {
+  for (const fixture of fixtures) {
     const result = await answerRag(fixture.question, {complete});
     const row = scoreRag(fixture, result);
     results.push({...row, generatedClaims: result.claims.map(claim => claim.text)});
@@ -67,19 +84,30 @@ export async function runLive(complete) {
 
 async function runHosted(fixtures) {
   const url = 'https://eu-ai-act-research-desk.vercel.app/api/answer';
-  const ready = await fetch(url, {signal: AbortSignal.timeout(10_000)});
-  if (!ready.ok || !(await ready.json()).available) throw new Error('Hosted provider unavailable.');
+  try {
+    const ready = await fetch(url, {signal: AbortSignal.timeout(10_000)});
+    if (!ready.ok || !(await ready.json()).available) throw new Error('Hosted provider unavailable.');
+  } catch {
+    console.error('Hosted provider readiness check failed.');
+    return fixtures.map(fixture => ({case: fixture.id, reason: 'provider-unavailable', passed: false}));
+  }
   const results = [];
   for (const fixture of fixtures) {
-    const response = await fetch(url, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({question: fixture.question}), signal: AbortSignal.timeout(58_000),
-    });
-    const body = response.ok ? await response.json() : null;
-    const row = response.ok ? {...scoreRag(fixture, body), generatedClaims: body.claims.map(claim => claim.text)}
-      : {case: fixture.id, reason: `http-${response.status}`, passed: fixture.id === 'empty' && response.status === 400};
-    results.push({...row, http: response.status});
-    console.log(`${row.passed ? 'PASS' : 'FAIL'} ${row.case} HTTP ${response.status} ${row.status ?? ''}`);
+    let row;
+    try {
+      const response = await fetch(url, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({question: fixture.question}), signal: AbortSignal.timeout(58_000),
+      });
+      const body = response.ok ? await response.json() : null;
+      row = response.ok ? {...scoreRag(fixture, body), generatedClaims: body.claims.map(claim => claim.text)}
+        : {case: fixture.id, reason: 'http-' + response.status, passed: fixture.id === 'empty' && response.status === 400};
+      row.http = response.status;
+    } catch (error) {
+      row = {case: fixture.id, reason: error.name === 'TimeoutError' ? 'request-timeout' : 'invalid-or-unavailable-response', passed: false};
+    }
+    results.push(row);
+    console.log(row.passed ? 'PASS' : 'FAIL', row.case, row.http ?? '', row.status ?? row.reason ?? '');
   }
   return results;
 }
@@ -90,12 +118,15 @@ async function main() {
   if (!hosted && (!complete || !process.env.EU_AI_ACT_OLLAMA_MODEL || process.env.VERCEL)) {
     throw new Error('Start Ollama and set EU_AI_ACT_OLLAMA_MODEL before running the local evaluation.');
   }
-  const fixtures = process.argv.includes('--boundary-feedback') ? [...retrievalFeedbackCases.slice(0, 1), ...boundaryFeedbackCases]
+  const fixtures = process.argv.includes('--weekly-smoke') ? [...starterCases, ...semanticCases.filter(fixture =>
+    !starterCases.some(starter => starter.id === fixture.id))]
+    : process.argv.includes('--boundary-feedback') ? [...retrievalFeedbackCases.slice(0, 1), ...boundaryFeedbackCases]
     : process.argv.includes('--retrieval-feedback') ? retrievalFeedbackCases
     : process.argv.includes('--feedback') ? feedbackCases
     : process.argv.includes('--starters') ? starterCases : cases;
-  const results = hosted ? await runHosted(fixtures) : await runLive(complete);
-  const report = {mode: hosted ? 'production-http' : 'local-ollama', model: hosted ? undefined : process.env.EU_AI_ACT_OLLAMA_MODEL,
+  const results = hosted ? await runHosted(fixtures) : await runLive(complete, fixtures);
+  const report = {mode: hosted ? 'production-http' : 'local-ollama', checkedAt: new Date().toISOString(),
+    model: hosted ? undefined : process.env.EU_AI_ACT_OLLAMA_MODEL,
     passed: results.filter(row => row.passed).length, total: results.length, results};
   const output = process.argv[hosted ? 3 : 2];
   if (output) writeFileSync(output, JSON.stringify(report, null, 2) + '\n');

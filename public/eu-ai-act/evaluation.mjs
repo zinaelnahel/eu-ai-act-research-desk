@@ -1,4 +1,20 @@
 const metrics = document.getElementById('metrics');
+const hostedSmoke = document.getElementById('hosted-smoke');
+fetch('/api/smoke-status', {signal: AbortSignal.timeout(6000)})
+  .then(async response => {
+    if (!response.ok) return;
+    const {latest} = await response.json();
+    if (!latest) {
+      hostedSmoke.textContent = 'Weekly hosted smoke · awaiting first expanded run';
+      return;
+    }
+    const date = new Intl.DateTimeFormat('en', {dateStyle: 'medium', timeZone: 'UTC'}).format(new Date(latest.date));
+    const {conclusion} = latest;
+    const outcome = conclusion === 'success' ? 'Passed' : conclusion === 'failure' ? 'Failed' : conclusion.replaceAll('_', ' ');
+    hostedSmoke.href = latest.url;
+    hostedSmoke.textContent = 'Weekly hosted smoke · ' + date + ' · ' + outcome;
+  })
+  .catch(() => {/* The workflow link remains available. */});
 const formatPrecision = value => value === null ? '—' : new Intl.NumberFormat('en', {style: 'percent', maximumFractionDigits: 1}).format(value);
 try {
   const response = await fetch('./evaluation.json');

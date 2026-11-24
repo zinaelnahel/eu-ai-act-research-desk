@@ -25,7 +25,7 @@ If the first draft fails validation or review, the server attempts one shorter d
 
 The home page starts with three everyday questions under **At work**, **Using a chatbot**, and **A decision about me**. **Help me find a question** opens the guided situations. If retrieval comes up short, the desk suggests describing who uses the AI, what it does, and how it affects you. The evidence view explains terms such as provider and deployer when they appear in the passages.
 
-[Starter prompt checks](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml) run these same three questions against the live deployment weekly. Each run records outcomes, fallback reasons and citations. These checks use the configured hosted model.
+The weekly hosted smoke workflow runs the same three starter questions alongside legal boundary cases. Each run records outcomes, fallback reasons and citations. The testing evidence page links to the latest completed expanded run and shows its date and result. [Hosted smoke workflow](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml)
 
 Ask AI keeps a short conversation on the current page. It shows the provision carried forward and asks for clarification when the reference is ambiguous. Expand an earlier question to revisit its answer, or select Start a new conversation to clear the page's history. For generated answers, the model receives a standalone question.
 
