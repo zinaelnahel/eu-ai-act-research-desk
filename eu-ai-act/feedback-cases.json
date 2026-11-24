@@ -1,0 +1,48 @@
+[
+  {
+    "id": "deployer-logs",
+    "question": "How long must deployers keep high-risk AI logs, including logs outside their control?",
+    "source": "art_26",
+    "paragraphPhrases": {"6": ["(?:six|6) months", "at least|minimum", "under (?:their|the deployer.?s) control", "(?:union|eu).{0,35}national law"]},
+    "draft": "Deployers must retain logs under their control for an appropriate period of at least six months unless applicable Union or national law provides otherwise."
+  },
+  {
+    "id": "incident-death",
+    "question": "Does a provider always have 15 days to report a serious incident, including when someone dies?",
+    "source": "art_73",
+    "paragraphPhrases": {
+      "4": ["(?:10|ten) days", "immediat", "causal", "suspect", "aware"],
+      "2": ["(?:15|fifteen)[ -]days?", "immediat", "causal", "aware"]
+    },
+    "drafts": {
+      "art_73": "If someone dies, report immediately when a causal link is established or suspected, and within ten days of becoming aware of the incident.",
+      "art_73_p2": "Ordinarily report immediately when a causal link or its reasonable likelihood is established, with a fifteen-day limit from awareness."
+    }
+  },
+  {
+    "id": "incident-infrastructure",
+    "question": "What is the reporting deadline if a serious incident disrupts critical infrastructure?",
+    "sources": ["art_73", "art_3"],
+    "sourcePhrases": {"art_3": ["serious", "irreversible", "critical infrastructure"]},
+    "paragraphPhrases": {"3": ["(?:2|two) days", "immediat", "aware"]},
+    "drafts": {
+      "art_73": "Report immediately and within two days of becoming aware of the incident.",
+      "art_3": "The threshold is serious and irreversible disruption to the management or operation of critical infrastructure."
+    }
+  },
+  {
+    "id": "incident-incomplete",
+    "question": "Can a provider file an incomplete initial incident report and send the rest later?",
+    "source": "art_73",
+    "paragraphPhrases": {"5": ["incomplete", "necessar", "timely", "followed|follow.up", "complete report"]},
+    "draft": "Where necessary to ensure timely reporting, the provider may submit an incomplete initial report followed by a complete report."
+  },
+  {
+    "id": "adverse-explanation",
+    "question": "Can someone get an explanation of an adverse decision based on high-risk AI?",
+    "source": "art_86",
+    "paragraphPhrases": {"1": ["deployer", "annex iii", "(?:point|item|section) (?:2|two)", "legal effects", "similarly significant", "health", "safety", "fundamental rights"]},
+    "draft": "An affected person can get an explanation of the AI role and main decision elements from the deployer when a decision is based on Annex III high-risk AI output, excluding point 2, and has legal effects or similarly significant effects they consider adverse to health, safety or fundamental rights."
+  },
+  {"id": "mars-moons", "question": "How many moons does Mars have?"}
+]

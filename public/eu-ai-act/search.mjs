@@ -115,6 +115,26 @@ export function createDesk(corpus) {
         citation(transitions, transitions.blocks.join('\n\n')),
       ]};
     }
+    const incident = /\b(?:incidents?|incident report)\b/i.test(question);
+    if (incident && /\b(?:incomplete|partial)\b/i.test(question)) {
+      const doc = documents.get('art_73');
+      return {kind: 'evidence', evidence: [citation(doc, snippet(doc, /^5\. /))]};
+    }
+    if (incident && /\bcritical infrastructure\b/i.test(question)) {
+      const doc = documents.get('art_73');
+      const definition = documents.get('art_3');
+      return {kind: 'evidence', evidence: [citation(doc, snippet(doc, /^3\. /)),
+        citation(definition, snippet(definition, /^\(49\)/))]};
+    }
+    if (incident && /\b(?:dies?|deaths?|fatal(?:ity|ities)?|died)\b/i.test(question)) {
+      const doc = documents.get('art_73');
+      return {kind: 'evidence', evidence: [{...citation(doc, snippet(doc, /^4\. /)),
+        supporting: [snippet(doc, /^2\. /)]}]};
+    }
+    if (/\bdeployers?\b/i.test(question) && /\blogs?\b/i.test(question)) {
+      const doc = documents.get('art_26');
+      return {kind: 'evidence', evidence: [citation(doc, snippet(doc, /^6\. /))]};
+    }
     const matched = TOPICS.find(([pattern]) => pattern.test(question));
     if (matched) {
       const evidence = matched[1].map(([id, pattern]) => {
@@ -129,7 +149,7 @@ export function createDesk(corpus) {
       }
       if (primary.id === 'art_50' && /interact directly/i.test(primary.quote)) {
         const timing = documents.get('art_50').blocks.find(block => /^5\. /.test(block));
-        if (timing) primary.timing = timing;
+        if (timing) primary.supporting = [timing];
         summary = 'Providers must generally tell people when they interact directly with AI, unless that is obvious in context. The information must be clear and distinguishable by the first interaction. Read the provisions for accessibility requirements and the qualified law-enforcement exception.';
       }
       return {kind: 'evidence', summary, evidence};

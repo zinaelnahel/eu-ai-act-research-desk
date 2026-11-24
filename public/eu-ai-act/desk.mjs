@@ -51,12 +51,20 @@ function sourceLink(text, url) {
   return link;
 }
 
+function passageLabel(label, quote) {
+  const paragraph = /^(\d+)\.\s/.exec(quote)?.[1];
+  return paragraph && /^Article /.test(label) ? `${label}(${paragraph})` : label;
+}
+
 function renderEvidence(item, doc, showContext = true) {
   const section = element('section', '', 'evidence');
-  section.append(element('h3', [item.label, item.title].filter(Boolean).join(' · ')));
+  section.append(element('h3', [showContext ? passageLabel(item.label, item.quote) : item.label, item.title].filter(Boolean).join(' · ')));
   section.append(element('p', item.quote));
-  if (item.timing) {
-    section.append(element('h4', 'Article 50(5) · Timing'), element('p', item.timing));
+  for (const passage of item.supporting || []) {
+    const paragraph = /^([0-9]+)\. /.exec(passage)?.[1];
+    const label = paragraph ? `${item.label}(${paragraph})` : item.label;
+    const suffix = item.id === 'art_50' ? ' · Timing' : '';
+    section.append(element('h4', label + suffix), element('p', passage));
   }
   section.append(sourceLink(doc.kind === 'recital' ? 'Read the Official Journal recital' : 'Read the consolidated provision', item.url));
   if (showContext && item.quote !== doc.blocks.join('\n\n') && doc.blocks.length > 1) {
@@ -74,9 +82,7 @@ function renderGenerated(claims, documents) {
   const list = element('ol');
   for (const claim of claims) {
     const item = element('li', claim.text + ' ');
-    const paragraph = /^(\d+)\.\s/.exec(claim.quote)?.[1];
-    const label = paragraph && /^Article /.test(claim.label) ? `${claim.label}(${paragraph})` : claim.label;
-    item.append(sourceLink(label, claim.url));
+    item.append(sourceLink(passageLabel(claim.label, claim.quote), claim.url));
     const details = element('details');
     details.append(element('summary', 'Read supporting quote'), element('p', claim.quote));
     const provision = documents.get(claim.sourceId);

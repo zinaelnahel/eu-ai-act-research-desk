@@ -5,6 +5,7 @@ import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 
 export const cases = JSON.parse(readFileSync(new URL('./rag-cases.json', import.meta.url), 'utf8'));
+export const feedbackCases = JSON.parse(readFileSync(new URL('./feedback-cases.json', import.meta.url), 'utf8'));
 
 export function scoreRag(fixture, result) {
   const {status, claims, retrievedIds, metrics} = result;
@@ -16,6 +17,10 @@ export function scoreRag(fixture, result) {
   const allowed = new Set([...required, ...Object.keys(fixture.optionalSources || {})]);
   for (const [source, patterns] of Object.entries(fixture.sourcePhrases || {})) {
     const citedText = claims.filter(claim => claim.sourceId === source).map(claim => claim.text).join(' ');
+    missing.push(...patterns.filter(pattern => !new RegExp(pattern, 'i').test(citedText)));
+  }
+  for (const [paragraph, patterns] of Object.entries(fixture.paragraphPhrases || {})) {
+    const citedText = claims.filter(claim => claim.quote.startsWith(paragraph + '. ')).map(claim => claim.text).join(' ');
     missing.push(...patterns.filter(pattern => !new RegExp(pattern, 'i').test(citedText)));
   }
   const passages = verifiedContext(desk.ask(fixture.question));
@@ -76,7 +81,8 @@ async function main() {
     throw new Error('Start Ollama and set EU_AI_ACT_OLLAMA_MODEL before running the local evaluation.');
   }
   const starterIds = new Set(['workplace-exception', 'chatbot-disclosure', 'gpai-obligations']);
-  const fixtures = process.argv.includes('--starters') ? cases.filter(item => starterIds.has(item.id)) : cases;
+  const fixtures = process.argv.includes('--feedback') ? feedbackCases
+    : process.argv.includes('--starters') ? cases.filter(item => starterIds.has(item.id)) : cases;
   const results = hosted ? await runHosted(fixtures) : await runLive(complete);
   const report = {mode: hosted ? 'production-http' : 'local-ollama', model: hosted ? undefined : process.env.EU_AI_ACT_OLLAMA_MODEL,
     passed: results.filter(row => row.passed).length, total: results.length, results};

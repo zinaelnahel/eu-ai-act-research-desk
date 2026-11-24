@@ -1,10 +1,13 @@
 export function resolveFollowUp(question, previous) {
   const text = question.trim();
-  if (!/^(?:and\s+|what about\b|how about\b|(?:does|do|would|will|is|are) (?:it|that|they|those|this)\b|(?:what|which) (?:is|are|was) (?:the |its |their )?(?:exceptions?|limits?)\b|what['’]s the exception\b)/i.test(text)) {
+  if (!/^(?:and\s+|what about\b|how about\b|what if (?:it|that|the incident)\b|(?:does|do|would|will|is|are) (?:it|that|they|those|this)\b|(?:what|which) (?:is|are|was) (?:the |its |their )?(?:exceptions?|limits?)\b|what['’]s the exception\b)/i.test(text)) {
     return {question: text};
   }
   if (previous?.ids.length !== 1) return {clarify: true};
   const [id] = previous.ids;
+  if (id === 'art_73' && /\bcritical infrastructure\b/i.test(text)) {
+    return {question: 'What is the reporting deadline if a serious incident disrupts critical infrastructure?', reference: 'Article 73'};
+  }
   const emotion = id === 'art_5' && /infer.{0,32}emotions|emotion recognition/i.test(previous.question);
   if (emotion &&
       /\b(?:schools?|education|pupils?|students?)\b/i.test(text)) {

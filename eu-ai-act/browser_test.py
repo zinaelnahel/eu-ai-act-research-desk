@@ -32,6 +32,33 @@ def test_missing_article_and_model_failure_give_specific_next_steps(open_page):
     expect(page.locator("#answer")).to_contain_text("at the time of the first interaction or exposure")
 
 
+def test_incident_fallback_shows_answering_paragraph_and_handles_followup(open_page):
+    page = open_page(mobile=True)
+    page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))
+    search = page.get_by_role("searchbox", name="Your question")
+    expect(page.get_by_role("button", name="Ask AI")).to_be_enabled()
+    search.fill("Does a provider always have 15 days to report a serious incident, including when someone dies?")
+    search.press("Enter")
+    answer = page.locator("#answer")
+    expect(answer.get_by_role("heading", name="Article 73(4)", exact=False)).to_be_visible()
+    expect(answer.get_by_text("not later than 10 days", exact=False).first).to_be_visible()
+    expect(answer.get_by_role("heading", name="Article 73(2)", exact=True)).to_be_visible()
+    search.fill("What if the incident disrupts critical infrastructure?")
+    search.press("Enter")
+    expect(answer).to_contain_text("Following up on Article 73")
+    expect(answer.get_by_role("heading", name="Article 73(3)", exact=False)).to_be_visible()
+    expect(answer.get_by_text("not later than two days", exact=False).first).to_be_visible()
+    expect(answer.get_by_text("serious and irreversible disruption", exact=False).first).to_be_visible()
+    search.fill("Can a provider file an incomplete initial incident report and send the rest later?")
+    search.press("Enter")
+    expect(answer.get_by_role("heading", name="Article 73(5)", exact=False)).to_be_visible()
+    expect(answer.get_by_text("Where necessary to ensure timely reporting", exact=False).first).to_be_visible()
+    search.fill("How many moons does Mars have?")
+    search.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("did not find enough matching evidence")
+    assert_no_page_overflow(page)
+
+
 def test_new_legal_records_show_review_notice_and_official_link(open_page):
     page = open_page("/index.html#library", mobile=True)
     page.route("**/api/source-status", lambda route: route.fulfill(json={

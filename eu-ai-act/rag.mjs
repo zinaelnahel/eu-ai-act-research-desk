@@ -28,6 +28,28 @@ const instructions = {
 const openSourceGuidance = ' For the open-source exemption use three short claims grounded in the exemption provision: qualifying licences and public model information; both technical and integrator documentation duties covered by the exemption; copyright and training-summary duties retained, and no exemption for systemic-risk models. Keep references to paragraph numbers out of the answer. Apply only where the passage supports these details.';
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
 
+const legalRequirements = [
+  {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /(?:exclud|except).{0,40}(?:point|section|item)?\s*(?:2|two)\b/i,
+    /legal effects?/i, /similarly significant/i, /adverse/i, /health/i, /safety/i, /fundamental rights/i],
+  guidance: ' For the explanation right preserve every condition: affected person, deployer decision based on Annex III high-risk AI outputs excluding Annex III point 2, legal effects or similarly significant impact, and perceived adverse impact on health, safety or fundamental rights. State what the deployer must explain.'},
+  {id: 'art_73', paragraph: 4, patterns: [/(?:10|ten)[ -]days?\b/i, /immediat/i, /causal/i, /suspect/i, /aware/i],
+  guidance: ' Cite art_73 for death: report immediately when a causal link is established or suspected, with a ten-day outer limit from awareness. Use art_73_p2 separately for the ordinary fifteen-day outer limit and the immediate-reporting trigger.'},
+  {id: 'art_73_p2', paragraph: 2, patterns: [/(?:15|fifteen)[ -]days?\b/i, /immediat/i, /causal/i, /aware/i]},
+  {id: 'art_73', paragraph: 3, patterns: [/(?:2|two)[ -]days?\b/i, /immediat/i, /aware/i],
+  guidance: ' Explain the immediate reporting obligation with a two-day outer limit from awareness, citing art_73. Cite art_3 separately for the serious and irreversible disruption threshold for critical infrastructure.'},
+  {id: 'art_3', patterns: [/serious/i, /irreversible/i, /critical infrastructure/i],
+  when: context => context.some(item => item.id === 'art_73' && /^3\. /.test(item.quote))},
+  {id: 'art_73', paragraph: 5, patterns: [/necessar/i, /timely/i, /incomplete|partial/i, /complete report/i],
+  guidance: ' State that an incomplete initial report is permitted where necessary for timely reporting and must be followed by a complete report.'},
+  {id: 'art_26', paragraph: 6, patterns: [/(?:6|six) months/i, /under (?:their|the deployer.?s) control|control limitation/i, /(?:union|eu).{0,35}national law/i],
+  guidance: ' For retention name the deployer, distinguish logs under its control from other logs, give the six-month minimum and preserve exceptions under applicable Union or national law.'},
+];
+
+function requirementsFor(context) {
+  return legalRequirements.filter(rule => (!rule.when || rule.when(context)) &&
+    context.some(item => item.id === rule.id && (!rule.paragraph || item.quote.startsWith(rule.paragraph + '. '))));
+}
+
 const keysAre = (obj, keys) => obj && typeof obj === 'object' && !Array.isArray(obj) &&
   Object.keys(obj).length === keys.length && keys.every(key => Object.hasOwn(obj, key));
 
@@ -44,10 +66,11 @@ export function verifiedContext(retrieval, documents = desk.documents) {
     size += item.quote.length;
     seen.add(item.id);
     result.push({id: item.id, sourceId: item.id, quote: item.quote, label: source.label, title: source.title, url: source.url});
-    if (item.id === 'art_50' && /^1\./.test(item.quote) && item.timing &&
-      source.blocks.includes(item.timing) && /^5\./.test(item.timing) && size + item.timing.length <= MAX_CONTEXT_CHARS) {
-      size += item.timing.length;
-      result.push({id: 'art_50_p5', sourceId: item.id, quote: item.timing, label: source.label, title: source.title, url: source.url});
+    for (const quote of item.supporting || []) {
+      const paragraph = /^([0-9]+)\. /.exec(quote)?.[1];
+      if (!paragraph || quote === item.quote || !source.blocks.includes(quote) || size + quote.length > MAX_CONTEXT_CHARS) continue;
+      size += quote.length;
+      result.push({id: `${item.id}_p${paragraph}`, sourceId: item.id, quote, label: source.label, title: source.title, url: source.url});
     }
   }
   return result;
@@ -117,13 +140,19 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
       ['art_53', 'art_55'].every(id => context.some(item => item.id === id));
     const gpaiGuidance = gpaiOverview ? ' Cite art_53 for general duties including technical and integrator documentation, copyright and training summary. Use a separate claim citing art_55 for additional systemic-risk duties, including evaluation, risk mitigation, serious incident reporting and cybersecurity.' : '';
     const draftInstructions = instructions.draft + guidance + timingGuidance + gpaiGuidance;
+    const requirements = requirementsFor(context);
+    const legalGuidance = requirements.map(rule => rule.guidance || '').join('');
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
       modelCalls++;
       const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters without digits or cross-references.' : '';
-      const draft = await complete('draft', draftInstructions + retry, {question, passages}, draftSchema);
+      const draft = await complete('draft', draftInstructions + legalGuidance + retry, {question, passages}, draftSchema);
       const claims = validateDraft(draft, context);
-      if (!claims || (gpaiOverview && claims.length && !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id)))) {
+      const missingLegalCondition = claims?.length && requirements.some(rule => {
+        const text = claims.filter(claim => claim.passageId === rule.id).map(claim => claim.text).join(' ');
+        return rule.patterns.some(pattern => !pattern.test(text));
+      });
+      if (!claims || missingLegalCondition || (gpaiOverview && claims.length && !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id)))) {
         reason = 'invalid-draft';
         continue;
       }

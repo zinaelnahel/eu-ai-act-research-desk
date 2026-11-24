@@ -1,7 +1,7 @@
 import {strict as assert} from 'node:assert';
 import {test} from 'node:test';
 import {answerRag, verifiedContext} from './rag.mjs';
-import {cases, scoreRag} from './rag-eval.mjs';
+import {cases, feedbackCases, scoreRag} from './rag-eval.mjs';
 import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 import {createAnswerHandler} from '../api/answer.mjs';
@@ -28,7 +28,7 @@ function draftFor(fixture, passages) {
   })};
 }
 
-for (const fixture of cases) {
+for (const fixture of [...cases, ...feedbackCases]) {
   test('RAG contract: ' + fixture.id, async () => {
     const complete = async (stage, _, data) => stage === 'draft'
       ? draftFor(fixture, data.passages) : {approved: true};
@@ -130,6 +130,17 @@ test('chatbot disclosure requires a timing claim and presents it separately to r
   const result = await answerRag(fixture.question, {complete});
   assert.deepEqual(result.claims.map(claim => claim.sourceId), ['art_50', 'art_50']);
   assert.match(result.claims[1].quote, /^5\. /);
+});
+
+test('rejects an overbroad explanation right even with a valid Article 86 citation', async () => {
+  const fixture = feedbackCases.find(item => item.id === 'adverse-explanation');
+  const result = await answerRag(fixture.question, {complete: async stage => {
+    assert.equal(stage, 'draft');
+    return {claims: [{sourceId: 'art_86', text: 'A person can get an explanation from the deployer of any adverse decision based on high-risk AI.'}]};
+  }});
+  assert.equal(result.reason, 'invalid-draft');
+  assert.deepEqual(result.claims, []);
+  assert.deepEqual(result.retrievedIds, ['art_86']);
 });
 
 test('rejects altered quotations, unknown source IDs, and unsupported numbers before review', async () => {
