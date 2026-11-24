@@ -14,6 +14,12 @@ The RAG pipeline generates an answer from passages returned by the existing 360-
 
 ## Production verification
 
+### Role and cutoff boundaries
+
+The six-case [hosted boundary check](eu-ai-act/rag-boundary-report.json) passed. Model-generated answers cited all three routes in Article 25(1). The three Article 111(3) cases used a checked comparison of the placement date with the cutoff in the pinned passage and made zero model calls. The browser test verifies that each route and date leads with the deciding provision when model generation is unavailable.
+
+For wider retrieval coverage, see the [author-labeled challenge cases](eu-ai-act/challenge-cases.json) and [independent review pack](INDEPENDENT_REVIEW.md). The challenge set informs development and does not substitute for an independent legal assessment.
+
 ### Plain-language retrieval regression set
 
 All seven [answer cases](eu-ai-act/retrieval-feedback-cases.json) passed in the hosted rerun. Trademark, impact assessment and the GPAI transitional deadline now retrieve the answer-bearing paragraphs. The browser suite verifies that all three paragraphs stay visible during a simulated model outage. The direct Article 25 lookup and the two-turn complaint and compensation conversation also passed in the live browser.

@@ -1,0 +1,132 @@
+{
+  "mode": "production-http",
+  "passed": 6,
+  "total": 6,
+  "results": [
+    {
+      "case": "distributor-trademark",
+      "expectedSources": [
+        "art_25"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_25"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2063,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "A distributor becomes the provider of a high-risk AI system when it puts its name or trademark on a high-risk AI system that is already placed on the market or put into service.",
+        "This applies for the purposes of the Regulation, making the distributor subject to the provider obligations under Article 16.",
+        "The rule applies without prejudice to contractual arrangements that allocate the obligations differently."
+      ],
+      "http": 200
+    },
+    {
+      "case": "distributor-substantial-modification",
+      "expectedSources": [
+        "art_25"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_25"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2666,
+      "modelCalls": 3,
+      "generatedClaims": [
+        "Yes. A distributor (or other third party) is considered a provider and subject to provider obligations if it makes a substantial modification to a high-risk AI system already on the market or in service, and the system remains high-risk under Article 6."
+      ],
+      "http": 200
+    },
+    {
+      "case": "distributor-intended-purpose",
+      "expectedSources": [
+        "art_25"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_25"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2059,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Yes. A distributor is considered a provider if it modifies the intended purpose of an AI system already placed on the market or put into service so that a previously non-high-risk system becomes high-risk; rebranding is not required for this point."
+      ],
+      "http": 200
+    },
+    {
+      "case": "gpai-day-before",
+      "expectedSources": [
+        "art_111"
+      ],
+      "status": "answered",
+      "answerMode": "source-rule",
+      "sourceIds": [
+        "art_111"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1,
+      "modelCalls": 0,
+      "generatedClaims": [
+        "1 August 2025 is before the cutoff. Article 111(3) sets a compliance deadline of 2 August 2027 for those models."
+      ],
+      "http": 200
+    },
+    {
+      "case": "gpai-cutoff-date",
+      "expectedSources": [
+        "art_111"
+      ],
+      "status": "answered",
+      "answerMode": "source-rule",
+      "sourceIds": [
+        "art_111"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 0,
+      "modelCalls": 0,
+      "generatedClaims": [
+        "2 August 2025 is on the cutoff. The Article 111(3) deadline does not apply because it covers only models placed on the market before 2 August 2025."
+      ],
+      "http": 200
+    },
+    {
+      "case": "gpai-day-after",
+      "expectedSources": [
+        "art_111"
+      ],
+      "status": "answered",
+      "answerMode": "source-rule",
+      "sourceIds": [
+        "art_111"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 0,
+      "modelCalls": 0,
+      "generatedClaims": [
+        "3 August 2025 is after the cutoff. The Article 111(3) deadline does not apply because it covers only models placed on the market before 2 August 2025."
+      ],
+      "http": 200
+    }
+  ]
+}
