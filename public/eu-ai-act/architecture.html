@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How the EU AI Act Research Desk works</title>
+<link rel="stylesheet" href="./desk.css">
+<style>
+  .architecture { padding-block: 24px; }
+  .architecture h1 { max-width: 22ch; font-size: clamp(2rem, 5vw, 3.5rem); }
+  .architecture p { margin-block: 8px; }
+  .architecture .intro { margin: 0; padding: 24px; }
+  .architecture h2 { font-size: 1.35rem; margin-block: 18px 8px; }
+  .architecture h3 { font-size: 1rem; }
+  .architecture ol, .architecture .proof { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 0; margin: 0; }
+  .architecture li, .architecture .proof > div { list-style: none; border: 1px solid var(--desk-border); border-radius: 12px; background: var(--desk-surface); padding: 13px; }
+  .architecture .step { display: inline-block; color: var(--desk-accent); font: 700 .82rem var(--reference); margin-bottom: 4px; }
+  .architecture .numbers { color: var(--desk-accent); font-size: 1.6rem; font-weight: 750; }
+  .architecture footer { display: flex; gap: 12px; padding-block: 16px 0; }
+  @media (max-width: 660px) { .architecture ol, .architecture .proof { grid-template-columns: 1fr; } }
+  @page { size: A4; margin: 12mm; }
+  @media print {
+    .architecture { width: auto; padding: 0; font-size: 10pt; line-height: 1.4; }
+    .architecture .intro { padding: 16px; }
+    .architecture h1 { font-size: 27pt; }
+    .architecture h2 { margin-block: 12px 6px; }
+    .architecture p { margin-block: 5px; }
+    .architecture ol, .architecture .proof { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .architecture li, .architecture .proof > div { padding: 9px; }
+    .architecture section, .architecture li { break-inside: avoid; }
+    .architecture footer { padding-top: 14px; }
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+</style>
+<body class="research-theme">
+<main class="wrap architecture">
+  <section class="intro">
+    <p class="kicker">ZINA EL NAHEL · AI QUALITY ENGINEERING</p>
+    <h1>EU AI Act Research Desk</h1>
+    <p>A retrieval-augmented generation system for asking questions about a versioned legal corpus and inspecting the evidence behind the answer.</p>
+  </section>
+  <section aria-labelledby="pipeline">
+    <h2 id="pipeline">From question to cited answer</h2>
+    <ol>
+      <li><span class="step">01 · ASK</span><h3>Resolve the question</h3><p>The browser turns supported follow-ups into standalone questions and asks for clarification when the reference is unclear.</p></li>
+      <li><span class="step">02 · RETRIEVE</span><h3>Find relevant provisions</h3><p>Weighted passage search and provision lookup use a pinned EUR-Lex corpus of articles, annexes and recitals.</p></li>
+      <li><span class="step">03 · GENERATE</span><h3>Draft from evidence</h3><p>A Vercel function sends verified passages to OpenAI. The model returns structured claims with source IDs.</p></li>
+      <li><span class="step">04 · VALIDATE</span><h3>Check the draft</h3><p>Code checks source IDs and selected constraints. A model review then checks grounding and material exceptions.</p></li>
+      <li><span class="step">05 · CITE</span><h3>Show the supporting text</h3><p>The server attaches exact quotes and official links. Readers can expand a citation to see its surrounding provision.</p></li>
+      <li><span class="step">06 · FALL BACK</span><h3>Keep the evidence available</h3><p>If generation is unsupported or unavailable, the desk shows retrieved passages or abstains when evidence is insufficient.</p></li>
+    </ol>
+  </section>
+  <section aria-labelledby="testing">
+    <h2 id="testing">How I tested it</h2>
+    <div class="proof">
+      <div><span class="numbers">43/43</span><h3>Retrieval cases</h3><p>Required provisions, irrelevant results, exact quotations and abstention.</p></div>
+      <div><span class="numbers">15/15</span><h3>Hosted smoke cases</h3><p>Nine cited answers, five abstentions, and one empty-input check in the recorded run.</p></div>
+      <div><h3>Regression coverage</h3><p>Node.js, pytest and Playwright cover citation contracts, keyboard and mobile flows, and visual changes in GitHub Actions.</p></div>
+    </div>
+  </section>
+  <section aria-labelledby="tradeoff">
+    <h2 id="tradeoff">A failure worth discussing</h2>
+    <p>An early model answer cited Article 5 but reversed a prohibition. That led to a test that fails even when the citation and expected keywords are correct. The test covers the observed error pattern. Broader legal accuracy still requires expert review.</p>
+  </section>
+  <footer>
+    <a href="https://eu-ai-act-research-desk.vercel.app/index.html">Live Research Desk</a>
+    <a href="https://eu-ai-act-research-desk.vercel.app/evaluation.html">Evaluation evidence</a>
+    <a href="https://github.com/zinaelnahel/eu-ai-act-research-desk">Source code</a>
+  </footer>
+</main>
+</body>
+</html>

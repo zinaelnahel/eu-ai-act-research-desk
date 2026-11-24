@@ -17,6 +17,22 @@ def test_ask_ai_greeting_from_library(open_page):
     expect(page.get_by_role("heading", name="Source-grounded answers")).to_be_focused()
 
 
+def test_new_legal_records_show_review_notice_and_official_link(open_page):
+    page = open_page("/index.html#library", mobile=True)
+    page.route("**/api/source-status", lambda route: route.fulfill(json={
+        "checkedAt": "2026-11-24T06:27:00Z",
+        "changes": [{"id": "02024R1689-20270101"}],
+    }))
+    page.reload()
+    notice = page.locator("#source-check")
+    expect(notice).to_contain_text("24 Nov 2026 (UTC)")
+    expect(notice).to_contain_text("awaiting review")
+    expect(notice.get_by_role("link")).to_have_attribute(
+        "href", "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A02024R1689-20270101"
+    )
+    assert_no_page_overflow(page)
+
+
 def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
     page = open_page(mobile=True)
     requests = []

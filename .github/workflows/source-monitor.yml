@@ -1,0 +1,50 @@
+name: EU AI Act source monitor
+
+on:
+  schedule:
+    - cron: '27 6 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'eu-ai-act/source-monitor.mjs'
+      - '.github/workflows/source-monitor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: eu-ai-act-source-monitor
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Publications Office metadata
+        run: node eu-ai-act/source-monitor.mjs | tee source-monitor.json
+        shell: bash
+      - name: Record result and open a review issue for new records
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          jq -r '"Checked at \(.checkedAt). New records: \(.changes | length)."' source-monitor.json >> "$GITHUB_STEP_SUMMARY"
+          jq -r '.changes[] | "- \(.kind): [\(.id)](\(.url))"' source-monitor.json >> "$GITHUB_STEP_SUMMARY"
+          if [ "$(jq '.changes | length' source-monitor.json)" -eq 0 ]; then exit 0; fi
+          fingerprint=$(jq -c '.changes | map(.id) | sort' source-monitor.json | sha256sum | cut -c1-12)
+          title="Review new EU AI Act sources ($fingerprint)"
+          if gh issue list --state all --search "in:title $fingerprint" --json title --jq '.[].title' | grep -Fxq "$title"; then exit 0; fi
+          {
+            cat "$GITHUB_STEP_SUMMARY"
+            printf '\nReview the official texts and their applicability dates. Compare affected provisions with the pinned corpus, rebuild it where applicable, and rerun retrieval, answer, citation, and quiz tests before publishing.\n'
+          } > source-review.md
+          gh issue create --title "$title" --body-file source-review.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eu-ai-act-source-check
+          path: source-monitor.json

@@ -17,6 +17,27 @@ let modelRequest;
 let previous;
 let activeQuestion;
 
+fetch('/api/source-status', {signal: AbortSignal.timeout(9000)})
+  .then(async response => {
+    const notice = byId('source-check');
+    if (response.status === 404) return;
+    if (!response.ok) throw new Error('Source check unavailable');
+    const {checkedAt, changes} = await response.json();
+    const date = new Intl.DateTimeFormat('en-GB', {dateStyle: 'medium', timeZone: 'UTC'}).format(new Date(checkedAt));
+    notice.textContent = `Sources checked ${date} (UTC). ` +
+      (changes.length ? 'New source records are awaiting review. Answers use the edition shown above.' : 'No new records were found.');
+    for (const change of changes) {
+      const url = new URL('https://eur-lex.europa.eu/legal-content/EN/TXT/');
+      url.searchParams.set('uri', 'CELEX:' + change.id);
+      notice.append(' ', sourceLink(change.id, url.href));
+    }
+    notice.hidden = false;
+  }).catch(() => {
+    const notice = byId('source-check');
+    notice.textContent = 'Source check unavailable. Answers use the edition shown above.';
+    notice.hidden = false;
+  });
+
 function element(tag, text, className) {
   const node = document.createElement(tag);
   if (text) node.textContent = text;

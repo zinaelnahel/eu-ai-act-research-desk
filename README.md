@@ -37,7 +37,15 @@ In PowerShell use `$env:EU_AI_ACT_OLLAMA_MODEL = 'qwen3:4b'`. On Vercel, the API
 
 [Read the generated-answer evaluation](RAG_EVALUATION.md) for the offline regression checks, local model results and known failures.
 
-Production limits answer requests to 24 per minute per client IP on each warm function instance. The UI keeps the retrieved passages visible on HTTP 429. A Vercel Firewall rule on `POST /api/answer` is the project-wide control across instances.
+Vercel Firewall limits `POST /api/answer` to 20 requests per minute per client IP at the edge. The application also limits each warm function instance. The UI keeps the retrieved passages visible on HTTP 429.
+
+## Monitor official source changes
+
+[GitHub Actions](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/source-monitor.yml) checks the Publications Office’s CELLAR metadata daily for new consolidations, amendments and corrigenda linked to the AI Act. It records each check and opens a deduplicated review issue with official links when it finds a change. The Legal sources panel shows when the latest metadata check ran and identifies new records awaiting review. The metadata baseline records known documents and does not certify that every record applies to the English text.
+
+An update is reviewed against the Official Journal and checked for applicability before the corpus is rebuilt. Use the corpus rebuild and evaluation steps below and review quiz citations before publishing any new snapshot.
+
+[Interview infographic](https://eu-ai-act-research-desk.vercel.app/architecture.html) · [One-page PDF](https://eu-ai-act-research-desk.vercel.app/architecture.pdf)
 
 ## Run and verify
 
