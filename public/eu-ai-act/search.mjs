@@ -32,11 +32,16 @@ const TARGETED_TOPICS = [
   [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:chang\w*|modif\w*).{0,25}intended purpose\b.*\bhigh.risk\b/i, [['art_25', 1, 'c']]],
   [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\bsubstantial\w* (?:modif\w*|chang\w*)\b.*\bhigh.risk\b/i, [['art_25', 1, 'b']]],
   [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:trademark|own (?:name|brand))\b|\b(?:trademark|own (?:name|brand))\b.*\b(?:distributors?|importers?|deployers?)\b/i, [['art_25', 1, 'a']]],
-  [/\b(?:fundamental rights impact assessment|fria)\b.*\b(?:chang\w*|updat\w*|outdated|out of date)\b|\b(?:chang\w*|updat\w*|outdated)\b.*\b(?:fundamental rights impact assessment|fria)\b/i, [['art_27', 2]]],
+  [/\b(?:fundamental rights impact assessment|fria)\b.*\b(?:chang\w*|updat\w*|outdated|out of date|stale)\b|\b(?:chang\w*|updat\w*|outdated|stale)\b.*\b(?:fundamental rights impact assessment|fria)\b/i, [['art_27', 2]]],
   [/\b(?:gpai|general.purpose ai models?)\b.*\b(?:already on the market|placed on the market|on the market before)\b/i, [['art_111', 3]]],
   [/\bmarket surveillance authorit\w*\b.*\bsource code\b|\bsource code\b.*\bmarket surveillance authorit\w*\b/i, [['art_74', 13]]],
   [/\binstructions (?:for|of) use\b.*\b(?:accuracy|robustness)\b|\b(?:accuracy|robustness)\b.*\binstructions (?:for|of) use\b/i, [['art_13', 3], ['art_15', 3]]],
   [/\bcomplaints?\b.*\bcompensation\b|\bcompensation\b.*\bcomplaints?\b/i, [['art_85']]],
+  [/\b(?:each member of staff|staff|operators?)\b.*\b(?:fixed|specific|minimum) level of (?:knowledge|literacy|training)\b/i, [['art_4', 1]]],
+  [/\brisk management\b.*\b(?:once|finished|lifecycle|throughout|after (?:launch|release|shipping))\b/i, [['art_9', 2]]],
+  [/\b(?:bring\w*|import\w*)\b.*\b(?:paperwork|documentation)\b.*\b(?:fake|falsif\w*)\b/i, [['art_23', 2]]],
+  [/\b(?:ask why|ask for (?:an )?explanation)\b.*\bdecision\b.*\b(?:high.risk|significant effect)\b/i, [['art_86', 1]]],
+  [/\bquality management system\b.*\b(?:small|proportionate|preserve|scale down)\b|\b(?:small|startup|scale down)\b.*\bquality management system\b/i, [['art_17', 2]]],
 ];
 const NOTES = {
   art_4: 'Providers and deployers must take measures to support AI literacy. The measures should reflect staff experience, training, and the context of use. Article 4(1) does not require them to guarantee a specific level of literacy for each person.',
@@ -135,7 +140,7 @@ export function createDesk(corpus) {
         const summary = day === 1
           ? '1 August 2025 is before the cutoff. Article 111(3) sets a compliance deadline of 2 August 2027 for those models.'
           : day >= 2 ? `${day} August 2025 is ${day === 2 ? 'on' : 'after'} the cutoff. The Article 111(3) deadline does not apply because it covers only models placed on the market before 2 August 2025.` : undefined;
-        return {kind: 'evidence', summary, evidence};
+        return {kind: 'evidence', summary, ...(summary ? {answerMode: 'source-rule'} : {}), evidence};
       }
     }
     if (TIMING.test(question)) {

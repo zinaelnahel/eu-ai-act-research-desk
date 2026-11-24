@@ -1,0 +1,12 @@
+[
+  {"name":"staff training minimum","question":"Must each member of staff achieve a fixed level of knowledge before they can operate the model?","sources":["art_4"],"phrases":["does not require","specific level of AI literacy"]},
+  {"name":"review after launch","question":"Can we treat the risk management file as finished once the high-risk system has shipped?","sources":["art_9"],"phrases":["entire lifecycle","regular systematic review and updating"]},
+  {"name":"fake conformity paperwork","question":"A company bringing a high-risk system into the EU suspects the conformity paperwork is fake. Can it still sell the system?","sources":["art_23"],"phrases":["falsified documentation","shall not place the system on the market"]},
+  {"name":"old assessment with changed facts","question":"Can a public-service deployer reuse an earlier fundamental rights impact assessment if the setup is similar but an entry has gone stale?","sources":["art_27"],"phrases":["in similar cases","no longer up to date","update the information"]},
+  {"name":"legal explanation eligibility","question":"Can I ask why a deployer made a decision relying on high-risk AI even if there was no significant effect on me?","sources":["art_86"],"phrases":["produces legal effects or similarly significantly affects","point 2"]},
+  {"name":"who receives a complaint","question":"Where should a legal person send a complaint if it has grounds to think the AI Act has been infringed?","sources":["art_85"],"phrases":["natural or legal person","relevant market surveillance authority"]},
+  {"name":"after release performance data","question":"Must the provider collect and analyse performance data throughout a high-risk system’s life after release?","sources":["art_72"],"phrases":["actively and systematically collect","throughout their lifetime"]},
+  {"name":"small team quality procedures","question":"Can a startup scale down the documentation for its quality management system, and what must it still preserve?","sources":["art_17"],"phrases":["proportionate to the size","level of protection"]},
+  {"name":"local permit","question":"Can you issue my bakery a trading permit?","sources":[],"phrases":[],"kind":"abstain"},
+  {"name":"individual product verdict","question":"Does my product comply with the AI Act?","sources":[],"phrases":[],"kind":"abstain"}
+]

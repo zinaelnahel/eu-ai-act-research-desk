@@ -1,6 +1,5 @@
 import {readFileSync} from 'node:fs';
 import {createDesk} from '../public/eu-ai-act/search.mjs';
-import {gpaiPlacementDay} from '../public/eu-ai-act/gpai-cutoff.mjs';
 
 const corpus = JSON.parse(readFileSync(new URL('../public/eu-ai-act/corpus.json', import.meta.url), 'utf8'));
 const desk = createDesk(corpus);
@@ -41,15 +40,9 @@ const legalRequirements = [
     guidance: ' Cover only point (c). Use one direct claim: the distributor becomes a provider by changing the intended purpose of a system already placed on the market or put into service, when a previously non-high-risk system becomes high-risk. Rebranding is unnecessary.'},
   {id: 'art_27', paragraph: 2, patterns: [/deployer/i, /chang/i, /out.of.date|outdated|no longer up to date/i, /updat.{0,30}information/i],
     guidance: ' State the deployer must take the necessary steps to update the information when an assessment element changes or is no longer up to date during use.'},
-  {id: 'art_111', paragraph: 3, when: (context, question) => /\bbefore\b/i.test(question) || !gpaiPlacementDay(question),
+  {id: 'art_111', paragraph: 3,
     patterns: [/provid/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
     guidance: ' State the transitional cutoff and compliance deadline clearly: providers of GPAI models placed on the market before 2 August 2025 must comply by 2 August 2027.'},
-  {id: 'art_111', paragraph: 3, when: (context, question) => !/\bbefore\b/i.test(question) && gpaiPlacementDay(question) === 1,
-    patterns: [/\byes\b|qualifi|falls within|applies/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
-    guidance: ' Start with Yes. State that the placement was before 2 August 2025 and the provider must comply by 2 August 2027. Omit other dates and obligations.'},
-  {id: 'art_111', paragraph: 3, when: (context, question) => !/\bbefore\b/i.test(question) && gpaiPlacementDay(question) >= 2,
-    patterns: [/\bno\b|does not apply|not (?:eligible|covered|qualify)|outside/i, /before (?:2 August|August 2)\s*,?\s*2025/i],
-    guidance: ' Start with No. State explicitly that the rule applies only to models placed on the market before 2 August 2025. Do not give a different compliance date. Repeat the words before 2 August 2025 even when that date appears in the question.'},
   {id: 'art_74', paragraph: 13, patterns: [/reasoned request/i, /necessar/i, /conform/i, /exhausted|insufficient/i],
     guidance: ' Answer only with the reasoned request and two cumulative conditions in this paragraph, including conformity assessment and exhaustion or insufficiency of other testing, auditing or checks.'},
   {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /high.risk/i,
@@ -69,8 +62,8 @@ const legalRequirements = [
   guidance: ' For retention name the deployer, distinguish logs under its control from other logs, give the six-month minimum and preserve exceptions under applicable Union or national law.'},
 ];
 
-function requirementsFor(context, question) {
-  return legalRequirements.filter(rule => (!rule.when || rule.when(context, question)) &&
+function requirementsFor(context) {
+  return legalRequirements.filter(rule => (!rule.when || rule.when(context)) &&
     context.some(item => item.id === rule.id && (!rule.paragraph || item.quote.startsWith(rule.paragraph + '. '))));
 }
 
@@ -113,7 +106,7 @@ export function missingDisclosureSafeguards(claims) {
     !(/safeguard/i.test(text) && /public.{0,60}report/i.test(text));
 }
 
-function validateDraft(draft, context, question) {
+function validateDraft(draft, context) {
   if (!keysAre(draft, ['claims']) || !Array.isArray(draft.claims) ||
     draft.claims.length > MAX_CLAIMS) return null;
   const passages = new Map(context.map(item => [item.id, item]));
@@ -127,9 +120,7 @@ function validateDraft(draft, context, question) {
     if (source.id === 'art_5' && /\bexcept\b/i.test(source.quote) &&
         /\b(?:is|are) (?:allowed|permitted)\b[\s\S]*\b(?:except|unless)\b/i.test(claim.text)) return null;
     const evidenceNumbers = new Set(normalizedNumbers(source.quote));
-    const day = source.id === 'art_111' ? gpaiPlacementDay(question) : null;
-    const claimedText = day ? claim.text.replace(new RegExp(`\\b(?:${day} August|August ${day}),? 2025\\b`, 'gi'), 'the stated date') : claim.text;
-    if (normalizedNumbers(claimedText).some(number => !evidenceNumbers.has(number))) return null;
+    if (normalizedNumbers(claim.text).some(number => !evidenceNumbers.has(number))) return null;
     seen.add(claim.text.trim());
     claims.push({text: claim.text.trim(), passageId: source.id, sourceId: source.sourceId, quote: source.quote,
       label: source.label, url: source.url, ...(source.clause ? {clause: source.clause} : {})});
@@ -152,6 +143,10 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
   });
   if (retrieval.kind !== 'evidence' && retrieval.kind !== 'matches') return result('abstained');
   if (!context.length) return result('abstained');
+  if (retrieve === desk.ask && retrieval.answerMode === 'source-rule') {
+    const {sourceId, label, url, quote} = context[0];
+    return {...result('answered', [{text: retrieval.summary, sourceId, label, url, quote}]), answerMode: 'source-rule'};
+  }
   if (!complete) return result('unavailable');
 
   try {
@@ -171,17 +166,14 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
       ['art_53', 'art_55'].every(id => context.some(item => item.id === id));
     const gpaiGuidance = gpaiOverview ? ' Cite art_53 for general duties including technical and integrator documentation, copyright and training summary. Use a separate claim citing art_55 for additional systemic-risk duties, including evaluation, risk mitigation, serious incident reporting and cybersecurity.' : '';
     const draftInstructions = instructions.draft + guidance + timingGuidance + gpaiGuidance + complaintGuidance;
-    const requirements = requirementsFor(context, question);
+    const requirements = requirementsFor(context);
     const legalGuidance = requirements.map(rule => rule.guidance || '').join('');
-    const dateReview = context.some(item => item.id === 'art_111' && /^3\. /.test(item.quote)) && gpaiPlacementDay(question) && !/\bbefore\b/i.test(question)
-      ? ' Check the placement date supplied in the question against the excerpt: strictly before 2 August 2025 qualifies, while the cutoff day and later do not. A comparison of the supplied date against the excerpt is grounded.'
-      : '';
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
       modelCalls++;
       const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters. Include dates or quantities supported by the excerpt, and omit unnecessary cross-references.' : '';
       const draft = await complete('draft', draftInstructions + legalGuidance + retry, {question, passages}, draftSchema);
-      const claims = validateDraft(draft, context, question);
+      const claims = validateDraft(draft, context);
       const missingLegalCondition = claims?.length && requirements.some(rule => {
         const text = claims.filter(claim => claim.passageId === rule.id).map(claim => claim.text).join(' ');
         return rule.patterns.some(pattern => !pattern.test(text));
@@ -194,7 +186,7 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
       }
       if (!claims.length) return result('abstained', [], 'empty-draft');
       modelCalls++;
-      const review = await complete('review', instructions.review + dateReview, {
+      const review = await complete('review', instructions.review, {
         question, passages, claims: claims.map(({text, passageId, quote}) => ({text, sourceId: passageId, quote})),
       }, reviewSchema);
       if (keysAre(review, ['approved']) && review.approved === true) return result('answered', claims.map(({passageId, ...claim}) => claim));

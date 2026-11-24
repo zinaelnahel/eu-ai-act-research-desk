@@ -206,7 +206,11 @@ try {
       prompt.append(element('strong', 'You asked: '), document.createTextNode(activeQuestion));
       answer.prepend(prompt);
       if (next.reference) prompt.append(element('span', ` · Following up on ${next.reference}`));
-      void requestGeneratedAnswer(next.question, desk.documents);
+      if (result.answerMode === 'source-rule') {
+        status.textContent = 'Answer from the date rule in Article 111(3).';
+      } else {
+        void requestGeneratedAnswer(next.question, desk.documents);
+      }
     } else {
       previous = undefined;
     }

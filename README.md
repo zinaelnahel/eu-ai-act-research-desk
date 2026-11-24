@@ -51,6 +51,8 @@ An update is reviewed against the Official Journal and checked for applicability
 
 ## Run and verify
 
+The separate [10-case authored challenge set](eu-ai-act/challenge-cases.json) exercises paraphrased conditions, obligations and abstention. It passed 4 of 10 before retrieval changes and 10 of 10 after them. CI keeps that development baseline under regression. The [independent review pack](INDEPENDENT_REVIEW.md) explains how a legal reviewer can score outputs blind and contribute unseen questions.
+
 Use Node.js 22 and Python 3.12. From the repository root:
 
 ```sh

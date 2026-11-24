@@ -37,6 +37,7 @@ def test_gpai_cutoff_and_distributor_routes_show_exact_fallback(open_page):
         expect(answer).to_contain_text("Following up on Article 111(3)")
         expect(answer.get_by_role("heading", name="Article 111(3)", exact=False)).to_be_visible()
         expect(answer).to_contain_text(f"{day} August 2025 is {result} the cutoff.")
+        expect(page.get_by_role("status")).to_have_text("Answer from the date rule in Article 111(3).")
     assert_no_page_overflow(page)
 
 
@@ -269,6 +270,9 @@ def test_official_journal_and_consolidated_links_are_distinct(open_page):
     expect(sources.get_by_role("link", name="2026 amendment · Official Journal")).to_have_attribute(
         "href", "https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng"
     )
+    sources.get_by_text("Official text in German or Spanish", exact=True).press("Enter")
+    expect(sources.get_by_role("link", name="Originalverordnung")).to_have_attribute("hreflang", "de")
+    expect(sources.get_by_role("link", name="Reglamento original")).to_have_attribute("hreflang", "es")
 
 def test_mobile_quiz_keyboard_feedback_and_saved_xp(open_page):
     page = open_page(mobile=True)

@@ -52,6 +52,8 @@ jobs:
           node-version: '22'
       - name: Verify corpus, learning progress and RAG contracts
         run: node --test --test-reporter=spec --test-reporter=junit --test-reporter-destination=stdout --test-reporter-destination=node-results.xml eu-ai-act/*.test.mjs
+      - name: Check the authored challenge set
+        run: node eu-ai-act/challenge-eval.mjs challenge-results.json --gate
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -84,6 +86,7 @@ jobs:
             public/eu-ai-act/evaluation.json
             pytest-results.xml
             node-results.xml
+            challenge-results.json
       - name: Upload visual and performance evidence
         if: always()
         uses: actions/upload-artifact@v4

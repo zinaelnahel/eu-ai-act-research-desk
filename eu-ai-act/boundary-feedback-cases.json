@@ -15,13 +15,15 @@
   },
   {
     "id": "gpai-day-before",
+    "answerMode": "source-rule",
     "question": "Does the transitional deadline apply to a GPAI model first placed on the market on 1 August 2025?",
     "source": "art_111",
-    "paragraphPhrases": {"3": ["yes|qualifi|falls within|applies", "before 2 August 2025", "by 2 August 2027"]},
+    "paragraphPhrases": {"3": ["before the cutoff", "deadline of 2 August 2027"]},
     "draft": "Yes. A model placed on the market on 1 August 2025 was placed before 2 August 2025. Its provider must comply by 2 August 2027."
   },
   {
     "id": "gpai-cutoff-date",
+    "answerMode": "source-rule",
     "question": "Does the transitional deadline apply to a GPAI model first placed on the market on 2 August 2025?",
     "source": "art_111",
     "paragraphPhrases": {"3": ["^no|does not apply|not (?:covered|eligible|qualify)|outside", "before 2 August 2025"]},
@@ -29,6 +31,7 @@
   },
   {
     "id": "gpai-day-after",
+    "answerMode": "source-rule",
     "question": "Does the transitional deadline apply to a GPAI model first placed on the market on 3 August 2025?",
     "source": "art_111",
     "paragraphPhrases": {"3": ["^no|does not apply|not (?:covered|eligible|qualify)|outside", "before 2 August 2025"]},
