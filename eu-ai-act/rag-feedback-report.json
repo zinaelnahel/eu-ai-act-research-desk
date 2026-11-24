@@ -1,0 +1,130 @@
+{
+  "mode": "production-http",
+  "passed": 6,
+  "total": 6,
+  "results": [
+    {
+      "case": "deployer-logs",
+      "expectedSources": [
+        "art_26"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_26"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2304,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Deployers must keep automatically generated high-risk AI logs that are under their control for at least six months, for a period appropriate to the intended purpose, unless applicable Union or national law provides otherwise.",
+        "For logs not under the deployer’s control, this excerpt does not impose a retention duty on the deployer.",
+        "Deployers that are financial institutions subject to Union financial services governance requirements must maintain the logs as part of the documentation kept under the relevant Union financial service law."
+      ],
+      "http": 200
+    },
+    {
+      "case": "incident-death",
+      "expectedSources": [
+        "art_73"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_73"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 3527,
+      "modelCalls": 3,
+      "generatedClaims": [
+        "Baseline rule: the report must be made immediately after a causal link or reasonable likelihood is established, and in any event no later than fifteen days after awareness.",
+        "Exception for death: once a causal relationship is established, or as soon as it is suspected, the report must be made immediately.",
+        "For death, the outer limit is ten days after awareness, so the fifteen-day period does not always apply."
+      ],
+      "http": 200
+    },
+    {
+      "case": "incident-infrastructure",
+      "expectedSources": [
+        "art_73",
+        "art_3"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_73",
+        "art_3"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1568,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "The report must be provided immediately, and in any event no later than two days after the provider or deployer becomes aware of the incident.",
+        "A serious incident includes an incident or malfunctioning of an AI system that leads to a serious and irreversible disruption of the management or operation of critical infrastructure."
+      ],
+      "http": 200
+    },
+    {
+      "case": "incident-incomplete",
+      "expectedSources": [
+        "art_73"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_73"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1369,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Where necessary to ensure timely reporting, the provider may submit an initial incident report that is incomplete, but it must be followed by a complete report."
+      ],
+      "http": 200
+    },
+    {
+      "case": "adverse-explanation",
+      "expectedSources": [
+        "art_86"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_86"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2210,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Yes. An affected person subject to a deployer’s decision based on the output of a high-risk AI system in Annex III, except point 2, has the right to obtain a clear and meaningful explanation from the deployer.",
+        "That right applies only where the decision produces legal effects or similarly significantly affects the person, and the person considers the impact adverse to their health, safety, or fundamental rights.",
+        "The explanation must cover the role of the AI system in the decision-making procedure and the main elements of the decision taken."
+      ],
+      "http": 200
+    },
+    {
+      "case": "mars-moons",
+      "expectedSources": [],
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 4,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    }
+  ]
+}

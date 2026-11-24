@@ -14,6 +14,16 @@ The RAG pipeline generates an answer from passages returned by the existing 360-
 
 ## Production verification
 
+### Browser-feedback regression set
+
+The six [browser-feedback cases](eu-ai-act/feedback-cases.json) passed against the hosted endpoint: five cited answers and one out-of-scope abstention. The infrastructure case uses the standalone question produced by the browser’s follow-up resolver. A separate live browser check exercised the original two-turn conversation. A simulated provider outage verified that the Article 73(4), (3) and (5) excerpts stay visible without opening the full provision. The Article 86 check rejects drafts that omit the eligibility threshold or Annex III point 2 exclusion.
+
+[Recorded results](eu-ai-act/rag-feedback-report.json)
+
+```sh
+node eu-ai-act/rag-eval.mjs --hosted rag-feedback-results.json --feedback
+```
+
 The [follow-up production run](eu-ai-act/rag-starter-report.json) passed 14 of 15 cases with the stricter chatbot timing rubric. All three starter prompts returned cited answers. The open-source exemption draft was withheld after review, and the desk kept its evidence available. The [weekly starter check](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml) records generated output and the reason when an answer falls back.
 
 An earlier hosted run with GPT-5.4 mini passed nine answerable questions, five abstention requests and empty input validation. The expanded cases require both provisions when distinguishing general and systemic-risk GPAI obligations, preserve the medical and safety exception for schools, and check which duties survive the open-source exemption. A passing run measures the labeled rubric for those cases.
