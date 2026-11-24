@@ -1,0 +1,133 @@
+{
+  "mode": "production-http",
+  "passed": 5,
+  "total": 6,
+  "results": [
+    {
+      "case": "deployer-logs",
+      "expectedSources": [
+        "art_26"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_26"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2031,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Deployers of high-risk AI systems must keep automatically generated logs that are under their control for a period appropriate to the intended purpose of the system, with a minimum of six months, unless applicable Union or national law provides otherwise, especially Union data-protection law.",
+        "For financial institutions subject to Union financial-services governance, arrangement, or process requirements, the logs must be maintained as part of the documentation kept under the relevant Union financial-service law."
+      ],
+      "http": 200
+    },
+    {
+      "case": "incident-death",
+      "expectedSources": [
+        "art_73"
+      ],
+      "status": "rejected",
+      "reason": "invalid-draft",
+      "sourceIds": [],
+      "missing": [
+        "(?:15|fifteen)[ -]days?",
+        "immediat",
+        "causal",
+        "aware",
+        "(?:10|ten) days",
+        "immediat",
+        "causal",
+        "suspect",
+        "aware"
+      ],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": false,
+      "latencyMs": 2713,
+      "modelCalls": 2,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "incident-infrastructure",
+      "expectedSources": [
+        "art_73",
+        "art_3"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_73",
+        "art_3"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1738,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "For a serious incident that disrupts critical infrastructure, the report must be provided immediately and no later than two days after the provider, or where applicable the deployer, becomes aware of the incident.",
+        "A serious incident includes an incident or malfunctioning of an AI system that leads to a serious and irreversible disruption of the management or operation of critical infrastructure."
+      ],
+      "http": 200
+    },
+    {
+      "case": "incident-incomplete",
+      "expectedSources": [
+        "art_73"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_73"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1366,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Yes. Where necessary to ensure timely reporting, the provider may submit an incomplete initial incident report, provided that it is followed by a complete report."
+      ],
+      "http": 200
+    },
+    {
+      "case": "adverse-explanation",
+      "expectedSources": [
+        "art_86"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_86"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2874,
+      "modelCalls": 3,
+      "generatedClaims": [
+        "An affected person has a right to get a clear and meaningful explanation from the deployer of the AI system’s role and the main elements of a decision taken on the basis of an Annex III high-risk AI system, except systems under point 2 of Annex III.",
+        "This right applies only when the decision produces legal effects or similarly significantly affects the person in a way they consider adverse to their health, safety, or fundamental rights."
+      ],
+      "http": 200
+    },
+    {
+      "case": "mars-moons",
+      "expectedSources": [],
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 3,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    }
+  ]
+}

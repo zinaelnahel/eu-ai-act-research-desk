@@ -1,0 +1,150 @@
+{
+  "mode": "production-http",
+  "passed": 7,
+  "total": 7,
+  "results": [
+    {
+      "case": "distributor-trademark",
+      "expectedSources": [
+        "art_25"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_25"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1741,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "A distributor is considered the provider of a high-risk AI system when it puts its name or trademark on a high-risk AI system already placed on the market or put into service, unless contractual arrangements allocate the obligations otherwise."
+      ],
+      "http": 200
+    },
+    {
+      "case": "accuracy-instructions",
+      "expectedSources": [
+        "art_13",
+        "art_15"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_13",
+        "art_15"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2221,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "The instructions for use must state the high-risk AI system’s level of accuracy, including the accuracy metrics it was tested and validated against, and any known or foreseeable circumstances that could affect that expected level of accuracy; they must also include the system’s level of robustness and cybersecurity, with the same “known or foreseeable circumstances” caveat.",
+        "The accompanying instructions for use must declare the levels of accuracy and the relevant accuracy metrics for high-risk AI systems."
+      ],
+      "http": 200
+    },
+    {
+      "case": "fria-update",
+      "expectedSources": [
+        "art_27"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_27"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1557,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Baseline rule: the obligation applies at first use of the high-risk AI system. If, during use, any element listed in paragraph 1 has changed or is no longer up to date, the deployer must take the necessary steps to update the information."
+      ],
+      "http": 200
+    },
+    {
+      "case": "request-source-code",
+      "expectedSources": [
+        "art_74"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_74"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1767,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "A market surveillance authority may request access to the source code of a high-risk AI system only on a reasoned request, and only if both conditions are met: access is necessary to assess conformity with Chapter III, Section 2 requirements, and testing, auditing, or verification based on the provider’s data and documentation have been exhausted or proved insufficient."
+      ],
+      "http": 200
+    },
+    {
+      "case": "lodge-complaint",
+      "expectedSources": [
+        "art_85"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_85"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1344,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Any natural or legal person with grounds to consider that there has been an infringement of the Regulation may submit a complaint to the relevant market surveillance authority."
+      ],
+      "http": 200
+    },
+    {
+      "case": "complaint-compensation",
+      "expectedSources": [
+        "art_85"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_85"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1642,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "No. Filing a complaint with the relevant market surveillance authority is separate from seeking compensation; the provision preserves other administrative or judicial remedies."
+      ],
+      "http": 200
+    },
+    {
+      "case": "gpai-transition-cutoff",
+      "expectedSources": [
+        "art_111"
+      ],
+      "status": "answered",
+      "sourceIds": [
+        "art_111"
+      ],
+      "missing": [],
+      "contradictions": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1330,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Providers of general-purpose AI models placed on the market before 2 August 2025 must comply with the Regulation by 2 August 2027."
+      ],
+      "http": 200
+    }
+  ]
+}

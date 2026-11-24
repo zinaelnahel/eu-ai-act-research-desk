@@ -14,6 +14,18 @@ The RAG pipeline generates an answer from passages returned by the existing 360-
 
 ## Production verification
 
+### Plain-language retrieval regression set
+
+All seven [answer cases](eu-ai-act/retrieval-feedback-cases.json) passed in the hosted rerun. Trademark, impact assessment and the GPAI transitional deadline now retrieve the answer-bearing paragraphs. The browser suite verifies that all three paragraphs stay visible during a simulated model outage. The direct Article 25 lookup and the two-turn complaint and compensation conversation also passed in the live browser.
+
+The earlier six-case feedback set was rerun separately. Five passed. The fatal-incident answer was withheld after draft validation, so the desk retained the Article 73(4) and 73(2) excerpts.
+
+[Seven-case results](eu-ai-act/rag-retrieval-feedback-report.json) · [Earlier-case recheck](eu-ai-act/rag-feedback-recheck-report.json)
+
+```sh
+node eu-ai-act/rag-eval.mjs --hosted rag-retrieval-feedback-results.json --retrieval-feedback
+```
+
 ### Browser-feedback regression set
 
 The six [browser-feedback cases](eu-ai-act/feedback-cases.json) passed against the hosted endpoint: five cited answers and one out-of-scope abstention. The infrastructure case uses the standalone question produced by the browser’s follow-up resolver. A separate live browser check exercised the original two-turn conversation. A simulated provider outage verified that the Article 73(4), (3) and (5) excerpts stay visible without opening the full provision. The Article 86 check rejects drafts that omit the eligibility threshold or Annex III point 2 exclusion.
