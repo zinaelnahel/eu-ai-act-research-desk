@@ -65,6 +65,10 @@ async function requestGeneratedAnswer(text) {
       body: JSON.stringify({question: text}),
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(52_000)]),
     });
+    if (response.status === 429) {
+      if (modelRequest === controller) status.textContent = 'Ask AI is receiving too many requests. Try again shortly or read the evidence below.';
+      return;
+    }
     if (!response.ok) throw new Error('Generation unavailable');
     const result = await response.json();
     if (modelRequest !== controller) return;

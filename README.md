@@ -35,6 +35,8 @@ In PowerShell use `$env:EU_AI_ACT_OLLAMA_MODEL = 'qwen3:4b'`. On Vercel, the API
 
 [Read the generated-answer evaluation](RAG_EVALUATION.md) for the offline regression checks, local model results and known failures.
 
+Production limits answer requests to 24 per minute per client IP on each warm function instance. The UI keeps the retrieved passages visible on HTTP 429. A Vercel Firewall rule on `POST /api/answer` is the project-wide control across instances.
+
 ## Run and verify
 
 Use Node.js 22 and Python 3.12. From the repository root:

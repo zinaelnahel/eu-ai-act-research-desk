@@ -61,6 +61,36 @@
     "draft": "Deployers generally disclose AI-generated or manipulated deepfakes. Evidently artistic or satirical works require appropriate disclosure that does not hamper enjoyment."
   },
   {
+    "id": "gpai-obligations",
+    "question": "What are the obligations for GPAI providers?",
+    "sources": ["art_53", "art_55"],
+    "sourcePhrases": {
+      "art_53": ["technical documentation", "copyright", "training"],
+      "art_55": ["systemic.risk", "evaluat|test", "mitigat", "incident"]
+    },
+    "forbidden": ["all (?:GPAI|general-purpose AI) (?:model )?providers must report serious incidents"],
+    "drafts": {
+      "art_53": "General-purpose AI model providers must keep technical documentation, make information available to integrators, adopt a copyright compliance policy and publish a summary of training content.",
+      "art_55": "Providers of systemic-risk models must also evaluate and test their models, assess and mitigate risk, report serious incidents and ensure adequate cybersecurity."
+    }
+  },
+  {
+    "id": "school-exception",
+    "question": "Could a school use AI to infer pupils’ emotions?",
+    "source": "art_5",
+    "phrases": ["school|education", "prohibit|ban|not (allowed|permitted)", "medical", "safety"],
+    "forbidden": ["allowed (?:at|in) school.{0,20}(?:except|unless)", "(?:permitted|allowed) for discipline"],
+    "draft": "The Act prohibits AI used to infer emotions in schools, except for systems intended for medical or safety reasons."
+  },
+  {
+    "id": "open-source-exception",
+    "question": "Are open-source GPAI providers exempt from obligations?",
+    "source": "art_53",
+    "phrases": ["open.source|free.{0,15}open", "licen[cs]", "technical documentation", "integrat", "copyright", "training", "systemic.risk"],
+    "forbidden": ["exempt from all obligations", "no copyright obligations"],
+    "draft": "Models under qualifying free and open-source licences can be exempt from technical documentation and integrator documentation duties but still face copyright and training-summary obligations. This exemption does not apply to systemic-risk models."
+  },
+  {
     "id": "out-of-scope",
     "question": "What is the capital of Canada?"
   },

@@ -1,8 +1,9 @@
 import {answerRag} from '../eu-ai-act/rag.mjs';
 import {createProvider} from '../eu-ai-act/rag-provider.mjs';
+import {createAnswerLimit} from '../eu-ai-act/answer-limit.mjs';
 
-const json = (value, status = 200) => Response.json(value, {
-  status, headers: {'Cache-Control': 'no-store'},
+const json = (value, status = 200, headers = {}) => Response.json(value, {
+  status, headers: {'Cache-Control': 'no-store', ...headers},
 });
 
 async function readQuestion(request) {
@@ -30,7 +31,7 @@ async function readQuestion(request) {
   }
 }
 
-export function createAnswerHandler(complete, run = answerRag) {
+export function createAnswerHandler(complete, run = answerRag, rateLimit = () => 0) {
   return async request => {
     if (request.method === 'GET') return json({available: Boolean(complete)});
     if (request.method !== 'POST') return json({error: 'Method not allowed'}, 405);
@@ -41,9 +42,11 @@ export function createAnswerHandler(complete, run = answerRag) {
     const question = await readQuestion(request);
     if (!question) return json({error: 'Enter a question of up to 600 characters'}, 400);
     if (!complete) return json({status: 'unavailable', claims: []}, 503);
+    const retryAfter = rateLimit(request);
+    if (retryAfter) return json({error: 'Too many requests'}, 429, {'Retry-After': String(retryAfter)});
     return json(await run(question, {complete}));
   };
 }
 
-const handle = createAnswerHandler(createProvider());
+const handle = createAnswerHandler(createProvider(), answerRag, process.env.VERCEL ? createAnswerLimit() : undefined);
 export default {fetch: handle};

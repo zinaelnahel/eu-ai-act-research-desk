@@ -16,11 +16,31 @@ on:
       - 'vercel.json'
       - '.github/workflows/eu-ai-act.yml'
   workflow_dispatch:
+    inputs:
+      hosted_eval:
+        description: Run the paid-model smoke benchmark against production
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
+  hosted-evaluation:
+    if: github.event_name == 'workflow_dispatch' && inputs.hosted_eval
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node eu-ai-act/rag-eval.mjs --hosted rag-hosted-results.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rag-hosted-results
+          path: rag-hosted-results.json
+
   evaluate:
     runs-on: ubuntu-latest
     steps:

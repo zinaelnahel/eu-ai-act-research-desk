@@ -5,11 +5,15 @@ import {cases, scoreRag} from './rag-eval.mjs';
 import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 import {createAnswerHandler} from '../api/answer.mjs';
+import {createAnswerLimit} from './answer-limit.mjs';
 
 const example = cases[0];
 function draftFor(fixture, passages) {
-  const passage = passages.find(item => item.id === fixture.source);
-  return {claims: [{text: fixture.draft, sourceId: passage.id}]};
+  const drafts = fixture.drafts || {[fixture.source]: fixture.draft};
+  return {claims: Object.entries(drafts).map(([sourceId, text]) => {
+    assert.ok(passages.some(passage => passage.id === sourceId));
+    return {sourceId, text};
+  })};
 }
 
 for (const fixture of cases) {
@@ -38,6 +42,37 @@ test('accepts multiple supported claims from different provisions', async () => 
   }});
   assert.equal(result.status, 'answered');
   assert.deepEqual(result.claims.map(claim => claim.sourceId), ['art_53', 'art_55']);
+});
+
+test('scoring catches a correct citation attached to the wrong class of provider', async () => {
+  const fixture = cases.find(item => item.id === 'gpai-obligations');
+  const result = await answerRag(fixture.question, {complete: async (stage, _, data) =>
+    stage === 'draft' ? draftFor(fixture, data.passages) : {approved: true}});
+  const [general, systemic] = result.claims;
+  assert.equal(scoreRag(fixture, {...result, claims: [general]}).passed, false);
+  assert.equal(scoreRag(fixture, {...result, claims: [
+    {...general, text: general.text + ' All GPAI providers must report serious incidents.'}, systemic,
+  ]}).passed, false);
+});
+
+test('rate limit rejects excess requests before the model and resets', async () => {
+  let time = 0;
+  let runs = 0;
+  const limit = createAnswerLimit({now: () => time, limit: 2});
+  const handle = createAnswerHandler(() => {}, async () => ({runs: ++runs}), limit);
+  const ask = ip => handle(new Request('https://example.test/api/answer', {
+    method: 'POST', headers: {'Content-Type': 'application/json', 'x-vercel-forwarded-for': ip},
+    body: JSON.stringify({question: example.question}),
+  }));
+  assert.equal((await ask('192.0.2.1')).status, 200);
+  assert.equal((await ask('192.0.2.1')).status, 200);
+  const limited = await ask('192.0.2.1');
+  assert.equal(limited.status, 429);
+  assert.equal(limited.headers.get('Retry-After'), '60');
+  assert.equal(runs, 2);
+  assert.equal((await ask('192.0.2.2')).status, 200);
+  time = 60_000;
+  assert.equal((await ask('192.0.2.1')).status, 200);
 });
 
 test('evaluation fails a changed citation or an exception with missing safeguards', async () => {

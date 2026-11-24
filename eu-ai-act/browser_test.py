@@ -22,8 +22,10 @@ def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
                 "text": "The ban includes workplace emotion inference.",
                 "label": "Article 5", "url": url, "quote": "medical or safety reasons",
             }]})
-        else:
+        elif len(requests) == 2:
             route.fulfill(json={"status": "rejected", "claims": []})
+        else:
+            route.fulfill(status=429, json={"error": "Too many requests"})
 
     page.route("**/api/answer", answer)
     page.reload()
@@ -45,10 +47,13 @@ def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
     expect(page.get_by_role("link", name="Read the consolidated provision")).to_have_attribute("href", url)
     page.get_by_role("button", name="Find evidence only").click()
     expect(page.get_by_role("status")).to_contain_text("Relevant provisions")
+    generate.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("too many requests")
+    expect(page.get_by_role("link", name="Read the consolidated provision")).to_have_attribute("href", url)
     search.fill("What is the capital of Canada?")
     generate.press("Enter")
     expect(page.get_by_role("status")).to_contain_text("did not find enough")
-    assert len(requests) == 2
+    assert len(requests) == 3
 
 
 def test_desktop_keyboard_question_abstention_and_annex_browse(open_page):
