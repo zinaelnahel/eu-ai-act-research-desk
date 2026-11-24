@@ -7,11 +7,16 @@
   <link rel="stylesheet" href="./desk.css">
   <script type="module" src="./evaluation.mjs"></script>
 </head>
-<body>
-  <header class="masthead"><div class="wrap top"><a class="wordmark" href="./index.html">EU AI Act <span>Research Desk</span></a><a href="./index.html">Back to research desk</a></div></header>
+<body class="research-theme evaluation-page">
+  <header class="masthead">
+    <div class="wrap top">
+      <a class="wordmark" href="./index.html"><span class="desk-mark" aria-hidden="true">§</span> EU AI Act <span>Research Desk</span></a>
+      <nav aria-label="Main navigation"><a href="./index.html">Ask AI</a><a href="./index.html#library">Browse the Act</a><a href="./evaluation.html" aria-current="page">Testing evidence</a><a href="./learn.html">Learn</a></nav>
+    </div>
+  </header>
   <main class="wrap">
-    <section class="intro"><p class="kicker">QUALITY ENGINEERING</p><h1>Evaluation report</h1><p>Can the desk find the right provision, preserve an important exception, and recognise when it lacks evidence?</p></section>
-    <section class="research" aria-labelledby="results" style="margin-block: 24px">
+    <section class="intro desk-heading"><p class="kicker">QUALITY ENGINEERING</p><h1>Testing <em>evidence.</em></h1><p>See how the desk checks source retrieval, legal qualifiers, and when to abstain.</p></section>
+    <section class="research" aria-labelledby="results">
       <h2 id="results">Labeled scenarios</h2>
       <p id="metrics" role="status">Loading report…</p>
       <p id="precision"></p>
@@ -47,5 +52,6 @@
       <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk">View the test suite and source code</a></p>
     </section>
   </main>
+  <footer class="wrap"><a href="https://portfoliozinaelnahel.vercel.app/#work">Zina El Nahel · Portfolio</a><a href="./index.html">Back to Ask AI</a></footer>
 </body>
 </html>
