@@ -61,12 +61,25 @@ footer { padding-block: 25px 35px; font-size: .87rem; color: #4e5d70; }
 table { width: 100%; border-collapse: collapse; }
 td, th { text-align: left; padding: 10px; border-bottom: 1px solid #ccd4df; vertical-align: top; }
 .table-wrap { overflow: auto; }
-.assistant-home { color: #232b23; background: #f8f8f0; }
-.assistant-home .masthead { color: #252e25; background: #f8f8f0; border-bottom: 1px solid #dce0d3; }
-.assistant-home .wordmark { display: inline-flex; align-items: center; gap: 6px; font-size: 1.1rem; }
-.assistant-home .wordmark span { color: #3b583b; }
-.assistant-home .wordmark .desk-mark { display: inline-grid; place-items: center; width: 32px; height: 32px; margin-right: 5px; border-radius: 50%; background: #254831; color: white; font-family: Georgia, serif; }
-.assistant-home nav a { text-decoration-thickness: 1px; }
+.research-theme {
+  --desk-ink: #232b23;
+  --desk-accent: #254831;
+  --desk-accent-hover: #396345;
+  --desk-muted: #3e583e;
+  --desk-canvas: #f8f8f0;
+  --desk-surface: #fffef8;
+  --desk-border: #d4ddcf;
+  --desk-tint: #eef4e9;
+  --desk-pattern: radial-gradient(#7c907244 1px, transparent 1px) 0 0 / 18px 18px, #e9eddb;
+  color: var(--desk-ink);
+  background: var(--desk-canvas);
+}
+.research-theme .masthead { color: var(--desk-ink); background: var(--desk-canvas); border-bottom: 1px solid var(--desk-border); }
+.research-theme .wordmark { display: inline-flex; align-items: center; gap: 6px; font-size: 1.1rem; }
+.research-theme .wordmark span { color: var(--desk-muted); }
+.research-theme .wordmark .desk-mark { display: inline-grid; place-items: center; width: 32px; height: 32px; margin-right: 5px; border-radius: 50%; background: var(--desk-accent); color: white; font-family: Georgia, serif; }
+.research-theme nav a { text-decoration-thickness: 1px; }
+.research-theme nav a[aria-current="page"] { font-weight: 700; text-decoration-thickness: 2px; }
 .assistant-home .intro {
   display: grid;
   grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
@@ -76,18 +89,18 @@ td, th { text-align: left; padding: 10px; border-bottom: 1px solid #ccd4df; vert
   margin-top: clamp(16px, 4vw, 44px);
   border: 0;
   border-radius: 20px;
-  background: radial-gradient(#7c907244 1px, transparent 1px) 0 0 / 18px 18px, #e9eddb;
+  background: var(--desk-pattern);
 }
 .desk-heading .kicker { color: #3d593c; }
 .desk-heading h1 { font: 700 clamp(2.5rem, 5.8vw, 5rem)/.98 var(--display); letter-spacing: -.064em; max-width: 11ch; }
 .desk-heading em { color: #315c3e; font-style: normal; }
 .desk-heading > p:last-child { max-width: 33ch; margin-bottom: 0; }
-.desk-composer { background: #fffef8; border: 1px solid #b7c7b4; padding: clamp(14px, 3vw, 28px); border-radius: 16px; box-shadow: 0 12px 0 #64816420; }
+.desk-composer { background: var(--desk-surface); border: 1px solid #b7c7b4; padding: clamp(14px, 3vw, 28px); border-radius: 16px; box-shadow: 0 12px 0 #64816420; }
 .desk-composer form { margin-top: 0; }
 .desk-composer label { font-size: 1rem; }
 .desk-composer input { border-color: #829783; border-radius: 8px; }
-.desk-composer #ask { background: #254831; border-color: #254831; border-radius: 8px; }
-.desk-composer #ask:hover { background: #396345; }
+.desk-composer #ask { background: var(--desk-accent); border-color: var(--desk-accent); border-radius: 8px; }
+.desk-composer #ask:hover { background: var(--desk-accent-hover); }
 .desk-composer .examples button { background: #f0f3e6; color: #2c4932; border-color: #c7d3bf; border-radius: 18px; text-align: left; }
 .desk-composer .examples button:hover { background: #e1ead8; }
 .desk-secondary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 16px; font-size: .86rem; }
