@@ -146,8 +146,9 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
     const timingGuidance = context.some(item => item.id === 'art_50_p5')
       ? ' Use three short claims: (one) art_50: Providers must tell people interacting directly with AI unless it is obvious in context. (two) art_50: Explain the exception for legally authorised criminal-offence systems with third-party safeguards and the limitation for systems available for public reporting. (three) art_50_p5: State that clear, distinguishable and accessible notice must be given by the first interaction.'
       : '';
-    const complaintGuidance = context.some(item => item.id === 'art_85') && /\bcompensation\b/i.test(question)
-      ? ' Distinguish a complaint to the market surveillance authority from seeking compensation. The provision preserves other administrative or judicial remedies; do not assert eligibility for compensation or describe a procedure not in the excerpt.'
+    const compensationQuestion = context.some(item => item.id === 'art_85') && /\bcompensation\b/i.test(question);
+    const complaintGuidance = compensationQuestion
+      ? ' Say explicitly that filing a complaint with the market surveillance authority is separate from seeking compensation. Use the word compensation. Explain that the provision preserves other administrative or judicial remedies. Do not assert eligibility or describe another procedure.'
       : '';
     const gpaiOverview = /obligations? for (?:gpai|general.purpose ai)(?: model)? providers?/i.test(question) &&
       ['art_53', 'art_55'].every(id => context.some(item => item.id === id));
@@ -165,7 +166,9 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
         const text = claims.filter(claim => claim.passageId === rule.id).map(claim => claim.text).join(' ');
         return rule.patterns.some(pattern => !pattern.test(text));
       });
-      if (!claims || missingLegalCondition || (gpaiOverview && claims.length && !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id)))) {
+      const missingCompensation = compensationQuestion && claims?.length &&
+        !claims.some(claim => claim.sourceId === 'art_85' && /\bcompensation\b/i.test(claim.text));
+      if (!claims || missingLegalCondition || missingCompensation || (gpaiOverview && claims.length && !['art_53', 'art_55'].every(id => claims.some(claim => claim.sourceId === id)))) {
         reason = 'invalid-draft';
         continue;
       }
