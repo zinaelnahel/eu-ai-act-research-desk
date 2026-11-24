@@ -108,14 +108,14 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
     if (!claims) {
       modelCalls++;
       const retry = await complete('draft', draftInstructions +
-        ' The previous draft failed validation. Use one or two sentences of at most 220 characters each. Use only source IDs from the supplied excerpts. Write without digits, provision references or cross-references in claim text. Preserve the conditions and safeguards.', {question, passages}, draftSchema);
+        ' The previous draft failed validation. Each claim must be at most 300 characters. Use only source IDs from the supplied excerpts. Write without digits, provision references or cross-references in claim text. Preserve the conditions and safeguards.', {question, passages}, draftSchema);
       claims = validateDraft(retry, context);
     }
     if (!claims) return result('rejected');
     if (!claims.length) return result('abstained');
 
     modelCalls++;
-    const review = await complete('review', instructions.review + guidance, {
+    const review = await complete('review', instructions.review, {
       question, passages, claims: claims.map(({text, sourceId, quote}) => ({text, sourceId, quote})),
     }, reviewSchema);
     return keysAre(review, ['approved']) && review.approved === true
