@@ -20,13 +20,13 @@
     <section class="intro" aria-labelledby="desk-title">
       <p class="kicker">REGULATION (EU) 2024/1689</p>
       <h1 id="desk-title">Ask the EU AI Act.</h1>
-      <p>Find the passages that answer your question and check them against the official text.</p>
+      <p id="ask-description">Find the passages that answer your question and check them against the official text.</p>
       <a class="learn-launch" href="./learn.html">Learn with scenario quizzes</a>
       <form id="question-form">
         <label for="question">Your question</label>
         <div class="question-row"><input id="question" name="question" type="search" maxlength="600" required placeholder="What does the Act say about…"><button type="submit" id="ask" disabled>Find evidence</button></div>
       </form>
-      <button id="generate" class="generate-answer" type="submit" form="question-form" hidden disabled>Generate cited answer</button>
+      <button id="evidence-only" class="generate-answer" type="submit" form="question-form" hidden>Find evidence only</button>
       <div class="examples" aria-label="Example questions">
         <button type="button" disabled>Is emotion recognition allowed at work?</button>
         <button type="button" disabled>When must a chatbot disclose it is AI?</button>

@@ -22,7 +22,7 @@ With Ollama running locally and the model installed, run these commands from the
 ```sh
 export EU_AI_ACT_OLLAMA_MODEL=qwen3:4b
 node eu-ai-act/serve.mjs
-# Open http://127.0.0.1:8080 and select Generate cited answer.
+# Open http://127.0.0.1:8080 and select Ask AI.
 # In a separate terminal with the same environment variable:
 node eu-ai-act/rag-eval.mjs rag-live-results.json
 ```

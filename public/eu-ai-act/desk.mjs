@@ -5,11 +5,13 @@ const form = byId('question-form');
 const question = byId('question');
 const status = byId('status');
 const answer = byId('answer');
-const generate = byId('generate');
+const ask = byId('ask');
+const evidenceOnly = byId('evidence-only');
 const kind = byId('kind');
 const provision = byId('provision');
 const examples = [...document.querySelectorAll('.examples button')];
 let modelRequest;
+let assistantAvailable = false;
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -51,7 +53,7 @@ function renderGenerated(claims) {
     list.append(item);
   }
   section.append(list);
-  answer.prepend(section);
+  answer.querySelector('.asked-question').after(section);
 }
 
 async function requestGeneratedAnswer(text) {
@@ -80,9 +82,21 @@ async function requestGeneratedAnswer(text) {
   }
 }
 
-fetch('/api/answer', {signal: AbortSignal.timeout(3500)})
+fetch('/api/answer', {signal: AbortSignal.timeout(8000), cache: 'no-store'})
   .then(response => response.ok ? response.json() : null)
-  .then(settings => { if (settings?.available) generate.hidden = false; })
+  .then(settings => {
+    if (!settings?.available) return;
+    assistantAvailable = true;
+    ask.textContent = 'Ask AI';
+    evidenceOnly.hidden = false;
+    const learn = document.querySelector('.learn-launch');
+    document.querySelector('.examples').after(learn);
+    learn.classList.add('learn-secondary');
+    const learnNav = document.querySelector('nav a[href="./learn.html"]');
+    learnNav.parentElement.append(learnNav);
+    byId('ask-description').textContent =
+      'Ask the AI assistant a question about the Act. It answers from retrieved provisions and shows you the exact sources.';
+  })
   .catch(() => {});
 
 try {
@@ -93,8 +107,7 @@ try {
   byId('edition').textContent = corpus.version + ' · ' + corpus.documents.length + ' provisions';
   byId('official-source').href = corpus.currentSource;
   status.textContent = 'Ask a question above or select a provision to read.';
-  byId('ask').disabled = false;
-  generate.disabled = false;
+  ask.disabled = false;
   for (const button of examples) {
     button.disabled = false;
     button.addEventListener('click', () => {
@@ -119,7 +132,10 @@ try {
     for (const item of result.evidence) renderEvidence(item, desk.documents.get(item.id));
     if (result.kind === 'version') answer.append(sourceLink('Check for current versions on EUR-Lex', 'https://eur-lex.europa.eu/eli/reg/2024/1689'));
     byId('answer-title').focus();
-    if (event.submitter === generate && ['evidence', 'matches'].includes(result.kind)) {
+    if (assistantAvailable && event.submitter !== evidenceOnly && ['evidence', 'matches'].includes(result.kind)) {
+      const prompt = element('p', '', 'asked-question');
+      prompt.append(element('strong', 'You asked: '), document.createTextNode(question.value.trim()));
+      answer.prepend(prompt);
       void requestGeneratedAnswer(question.value);
     }
   });
