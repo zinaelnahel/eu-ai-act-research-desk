@@ -43,6 +43,27 @@ def test_guided_situations_and_definitions(open_page):
     expect(terms.get_by_role("link", name="Read the definitions in Article 3")).to_be_visible()
 
 
+def test_plain_language_starters_and_question_help(open_page):
+    page = open_page(mobile=True)
+    page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))
+    field = page.get_by_role("searchbox", name="Your question")
+    answer = page.locator("#answer")
+    for label, wording, source in [
+        ("At work", "Can my employer use AI to tell how I’m feeling?", "Article 5"),
+        ("Using a chatbot", "When does a chatbot have to tell me it’s AI?", "Article 50"),
+        ("A decision about me", "Can I ask for an explanation of an AI-assisted decision?", "Article 86"),
+    ]:
+        page.get_by_role("button", name=label, exact=False).click()
+        expect(field).to_have_value(wording)
+        expect(answer.get_by_role("heading", name=source, exact=False).first).to_be_visible()
+    field.fill("How do I bake banana bread?")
+    field.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("who uses the AI, what it does, and how it affects you")
+    page.get_by_role("link", name="Help me find a question").click()
+    expect(page.get_by_role("region", name="Start with your situation")).to_be_visible()
+    assert_no_page_overflow(page)
+
+
 def test_gpai_cutoff_and_distributor_routes_show_exact_fallback(open_page):
     page = open_page(mobile=True)
     page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))

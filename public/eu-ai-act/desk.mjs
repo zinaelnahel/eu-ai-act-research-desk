@@ -177,7 +177,7 @@ try {
   for (const button of examples) {
     button.disabled = false;
     button.addEventListener('click', () => {
-      question.value = button.textContent;
+      question.value = button.querySelector('.example-question').textContent;
       form.requestSubmit();
     });
   }

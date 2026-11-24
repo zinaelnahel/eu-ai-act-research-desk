@@ -29,6 +29,7 @@ const TOPICS = [
 const CURRENT = /\b(as of today|currently in force|latest (?:version|amendments?)|changed since .{0,10}2026)\b/i;
 const TIMING = /\b(application dates?|when (?:does|will|did) (?:the )?(?:eu ai act|ai act|act|regulation|rules?) (?:start|apply|enter)|(?:start|become) applicable|transition(?:al)? dates?)\b/i;
 const TARGETED_TOPICS = [
+  [/\b(?:employers?|work)\b.*\b(?:tell|infer|guess|detect)\b.*\b(?:how .{0,20}feel\w*|emotions?)\b/i, [['art_5', /\(f\).*?infer emotions/is]]],
   [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:chang\w*|modif\w*).{0,25}intended purpose\b.*\bhigh.risk\b/i, [['art_25', 1, 'c']]],
   [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\bsubstantial\w* (?:modif\w*|chang\w*)\b.*\bhigh.risk\b/i, [['art_25', 1, 'b']]],
   [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:trademark|own (?:name|brand))\b|\b(?:trademark|own (?:name|brand))\b.*\b(?:distributors?|importers?|deployers?)\b/i, [['art_25', 1, 'a']]],
@@ -128,7 +129,8 @@ export function createDesk(corpus) {
     if (targeted) {
       const evidence = targeted[1].flatMap(([id, paragraph, clause]) => {
         const doc = documents.get(id);
-        const quote = paragraph ? doc?.blocks.find(block => block.startsWith(paragraph + '. ')) : doc?.blocks[0];
+        const quote = paragraph instanceof RegExp ? (doc && narrowQuote(id, snippet(doc, paragraph)))
+          : paragraph ? doc?.blocks.find(block => block.startsWith(paragraph + '. ')) : doc?.blocks[0];
         if (!quote) return [];
         const focused = clause && quote.split(` (${clause}) `)[1]?.split(/ \([abc]\) /)[0];
         return [{...citation(doc, clause === 'a' ? quote.split(' (b)')[0] : quote),
@@ -206,7 +208,7 @@ export function createDesk(corpus) {
     }).sort((a, b) => b.score - a.score);
     const top = ranked[0];
     if (top.best.hits < 2 || top.score < 4) {
-      return {kind: 'abstain', reason: 'I did not find enough matching evidence. Try naming a specific practice, obligation, or article.', evidence: []};
+      return {kind: 'abstain', reason: 'I did not find enough matching evidence. Try describing who uses the AI, what it does, and how it affects you.', evidence: []};
     }
     const evidence = ranked.filter(row => row.best.hits >= 2 && row.score >= top.score * 0.66).slice(0, 3)
       .map(({doc, best}) => citation(doc, ['art_113', 'art_111'].includes(doc.id) ? doc.blocks.join('\n\n') : best.text));

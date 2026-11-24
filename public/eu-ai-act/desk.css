@@ -108,6 +108,8 @@ td, th { text-align: left; padding: 10px; border-bottom: 1px solid #ccd4df; vert
 .desk-composer #ask:hover { background: var(--desk-accent-hover); }
 .desk-composer .examples button { background: #f0f3e6; color: #2c4932; border-color: #c7d3bf; border-radius: 18px; text-align: left; }
 .desk-composer .examples button:hover { background: #e1ead8; }
+.desk-composer .examples strong, .example-question { display: block; }
+.desk-composer .examples strong { font-size: .78rem; }
 .desk-secondary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; margin-top: 16px; font-size: .86rem; }
 .desk-secondary button, .desk-secondary a { color: #3e583e; background: transparent; text-decoration: underline; text-underline-offset: 4px; padding: 6px 0; border: 0; }
 .desk-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; grid-column: 1 / -1; padding: 0; margin: 0; list-style: none; font-size: .88rem; color: #34513b; }

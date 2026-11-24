@@ -17,7 +17,7 @@ export function resolveFollowUp(question, previous) {
   if (id === 'art_73' && /\bcritical infrastructure\b/i.test(text)) {
     return {question: 'What is the reporting deadline if a serious incident disrupts critical infrastructure?', reference: 'Article 73'};
   }
-  const emotion = id === 'art_5' && /infer.{0,32}emotions|emotion recognition/i.test(previous.question);
+  const emotion = id === 'art_5' && /infer.{0,32}emotions|emotion recognition|how .{0,20}feel\w*/i.test(previous.question);
   if (emotion &&
       /\b(?:schools?|education|pupils?|students?)\b/i.test(text)) {
     return {question: 'Does the prohibition on AI emotion recognition also apply in schools?', reference: 'Article 5'};

@@ -8,6 +8,11 @@ export const cases = JSON.parse(readFileSync(new URL('./rag-cases.json', import.
 export const feedbackCases = JSON.parse(readFileSync(new URL('./feedback-cases.json', import.meta.url), 'utf8'));
 export const retrievalFeedbackCases = JSON.parse(readFileSync(new URL('./retrieval-feedback-cases.json', import.meta.url), 'utf8'));
 export const boundaryFeedbackCases = JSON.parse(readFileSync(new URL('./boundary-feedback-cases.json', import.meta.url), 'utf8'));
+export const starterCases = [
+  {...cases.find(item => item.id === 'workplace-exception'), question: 'Can my employer use AI to tell how I’m feeling?'},
+  {...cases.find(item => item.id === 'chatbot-disclosure'), question: 'When does a chatbot have to tell me it’s AI?'},
+  {...feedbackCases.find(item => item.id === 'adverse-explanation'), question: 'Can I ask for an explanation of an AI-assisted decision?'},
+];
 
 export function scoreRag(fixture, result) {
   const {status, claims, retrievedIds, metrics} = result;
@@ -85,11 +90,10 @@ async function main() {
   if (!hosted && (!complete || !process.env.EU_AI_ACT_OLLAMA_MODEL || process.env.VERCEL)) {
     throw new Error('Start Ollama and set EU_AI_ACT_OLLAMA_MODEL before running the local evaluation.');
   }
-  const starterIds = new Set(['workplace-exception', 'chatbot-disclosure', 'gpai-obligations']);
   const fixtures = process.argv.includes('--boundary-feedback') ? [...retrievalFeedbackCases.slice(0, 1), ...boundaryFeedbackCases]
     : process.argv.includes('--retrieval-feedback') ? retrievalFeedbackCases
     : process.argv.includes('--feedback') ? feedbackCases
-    : process.argv.includes('--starters') ? cases.filter(item => starterIds.has(item.id)) : cases;
+    : process.argv.includes('--starters') ? starterCases : cases;
   const results = hosted ? await runHosted(fixtures) : await runLive(complete);
   const report = {mode: hosted ? 'production-http' : 'local-ollama', model: hosted ? undefined : process.env.EU_AI_ACT_OLLAMA_MODEL,
     passed: results.filter(row => row.passed).length, total: results.length, results};
