@@ -90,7 +90,11 @@ export function createDesk(corpus) {
     if (ids.length) {
       const resolved = ids.map(id => documents.get(id)).filter(Boolean);
       if (resolved.length !== ids.length) {
-        return {kind: 'abstain', reason: 'A cited provision is outside this edition. Check the consolidated regulation for added or renumbered provisions.', evidence: []};
+        const missing = ids.filter(id => !documents.has(id)).map(id => {
+          const [kind, ...number] = id.split('_');
+          return `${{art: 'Article', anx: 'Annex', rct: 'Recital', amend: 'Amendment recital'}[kind]} ${number.at(-1)}`;
+        });
+        return {kind: 'abstain', reason: `${missing.join(', ')} ${missing.length === 1 ? 'was' : 'were'} not found in this edition. Try searching by topic instead.`, evidence: []};
       }
       const context = words.filter(word => !/^(?:\d|[ivx]+$|article$|annex$|recital$|amendment$|say$|mean$|requir$|compar$)/.test(word));
       return {kind: 'lookup', evidence: resolved.map(doc => {
@@ -124,7 +128,9 @@ export function createDesk(corpus) {
         summary = 'The Act prohibits AI used to infer emotions in workplaces and educational institutions, with an exception for uses intended for medical or safety reasons.';
       }
       if (primary.id === 'art_50' && /interact directly/i.test(primary.quote)) {
-        summary = 'Providers of AI intended to interact directly with people generally must inform them that they are interacting with AI, unless that is obvious in context. Article 50(1) also specifies an exception for certain law-enforcement systems.';
+        const timing = documents.get('art_50').blocks.find(block => /^5\. /.test(block));
+        if (timing) primary.timing = timing;
+        summary = 'Providers must generally tell people when they interact directly with AI, unless that is obvious in context. The information must be clear and distinguishable by the first interaction. Read the provisions for accessibility requirements and the qualified law-enforcement exception.';
       }
       return {kind: 'evidence', summary, evidence};
     }

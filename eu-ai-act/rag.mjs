@@ -4,7 +4,7 @@ import {createDesk} from '../public/eu-ai-act/search.mjs';
 const corpus = JSON.parse(readFileSync(new URL('../public/eu-ai-act/corpus.json', import.meta.url), 'utf8'));
 const desk = createDesk(corpus);
 const MAX_CONTEXT_CHARS = 18_000;
-const MAX_CLAIMS = 3;
+const MAX_CLAIMS = 4;
 const MAX_CLAIM_CHARS = 420;
 
 const draftSchema = {
@@ -43,7 +43,12 @@ export function verifiedContext(retrieval, documents = desk.documents) {
     if (size + item.quote.length > MAX_CONTEXT_CHARS) continue;
     size += item.quote.length;
     seen.add(item.id);
-    result.push({id: item.id, quote: item.quote, label: source.label, title: source.title, url: source.url});
+    result.push({id: item.id, sourceId: item.id, quote: item.quote, label: source.label, title: source.title, url: source.url});
+    if (item.id === 'art_50' && /^1\./.test(item.quote) && item.timing &&
+      source.blocks.includes(item.timing) && /^5\./.test(item.timing) && size + item.timing.length <= MAX_CONTEXT_CHARS) {
+      size += item.timing.length;
+      result.push({id: 'art_50_p5', sourceId: item.id, quote: item.timing, label: source.label, title: source.title, url: source.url});
+    }
   }
   return result;
 }
@@ -76,10 +81,13 @@ function validateDraft(draft, context) {
     const evidenceNumbers = new Set(normalizedNumbers(source.quote));
     if (normalizedNumbers(claim.text).some(number => !evidenceNumbers.has(number))) return null;
     seen.add(claim.text.trim());
-    claims.push({text: claim.text.trim(), sourceId: source.id, quote: source.quote,
+    claims.push({text: claim.text.trim(), sourceId: source.sourceId, quote: source.quote,
       label: source.label, url: source.url});
   }
-  return missingDisclosureSafeguards(claims) ? null : claims;
+  return missingDisclosureSafeguards(claims) || (context.some(item => item.id === 'art_50_p5') && claims.length &&
+    (!claims.some(claim => /^1\./.test(claim.quote) && /\bproviders?\b/i.test(claim.text) && /obvious/i.test(claim.text)) ||
+     !claims.some(claim => /^5\./.test(claim.quote) && /first interaction/i.test(claim.text) &&
+       /accessib/i.test(claim.text) && /clear/i.test(claim.text)))) ? null : claims;
 }
 
 export async function answerRag(question, {complete, retrieve = desk.ask, documents = desk.documents}) {
@@ -87,8 +95,8 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
   const retrieval = retrieve(question);
   const context = verifiedContext(retrieval, documents);
   let modelCalls = 0;
-  const result = (status, claims = []) => ({
-    status, claims, retrievedIds: context.map(item => item.id), edition: corpus.version,
+  const result = (status, claims = [], reason) => ({
+    status, claims, reason, retrievedIds: [...new Set(context.map(item => item.sourceId))], edition: corpus.version,
     metrics: {modelCalls, latencyMs: Math.round(performance.now() - started)},
   });
   if (retrieval.kind !== 'evidence' && retrieval.kind !== 'matches') return result('abstained');
@@ -96,31 +104,35 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
   if (!complete) return result('unavailable');
 
   try {
-    modelCalls++;
     const passages = context.map(({id, title, quote}) => ({id, title, quote}));
     const guidance = /open[\s-]+source/i.test(question) && passages.some(({id}) => id === 'art_53')
       ? openSourceGuidance
       : passages.some(({id, quote}) => id === 'art_5' && /infer emotions.+workplace and education/i.test(quote))
         ? emotionGuidance : '';
-    const draftInstructions = instructions.draft + guidance;
-    const draft = await complete('draft', draftInstructions, {question, passages}, draftSchema);
-    let claims = validateDraft(draft, context);
-    if (!claims) {
+    const timingGuidance = context.some(item => item.id === 'art_50_p5')
+      ? ' Use up to four claims. Cite art_50 for the provider duty, the obviousness exception and the qualified law-enforcement exception. Cite art_50_p5 separately for clear, distinguishable notice by the first interaction and accessibility.'
+      : '';
+    const draftInstructions = instructions.draft + guidance + timingGuidance;
+    let reason;
+    for (let attempt = 0; attempt < 2; attempt++) {
       modelCalls++;
-      const retry = await complete('draft', draftInstructions +
-        ' The previous draft failed validation. Each claim must be at most 300 characters. Use only source IDs from the supplied excerpts. Write without digits, provision references or cross-references in claim text. Preserve the conditions and safeguards.', {question, passages}, draftSchema);
-      claims = validateDraft(retry, context);
+      const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters without digits or cross-references.' : '';
+      const draft = await complete('draft', draftInstructions + retry, {question, passages}, draftSchema);
+      const claims = validateDraft(draft, context);
+      if (!claims) {
+        reason = 'invalid-draft';
+        continue;
+      }
+      if (!claims.length) return result('abstained', [], 'empty-draft');
+      modelCalls++;
+      const review = await complete('review', instructions.review, {
+        question, passages, claims: claims.map(({text, sourceId, quote}) => ({text, sourceId, quote})),
+      }, reviewSchema);
+      if (keysAre(review, ['approved']) && review.approved === true) return result('answered', claims);
+      reason = 'review-rejected';
     }
-    if (!claims) return result('rejected');
-    if (!claims.length) return result('abstained');
-
-    modelCalls++;
-    const review = await complete('review', instructions.review, {
-      question, passages, claims: claims.map(({text, sourceId, quote}) => ({text, sourceId, quote})),
-    }, reviewSchema);
-    return keysAre(review, ['approved']) && review.approved === true
-      ? result('answered', claims) : result('rejected');
+    return result('rejected', [], reason);
   } catch {
-    return result('unavailable');
+    return result('unavailable', [], 'provider-error');
   }
 }

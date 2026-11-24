@@ -19,7 +19,9 @@ The [course RAG notebook](https://github.com/zinaelnahel/demos_ai_engineering_se
 
 The server retrieves from the same pinned corpus used by the evidence view. It gives the model verified passages and their titles, checks selected source IDs, attaches the original quotations and official links itself, then asks the model to review the draft for grounding and material exceptions. Unsupported or unreviewed drafts fall back to the evidence view. Both passes use the configured model, so the review can repeat the drafting model's mistakes.
 
-If a draft fails deterministic validation, the server attempts one shorter draft before falling back to the sources. Every published draft still goes through the same validation and review.
+If the first draft fails validation or review, the server attempts one shorter draft before falling back to the sources. Every published draft still goes through the same validation and review.
+
+[Starter prompt checks](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml) run the three built-in questions against the live deployment weekly. Each run records outcomes, fallback reasons and citations. These checks use the configured hosted model.
 
 Ask AI keeps a short conversation on the current page. For example, ask about workplace emotion recognition, then ask whether the rule also applies to schools. The desk shows the provision it carried forward and asks for clarification when the topic is unclear. Expand an earlier question to revisit its answer, or select Start a new conversation to clear the page's history. The model receives a standalone question for each turn.
 

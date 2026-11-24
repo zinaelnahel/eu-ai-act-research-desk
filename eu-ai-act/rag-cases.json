@@ -17,10 +17,14 @@
     "question": "When must a chatbot disclose it is AI?",
     "source": "art_50",
     "phrases": [
+      "provider",
       "inform|disclos|notifi",
       "obvious"
     ],
-    "draft": "Providers generally must inform people they are interacting with AI unless that is obvious in context."
+    "drafts": {
+      "art_50": "Providers generally must inform people they are interacting with AI unless that is obvious in context.",
+      "art_50_p5": "Provide the information clearly by the first interaction, in line with applicable accessibility requirements."
+    }
   },
   {
     "id": "literacy-level",

@@ -17,6 +17,21 @@ def test_ask_ai_greeting_from_library(open_page):
     expect(page.get_by_role("heading", name="Source-grounded answers")).to_be_focused()
 
 
+def test_missing_article_and_model_failure_give_specific_next_steps(open_page):
+    page = open_page()
+    page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))
+    search = page.get_by_role("searchbox", name="Your question")
+    expect(page.get_by_role("button", name="Ask AI")).to_be_enabled()
+    search.fill("What does Article 999 say?")
+    search.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("Article 999 was not found in this edition. Try searching by topic instead.")
+    search.fill("When must a chatbot disclose it is AI?")
+    search.press("Enter")
+    expect(page.get_by_role("status")).to_contain_text("temporarily unavailable")
+    expect(page.locator("#answer")).to_contain_text("Article 50(5) · Timing")
+    expect(page.locator("#answer")).to_contain_text("at the time of the first interaction or exposure")
+
+
 def test_new_legal_records_show_review_notice_and_official_link(open_page):
     page = open_page("/index.html#library", mobile=True)
     page.route("**/api/source-status", lambda route: route.fulfill(json={

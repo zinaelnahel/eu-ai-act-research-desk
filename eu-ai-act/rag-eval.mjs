@@ -18,20 +18,24 @@ export function scoreRag(fixture, result) {
     const citedText = claims.filter(claim => claim.sourceId === source).map(claim => claim.text).join(' ');
     missing.push(...patterns.filter(pattern => !new RegExp(pattern, 'i').test(citedText)));
   }
-  const passages = new Map(verifiedContext(desk.ask(fixture.question)).map(item => [item.id, item]));
+  const passages = verifiedContext(desk.ask(fixture.question));
   const invalidCitations = claims.filter(claim => {
-    const passage = passages.get(claim.sourceId);
-    return !passage || passage.url !== claim.url || passage.label !== claim.label || passage.quote !== claim.quote;
+    return !passages.some(passage => passage.sourceId === claim.sourceId && passage.url === claim.url &&
+      passage.label === claim.label && passage.quote === claim.quote);
   }).length;
+  if (fixture.id === 'chatbot-disclosure' && !claims.some(claim =>
+    /^5\./.test(claim.quote) && /first interaction/i.test(claim.text) && /accessib/i.test(claim.text))) {
+    missing.push('first interaction and accessibility cited to Article 50(5)');
+  }
   if (missingDisclosureSafeguards(claims)) {
     missing.push('safeguards and public reporting limitation when discussing criminal-offence systems');
   }
   const passed = required.length
     ? status === 'answered' && required.every(id => sourceIds.includes(id)) &&
       missing.length === 0 && contradictions.length === 0 && invalidCitations === 0 &&
-      sourceIds.every(id => allowed.has(id) && retrievedIds.includes(id)) && [2, 3].includes(metrics.modelCalls)
+      sourceIds.every(id => allowed.has(id) && retrievedIds.includes(id)) && [2, 3, 4].includes(metrics.modelCalls)
     : status === 'abstained' && claims.length === 0 && metrics.modelCalls === 0;
-  return {case: fixture.id, expectedSources: required, status, sourceIds, missing, contradictions, invalidCitations,
+  return {case: fixture.id, expectedSources: required, status, reason: result.reason, sourceIds, missing, contradictions, invalidCitations,
     passed, latencyMs: metrics.latencyMs, modelCalls: metrics.modelCalls};
 }
 
@@ -46,19 +50,19 @@ export async function runLive(complete) {
   return results;
 }
 
-async function runHosted() {
+async function runHosted(fixtures) {
   const url = 'https://eu-ai-act-research-desk.vercel.app/api/answer';
   const ready = await fetch(url, {signal: AbortSignal.timeout(10_000)});
   if (!ready.ok || !(await ready.json()).available) throw new Error('Hosted provider unavailable.');
   const results = [];
-  for (const fixture of cases) {
+  for (const fixture of fixtures) {
     const response = await fetch(url, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({question: fixture.question}), signal: AbortSignal.timeout(58_000),
     });
-    const body = await response.json();
+    const body = response.ok ? await response.json() : null;
     const row = response.ok ? {...scoreRag(fixture, body), generatedClaims: body.claims.map(claim => claim.text)}
-      : {case: fixture.id, passed: fixture.id === 'empty' && response.status === 400};
+      : {case: fixture.id, reason: `http-${response.status}`, passed: fixture.id === 'empty' && response.status === 400};
     results.push({...row, http: response.status});
     console.log(`${row.passed ? 'PASS' : 'FAIL'} ${row.case} HTTP ${response.status} ${row.status ?? ''}`);
   }
@@ -71,7 +75,9 @@ async function main() {
   if (!hosted && (!complete || !process.env.EU_AI_ACT_OLLAMA_MODEL || process.env.VERCEL)) {
     throw new Error('Start Ollama and set EU_AI_ACT_OLLAMA_MODEL before running the local evaluation.');
   }
-  const results = hosted ? await runHosted() : await runLive(complete);
+  const starterIds = new Set(['workplace-exception', 'chatbot-disclosure', 'gpai-obligations']);
+  const fixtures = process.argv.includes('--starters') ? cases.filter(item => starterIds.has(item.id)) : cases;
+  const results = hosted ? await runHosted(fixtures) : await runLive(complete);
   const report = {mode: hosted ? 'production-http' : 'local-ollama', model: hosted ? undefined : process.env.EU_AI_ACT_OLLAMA_MODEL,
     passed: results.filter(row => row.passed).length, total: results.length, results};
   const output = process.argv[hosted ? 3 : 2];

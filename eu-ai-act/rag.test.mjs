@@ -146,6 +146,14 @@ test('retries an invalid draft once, then reviews the corrected draft', async ()
   assert.equal(result.metrics.modelCalls, 3);
 });
 
+test('retries a reviewed rejection without publishing the rejected draft', async () => {
+  let reviews = 0;
+  const result = await answerRag(example.question, {complete: async (stage, _, {passages}) =>
+    stage === 'draft' ? draftFor(example, passages) : {approved: ++reviews === 2}});
+  assert.equal(result.status, 'answered');
+  assert.equal(result.metrics.modelCalls, 4);
+});
+
 test('rejects malformed model output and a reviewer refusal', async () => {
   for (const review of [{approved: false}, {approved: true, extra: 'synthetic note'}, 'yes']) {
     const result = await answerRag(example.question, {complete: async (stage, _, {passages}) =>

@@ -55,6 +55,9 @@ function renderEvidence(item, doc, showContext = true) {
   const section = element('section', '', 'evidence');
   section.append(element('h3', [item.label, item.title].filter(Boolean).join(' · ')));
   section.append(element('p', item.quote));
+  if (item.timing) {
+    section.append(element('h4', 'Article 50(5) · Timing'), element('p', item.timing));
+  }
   section.append(sourceLink(doc.kind === 'recital' ? 'Read the Official Journal recital' : 'Read the consolidated provision', item.url));
   if (showContext && item.quote !== doc.blocks.join('\n\n') && doc.blocks.length > 1) {
     const detail = element('details');

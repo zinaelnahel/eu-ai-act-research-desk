@@ -20,7 +20,7 @@ export function createProvider(env = process.env, request = fetch) {
     const headers = {'Content-Type': 'application/json'};
     if (!useLocal) headers.Authorization = 'Bearer ' + apiKey;
     const response = await request(useLocal ? OLLAMA_ENDPOINT : OPENAI_ENDPOINT, {
-      method: 'POST', headers, body: JSON.stringify(payload), signal: AbortSignal.timeout(useLocal ? 25_000 : 15_000),
+      method: 'POST', headers, body: JSON.stringify(payload), signal: AbortSignal.timeout(useLocal ? 25_000 : 11_000),
     });
     if (!response.ok) throw new Error('Model request failed');
     const body = await response.json();
