@@ -42,6 +42,8 @@ const semanticPairs = [
   ['workplace-exception', 'reversed prohibition', 'art_5', 'prohibits', 'permits'],
   ['school-exception', 'missing safety exception', 'art_5', 'medical or safety', 'medical'],
   ['chatbot-disclosure', 'provider replaced with deployer', 'art_50', 'Providers', 'Deployers'],
+  ['chatbot-disclosure', 'obviousness changed from an exception to a prerequisite', 'art_50', 'unless that is obvious', 'only when it is obvious'],
+  ['chatbot-disclosure', 'notice allowed during first interaction', 'art_50_p5', 'by the first', 'during the first'],
   ['chatbot-disclosure', 'notice after first interaction', 'art_50_p5', 'by the first', 'after the first'],
   ['chatbot-disclosure', 'timing attached to the wrong paragraph', 'art_50_p5', '', 'art_50'],
   ['chatbot-disclosure-safeguards', 'omitted third-party safeguards', 'art_50', ' subject to safeguards for third parties', ''],
@@ -82,6 +84,9 @@ for (const [id, name, sourceId, from, to] of semanticPairs) {
       return {...passage, text: claim.text};
     });
     assert.ok(scoreLegalClaims(citedAlteration, passages).length);
+    const alteredScore = scoreRag(fixture, {...accepted, claims: citedAlteration});
+    assert.equal(alteredScore.invalidCitations, 0);
+    assert.equal(alteredScore.passed, false);
     const rejected = await run(altered, () => assert.fail('Altered draft reached model review'));
     assert.equal(rejected.status, 'rejected');
     assert.equal(rejected.reason, 'invalid-draft');
