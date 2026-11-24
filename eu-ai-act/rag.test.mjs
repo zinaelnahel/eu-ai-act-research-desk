@@ -67,9 +67,23 @@ test('rejects altered quotations, unknown source IDs, and unsupported numbers be
       return draft;
     }});
     assert.equal(result.status, 'rejected');
-    assert.equal(result.metrics.modelCalls, 1);
+    assert.equal(result.metrics.modelCalls, 2);
     assert.deepEqual(result.claims, []);
   }
+});
+
+test('retries an invalid draft once, then reviews the corrected draft', async () => {
+  const stages = [];
+  const result = await answerRag(example.question, {complete: async (stage, _, data) => {
+    stages.push(stage);
+    if (stage === 'review') return {approved: true};
+    const draft = draftFor(example, data.passages);
+    if (stages.length === 1) draft.claims[0].text = 'There are 123 exceptions.';
+    return draft;
+  }});
+  assert.deepEqual(stages, ['draft', 'draft', 'review']);
+  assert.equal(result.status, 'answered');
+  assert.equal(result.metrics.modelCalls, 3);
 });
 
 test('rejects malformed model output and a reviewer refusal', async () => {

@@ -16,7 +16,7 @@ def screenshot(page, path, mobile):
         page.evaluate("document.fonts.ready")
         page.locator("#quiz").screenshot(path=path, animations="disabled")
     else:
-        expect(page.get_by_role("button", name="Find evidence")).to_be_enabled()
+        expect(page.get_by_role("button", name="Ask AI", exact=True)).to_be_enabled()
         page.evaluate("document.fonts.ready")
         page.screenshot(path=path, animations="disabled", full_page=True)
 

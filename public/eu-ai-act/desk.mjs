@@ -11,7 +11,6 @@ const kind = byId('kind');
 const provision = byId('provision');
 const examples = [...document.querySelectorAll('.examples button')];
 let modelRequest;
-let assistantAvailable = false;
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -82,23 +81,6 @@ async function requestGeneratedAnswer(text) {
   }
 }
 
-fetch('/api/answer', {signal: AbortSignal.timeout(8000), cache: 'no-store'})
-  .then(response => response.ok ? response.json() : null)
-  .then(settings => {
-    if (!settings?.available) return;
-    assistantAvailable = true;
-    ask.textContent = 'Ask AI';
-    evidenceOnly.hidden = false;
-    const learn = document.querySelector('.learn-launch');
-    document.querySelector('.examples').after(learn);
-    learn.classList.add('learn-secondary');
-    const learnNav = document.querySelector('nav a[href="./learn.html"]');
-    learnNav.parentElement.append(learnNav);
-    byId('ask-description').textContent =
-      'Ask the AI assistant a question about the Act. It answers from retrieved provisions and shows you the exact sources.';
-  })
-  .catch(() => {});
-
 try {
   const response = await fetch('./corpus.json');
   if (!response.ok) throw new Error('Corpus response failed');
@@ -108,6 +90,7 @@ try {
   byId('official-source').href = corpus.currentSource;
   status.textContent = 'Ask a question above or select a provision to read.';
   ask.disabled = false;
+  evidenceOnly.disabled = false;
   for (const button of examples) {
     button.disabled = false;
     button.addEventListener('click', () => {
@@ -132,7 +115,7 @@ try {
     for (const item of result.evidence) renderEvidence(item, desk.documents.get(item.id));
     if (result.kind === 'version') answer.append(sourceLink('Check for current versions on EUR-Lex', 'https://eur-lex.europa.eu/eli/reg/2024/1689'));
     byId('answer-title').focus();
-    if (assistantAvailable && event.submitter !== evidenceOnly && ['evidence', 'matches'].includes(result.kind)) {
+    if (event.submitter !== evidenceOnly && ['evidence', 'matches'].includes(result.kind)) {
       const prompt = element('p', '', 'asked-question');
       prompt.append(element('strong', 'You asked: '), document.createTextNode(question.value.trim()));
       answer.prepend(prompt);

@@ -15,7 +15,11 @@ The snapshot is pinned. Questions about newer versions are redirected to EUR-Lex
 
 ## Cited answer generation
 
+The [course RAG notebook](https://github.com/zinaelnahel/demos_ai_engineering_sept2026/blob/6145ed38e441875e5c1a6c2d65af31da38ac0685/N_LangChain/03_langchain-RAG.ipynb) uses LangChain and embedding-based retrieval. This project uses indexed legal provisions, reviewed mappings and weighted passage retrieval. Both retrieve context before calling the answer model. The legal index makes direct provision lookups and exact citation checks repeatable.
+
 The server retrieves from the same pinned corpus used by the evidence view. It gives the model verified passages and their titles, checks selected source IDs, attaches the original quotations and official links itself, then asks the model to review the draft for grounding and material exceptions. Unsupported or unreviewed drafts fall back to the evidence view. Both passes use the configured model, so the review can repeat the drafting model's mistakes.
+
+If a draft fails deterministic validation, the server attempts one shorter draft before falling back to the sources. Every published draft still goes through the same validation and review.
 
 With Ollama running locally and the model installed, run these commands from the repository root:
 

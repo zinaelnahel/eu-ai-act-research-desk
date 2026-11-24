@@ -9,28 +9,34 @@
   <link rel="stylesheet" href="./learn.css">
   <script type="module" src="./desk.mjs"></script>
 </head>
-<body>
+<body class="assistant-home">
   <header class="masthead">
     <div class="wrap top">
       <a class="wordmark" href="./index.html">EU AI Act <span>Research Desk</span></a>
-      <nav aria-label="Main navigation"><a href="./learn.html">Learn</a><a href="#library">Browse the Act</a><a href="#verification">Testing evidence</a></nav>
+      <nav aria-label="Main navigation"><a href="#library">Browse the Act</a><a href="#verification">Testing evidence</a><a href="./learn.html">Learn</a></nav>
     </div>
   </header>
   <main class="wrap">
     <section class="intro" aria-labelledby="desk-title">
-      <p class="kicker">REGULATION (EU) 2024/1689</p>
-      <h1 id="desk-title">Ask the EU AI Act.</h1>
-      <p id="ask-description">Find the passages that answer your question and check them against the official text.</p>
-      <a class="learn-launch" href="./learn.html">Learn with scenario quizzes</a>
+      <div class="desk-heading">
+        <p class="kicker">REGULATION (EU) 2024/1689</p>
+        <h1 id="desk-title">Ask the<br><em>EU AI Act.</em></h1>
+        <p>Ask in plain language. Get an answer you can check against the official text.</p>
+      </div>
+      <div class="desk-composer">
       <form id="question-form">
         <label for="question">Your question</label>
-        <div class="question-row"><input id="question" name="question" type="search" maxlength="600" required placeholder="What does the Act say about…"><button type="submit" id="ask" disabled>Find evidence</button></div>
+        <div class="question-row"><input id="question" name="question" type="search" maxlength="600" required placeholder="What does the Act say about…"><button type="submit" id="ask" disabled>Ask AI</button></div>
       </form>
-      <button id="evidence-only" class="generate-answer" type="submit" form="question-form" hidden>Find evidence only</button>
       <div class="examples" aria-label="Example questions">
         <button type="button" disabled>Is emotion recognition allowed at work?</button>
         <button type="button" disabled>When must a chatbot disclose it is AI?</button>
         <button type="button" disabled>What are the obligations for GPAI providers?</button>
+      </div>
+      <div class="desk-secondary">
+        <button id="evidence-only" type="submit" form="question-form" disabled>Find evidence only</button>
+        <a href="./learn.html">Learn with scenario quizzes</a>
+      </div>
       </div>
     </section>
     <div class="workbench">

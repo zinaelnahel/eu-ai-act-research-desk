@@ -21,7 +21,7 @@ export function scoreRag(fixture, result) {
   }
   const passed = fixture.source
     ? status === 'answered' && sourceIds.includes(fixture.source) && missing.length === 0 && invalidCitations === 0 &&
-      sourceIds.every(id => id === fixture.source && retrievedIds.includes(id)) && metrics.modelCalls === 2
+      sourceIds.every(id => id === fixture.source && retrievedIds.includes(id)) && [2, 3].includes(metrics.modelCalls)
     : status === 'abstained' && claims.length === 0 && metrics.modelCalls === 0;
   return {case: fixture.id, expectedSource: fixture.source || null, status, sourceIds, missing, invalidCitations,
     passed, latencyMs: metrics.latencyMs, modelCalls: metrics.modelCalls};

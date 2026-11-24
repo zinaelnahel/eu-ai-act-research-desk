@@ -54,9 +54,10 @@ def test_mobile_generated_answer_cites_evidence_and_keeps_fallback(open_page):
 def test_desktop_keyboard_question_abstention_and_annex_browse(open_page):
     page = open_page()
     search = page.get_by_role("searchbox", name="Your question")
-    expect(page.get_by_role("button", name="Find evidence")).to_be_enabled()
+    evidence = page.get_by_role("button", name="Find evidence only")
+    expect(evidence).to_be_enabled()
     search.fill("Could a school use AI to infer pupils’ emotions?")
-    search.press("Enter")
+    evidence.press("Enter")
     answers = page.locator("#answer")
     expect(page.get_by_role("heading", name="Source-grounded answers")).to_be_focused()
     expect(answers.get_by_role("link", name="Read the consolidated provision")).to_have_count(1)
