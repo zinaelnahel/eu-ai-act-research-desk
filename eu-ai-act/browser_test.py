@@ -423,3 +423,27 @@ def test_mobile_abstention_is_separate_from_previous_answer(open_page):
     expect(history.locator(".generated-answer")).to_be_hidden()
     assert calls == [first_question]
     assert_no_page_overflow(page)
+
+
+def test_vague_followup_archives_direct_lookup(open_page):
+    page = open_page(mobile=True)
+    search = page.get_by_role("searchbox", name="Your question")
+    ask = page.get_by_role("button", name="Ask AI", exact=True)
+    expect(ask).to_be_enabled()
+    search.fill("Article 112(3)")
+    ask.click()
+    current = page.locator("#answer")
+    expect(current).to_contain_text("Article 112(3)")
+
+    search.fill("Does that also apply?")
+    ask.click()
+    expect(page.get_by_role("status")).to_contain_text("Which topic or provision do you mean?")
+    expect(current).to_be_empty()
+    history = page.get_by_role("region", name="Previous questions", exact=True)
+    turn = history.locator("details.conversation-turn")
+    expect(turn).to_have_count(1)
+    expect(history.locator("details[open]")).to_have_count(0)
+    expect(turn.get_by_role("link", name="Read the consolidated provision")).to_be_hidden()
+    turn.locator(":scope > summary").press("Enter")
+    expect(turn.get_by_role("link", name="Read the consolidated provision")).to_be_visible()
+    expect(current).to_be_empty()
