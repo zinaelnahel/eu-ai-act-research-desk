@@ -10,13 +10,13 @@ The RAG pipeline generates an answer from passages returned by the existing 360-
 | Deterministic RAG and endpoint contract tests | 26 of 26 passed |
 | Local Python and Playwright suite | 59 passed, six optional citation-selection checks skipped |
 | Local Qwen3 4B generation smoke run | 10 of 12 passed |
-| Production OpenAI HTTP smoke run | 15 of 15 passed |
+| Production OpenAI HTTP smoke run with stricter timing checks | 14 of 15 passed |
 
 ## Production verification
 
 The [follow-up production run](eu-ai-act/rag-starter-report.json) passed 14 of 15 cases with the stricter chatbot timing rubric. All three starter prompts returned cited answers. The open-source exemption draft was withheld after review, and the desk kept its evidence available. The [weekly starter check](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml) records generated output and the reason when an answer falls back.
 
-The latest hosted run with GPT-5.4 mini passed nine answerable questions, five abstention requests and empty input validation. The expanded cases require both provisions when distinguishing general and systemic-risk GPAI obligations, preserve the medical and safety exception for schools, and check which duties survive the open-source exemption. Earlier runs exposed incomplete answers or withheld drafts. A passing run measures the labeled rubric for those cases.
+An earlier hosted run with GPT-5.4 mini passed nine answerable questions, five abstention requests and empty input validation. The expanded cases require both provisions when distinguishing general and systemic-risk GPAI obligations, preserve the medical and safety exception for schools, and check which duties survive the open-source exemption. A passing run measures the labeled rubric for those cases.
 
 Hosted scoring checks citation URLs, labels and quotations against the exact passages returned by the pinned corpus. It also checks relevant legal phrases and known omissions. The generated claims are retained for review since vocabulary checks cannot establish full legal completeness or correctness.
 

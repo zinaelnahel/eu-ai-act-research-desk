@@ -61,7 +61,7 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Run pytest retrieval and browser suites
         env:
-          BASE_REF: ${{ github.event.pull_request.base.sha || '1957a2590093798bc6aa44b23bd572158bead984' }}
+          BASE_REF: ${{ github.event.pull_request.base.sha || '9882baf19721d68d807aacc40be3da428508416b' }}
         run: |
           baseline=$(mktemp -d)
           git archive "$BASE_REF" public/eu-ai-act | tar -x -C "$baseline"
