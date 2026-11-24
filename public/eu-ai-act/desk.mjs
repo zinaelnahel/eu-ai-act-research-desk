@@ -7,6 +7,7 @@ const question = byId('question');
 const status = byId('status');
 const answer = byId('answer');
 const history = byId('conversation-history');
+const previousTurns = byId('previous-turns');
 const reset = byId('reset-conversation');
 const ask = byId('ask');
 const evidenceOnly = byId('evidence-only');
@@ -167,7 +168,7 @@ try {
     modelRequest?.abort();
     modelRequest = previous = activeQuestion = undefined;
     answer.replaceChildren();
-    history.replaceChildren();
+    previousTurns.replaceChildren();
     history.hidden = reset.hidden = true;
     question.value = '';
     provision.value = '';
@@ -200,9 +201,11 @@ try {
     }
     if (activeQuestion && activeQuestion !== question.value.trim()) {
       const turn = element('details', '', 'evidence conversation-turn');
-      turn.append(element('summary', activeQuestion), ...answer.childNodes);
-      history.prepend(turn);
-      if (history.children.length > 5) history.lastElementChild.remove();
+      const summary = activeQuestion.length > 100 ? activeQuestion.slice(0, 100).trimEnd() + '…' : activeQuestion;
+      turn.append(element('summary', summary), ...answer.childNodes);
+      previousTurns.querySelectorAll('details[open]').forEach(turn => { turn.open = false; });
+      previousTurns.prepend(turn);
+      if (previousTurns.children.length > 5) previousTurns.lastElementChild.remove();
       history.hidden = false;
     }
     answer.replaceChildren();

@@ -100,6 +100,11 @@ export function createDesk(corpus) {
   function ask(raw) {
     const question = raw.trim().slice(0, 600);
     if (!question) return {kind: 'abstain', reason: 'Enter a question about the Act.', evidence: []};
+    const inspectingWebsite = /\b(?:javascript[- ]rendered|javascript app|static files|api endpoints?)\b/i.test(question)
+      && /\b(?:the page loaded|the homepage mentions|probe its structure|look for its routes)\b/i.test(question);
+    if (inspectingWebsite) {
+      return {kind: 'abstain', reason: 'This desk answers questions about the EU AI Act. For this website’s evaluation report, open Testing evidence.', evidence: []};
+    }
     const words = terms(question);
     const ids = [...new Set(explicitReferences(question))];
     if (CURRENT.test(question)) {
@@ -208,7 +213,7 @@ export function createDesk(corpus) {
     }).sort((a, b) => b.score - a.score);
     const top = ranked[0];
     if (top.best.hits < 2 || top.score < 4) {
-      return {kind: 'abstain', reason: 'I did not find enough matching evidence. Try describing who uses the AI, what it does, and how it affects you.', evidence: []};
+      return {kind: 'abstain', reason: 'I did not find enough matching evidence in the EU AI Act. If your question is about AI use, try describing who uses the AI, what it does, and how it affects you.', evidence: []};
     }
     const evidence = ranked.filter(row => row.best.hits >= 2 && row.score >= top.score * 0.66).slice(0, 3)
       .map(({doc, best}) => citation(doc, ['art_113', 'art_111'].includes(doc.id) ? doc.blocks.join('\n\n') : best.text));

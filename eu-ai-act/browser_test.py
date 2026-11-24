@@ -285,7 +285,7 @@ def test_conversation_keeps_citations_and_requires_clear_context(open_page):
     )
     expect(page.locator("#answer").get_by_role("link", name="Read the consolidated provision")).to_have_attribute("href", url)
     assert submitted == ["Is emotion recognition allowed at work?"]
-    history = page.get_by_role("region", name="Previous questions and answers")
+    history = page.get_by_role("region", name="Previous questions", exact=True)
     history.get_by_text("Is emotion recognition allowed at work?", exact=True).click()
     expect(history.get_by_role("link", name="Article 5", exact=True)).to_be_visible()
     page.get_by_role("button", name="Start a new conversation").click()
@@ -389,4 +389,37 @@ def test_evaluation_links_to_latest_hosted_smoke_run(open_page):
     page.reload()
     link = page.get_by_role("link", name="Weekly hosted smoke · Nov 24, 2026 · Failed")
     expect(link).to_have_attribute("href", run_url)
+    assert_no_page_overflow(page)
+
+
+def test_mobile_abstention_is_separate_from_previous_answer(open_page):
+    page = open_page(mobile=True)
+    calls = []
+
+    def answer(route):
+        calls.append(route.request.post_data_json["question"])
+        route.fulfill(json={"status": "answered", "claims": [{
+            "text": "Staff need appropriate AI literacy.",
+            "label": "Article 4",
+            "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_4",
+            "quote": "a sufficient level of AI literacy",
+        }]})
+
+    page.route("**/api/answer", answer)
+    search = page.get_by_role("searchbox", name="Your question")
+    ask = page.get_by_role("button", name="Ask AI", exact=True)
+    expect(ask).to_be_enabled()
+    first_question = "What does the AI Act say about AI literacy?"
+    search.fill(first_question)
+    ask.click()
+    expect(page.locator("#answer .generated-answer")).to_be_visible()
+    search.fill("Is my GDPR consent banner compliant")
+    ask.click()
+    expect(page.get_by_role("status")).to_contain_text("did not find enough matching evidence in the EU AI Act")
+    expect(page.locator("#answer")).to_be_empty()
+    history = page.get_by_role("region", name="Previous questions", exact=True)
+    expect(history.get_by_role("heading", name="Previous questions")).to_be_visible()
+    expect(history.locator("details[open]")).to_have_count(0)
+    expect(history.locator(".generated-answer")).to_be_hidden()
+    assert calls == [first_question]
     assert_no_page_overflow(page)
