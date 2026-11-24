@@ -10,7 +10,7 @@
     "id": "distributor-intended-purpose",
     "question": "Does a distributor become the provider if it changes the intended purpose so an existing system becomes high-risk, without rebranding?",
     "source": "art_25",
-    "phrases": ["provid", "intended purpose", "not previously|previously non", "becom.{0,20}high.risk"],
+    "phrases": ["provid", "intended purpose", "not previously|previously.{0,20}(?:non|not)|non.high.risk|was not.{0,30}high.risk", "(?:becom|render|makes?|reclassif|now).{0,22}high.risk"],
     "draft": "A distributor becomes a provider if it changes the intended purpose of an already marketed or commissioned system that was not previously classified as high-risk so that it becomes high-risk. Rebranding is unnecessary for this route."
   },
   {

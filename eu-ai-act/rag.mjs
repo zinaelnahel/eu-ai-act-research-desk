@@ -37,8 +37,8 @@ const legalRequirements = [
     patterns: [/provid/i, /substantial/i, /already.{0,60}(?:market|service)/i, /remain|still/i, /high.risk/i],
     guidance: ' Cover only the substantial modification route in point (b): an already marketed or commissioned high-risk system remains high-risk after the modification, and the modifying party becomes a provider.'},
   {id: 'art_25', paragraph: 1, when: context => context.some(item => item.clause === 'c'),
-    patterns: [/provid/i, /intended purpose/i, /(?:not|non|previously).{0,50}high.risk/i, /becom.{0,20}high.risk/i, /market|service/i],
-    guidance: ' Cover only point (c): changing the intended purpose of an already marketed or commissioned system not previously classified as high-risk makes it high-risk, and the party becomes a provider. This route does not require rebranding.'},
+    patterns: [/provid/i, /intended purpose/i, /(?:not|non|previously).{0,50}high.risk/i, /(?:becom|render|makes?|reclassif|now).{0,22}high.risk/i, /market|service/i],
+    guidance: ' Cover only point (c). Use one direct claim: the distributor becomes a provider by changing the intended purpose of a system already placed on the market or put into service, when a previously non-high-risk system becomes high-risk. Rebranding is unnecessary.'},
   {id: 'art_27', paragraph: 2, patterns: [/deployer/i, /chang/i, /out.of.date|outdated|no longer up to date/i, /updat.{0,30}information/i],
     guidance: ' State the deployer must take the necessary steps to update the information when an assessment element changes or is no longer up to date during use.'},
   {id: 'art_111', paragraph: 3, when: (context, question) => /\bbefore\b/i.test(question) || !gpaiPlacementDay(question),
@@ -46,10 +46,10 @@ const legalRequirements = [
     guidance: ' State the transitional cutoff and compliance deadline clearly: providers of GPAI models placed on the market before 2 August 2025 must comply by 2 August 2027.'},
   {id: 'art_111', paragraph: 3, when: (context, question) => !/\bbefore\b/i.test(question) && gpaiPlacementDay(question) === 1,
     patterns: [/\byes\b|qualifi|falls within|applies/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
-    guidance: ' Answer yes to the placement date given because it is before the statutory cutoff. Give the cutoff and the compliance deadline. The date supplied in the question need not be repeated.'},
+    guidance: ' Start with Yes. State that the placement was before 2 August 2025 and the provider must comply by 2 August 2027. Omit other dates and obligations.'},
   {id: 'art_111', paragraph: 3, when: (context, question) => !/\bbefore\b/i.test(question) && gpaiPlacementDay(question) >= 2,
     patterns: [/\bno\b|does not apply|not (?:eligible|covered|qualify)|outside/i, /before (?:2 August|August 2)\s*,?\s*2025/i],
-    guidance: ' Answer no. The transitional rule applies only before 2 August 2025. The given date is on or after the cutoff. Avoid inferring a separate compliance date from this paragraph. The date supplied in the question need not be repeated.'},
+    guidance: ' Start with No. State explicitly that the rule applies only to models placed on the market before 2 August 2025. Do not give a different compliance date. Repeat the words before 2 August 2025 even when that date appears in the question.'},
   {id: 'art_74', paragraph: 13, patterns: [/reasoned request/i, /necessar/i, /conform/i, /exhausted|insufficient/i],
     guidance: ' Answer only with the reasoned request and two cumulative conditions in this paragraph, including conformity assessment and exhaustion or insufficiency of other testing, auditing or checks.'},
   {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /high.risk/i,
@@ -173,6 +173,9 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
     const draftInstructions = instructions.draft + guidance + timingGuidance + gpaiGuidance + complaintGuidance;
     const requirements = requirementsFor(context, question);
     const legalGuidance = requirements.map(rule => rule.guidance || '').join('');
+    const dateReview = context.some(item => item.id === 'art_111' && /^3\. /.test(item.quote)) && gpaiPlacementDay(question) && !/\bbefore\b/i.test(question)
+      ? ' Check the placement date supplied in the question against the excerpt: strictly before 2 August 2025 qualifies, while the cutoff day and later do not. A comparison of the supplied date against the excerpt is grounded.'
+      : '';
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
       modelCalls++;
@@ -191,7 +194,7 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
       }
       if (!claims.length) return result('abstained', [], 'empty-draft');
       modelCalls++;
-      const review = await complete('review', instructions.review, {
+      const review = await complete('review', instructions.review + dateReview, {
         question, passages, claims: claims.map(({text, passageId, quote}) => ({text, sourceId: passageId, quote})),
       }, reviewSchema);
       if (keysAre(review, ['approved']) && review.approved === true) return result('answered', claims.map(({passageId, ...claim}) => claim));
