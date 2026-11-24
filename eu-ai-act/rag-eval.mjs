@@ -13,6 +13,7 @@ export function scoreRag(fixture, result) {
   const missing = (fixture.phrases || []).filter(pattern => !new RegExp(pattern, 'i').test(text));
   const contradictions = (fixture.forbidden || []).filter(pattern => new RegExp(pattern, 'i').test(text));
   const required = fixture.sources || (fixture.source ? [fixture.source] : []);
+  const allowed = new Set([...required, ...Object.keys(fixture.optionalSources || {})]);
   for (const [source, patterns] of Object.entries(fixture.sourcePhrases || {})) {
     const citedText = claims.filter(claim => claim.sourceId === source).map(claim => claim.text).join(' ');
     missing.push(...patterns.filter(pattern => !new RegExp(pattern, 'i').test(citedText)));
@@ -28,7 +29,7 @@ export function scoreRag(fixture, result) {
   const passed = required.length
     ? status === 'answered' && required.every(id => sourceIds.includes(id)) &&
       missing.length === 0 && contradictions.length === 0 && invalidCitations === 0 &&
-      sourceIds.every(id => required.includes(id) && retrievedIds.includes(id)) && [2, 3].includes(metrics.modelCalls)
+      sourceIds.every(id => allowed.has(id) && retrievedIds.includes(id)) && [2, 3].includes(metrics.modelCalls)
     : status === 'abstained' && claims.length === 0 && metrics.modelCalls === 0;
   return {case: fixture.id, expectedSources: required, status, sourceIds, missing, contradictions, invalidCitations,
     passed, latencyMs: metrics.latencyMs, modelCalls: metrics.modelCalls};

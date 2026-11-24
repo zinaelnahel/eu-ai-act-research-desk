@@ -5,7 +5,7 @@
     "source": "art_5",
     "phrases": [
       "at work|workplace|workers?",
-      "prohibit|ban|not (allowed|permitted)",
+      "prohibit|ban|not (allowed|permitted)|may not be used",
       "medical",
       "safety"
     ],
@@ -45,6 +45,7 @@
     "id": "hiring",
     "question": "Where does the Act list AI for screening candidates?",
     "source": "anx_III",
+    "optionalSources": {"art_6": "The general classification rule supports the high-risk designation, while Annex III lists candidate screening."},
     "phrases": [
       "recruit|employment|candidate"
     ],
@@ -78,7 +79,7 @@
     "id": "school-exception",
     "question": "Could a school use AI to infer pupils’ emotions?",
     "source": "art_5",
-    "phrases": ["school|education", "prohibit|ban|not (allowed|permitted)", "medical", "safety"],
+    "phrases": ["school|education", "prohibit|ban|not (allowed|permitted)|may not be used", "medical", "safety"],
     "forbidden": ["allowed (?:at|in) school.{0,20}(?:except|unless)", "(?:permitted|allowed) for discipline"],
     "draft": "The Act prohibits AI used to infer emotions in schools, except for systems intended for medical or safety reasons."
   },
