@@ -1,7 +1,7 @@
 import {strict as assert} from 'node:assert';
 import {test} from 'node:test';
 import {answerRag, verifiedContext} from './rag.mjs';
-import {cases, feedbackCases, retrievalFeedbackCases, scoreRag} from './rag-eval.mjs';
+import {cases, feedbackCases, retrievalFeedbackCases, boundaryFeedbackCases, scoreRag} from './rag-eval.mjs';
 import {createProvider} from './rag-provider.mjs';
 import {desk} from './evaluate.mjs';
 import {createAnswerHandler} from '../api/answer.mjs';
@@ -28,7 +28,7 @@ function draftFor(fixture, passages) {
   })};
 }
 
-for (const fixture of [...cases, ...feedbackCases, ...retrievalFeedbackCases]) {
+for (const fixture of [...cases, ...feedbackCases, ...retrievalFeedbackCases, ...boundaryFeedbackCases]) {
   test('RAG contract: ' + fixture.id, async () => {
     const complete = async (stage, _, data) => stage === 'draft'
       ? draftFor(fixture, data.passages) : {approved: true};

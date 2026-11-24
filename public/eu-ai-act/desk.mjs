@@ -59,8 +59,9 @@ function passageLabel(label, quote) {
 
 function renderEvidence(item, doc, showContext = true) {
   const section = element('section', '', 'evidence');
-  section.append(element('h3', [showContext ? passageLabel(item.label, item.quote) : item.label, item.title].filter(Boolean).join(' · ')));
-  section.append(element('p', item.quote));
+  const label = showContext ? (item.clause ? `${item.label}(1)(${item.clause})` : passageLabel(item.label, item.quote)) : item.label;
+  section.append(element('h3', [label, item.title].filter(Boolean).join(' · ')));
+  section.append(element('p', item.focused || item.quote));
   for (const passage of item.supporting || []) {
     const paragraph = /^([0-9]+)\. /.exec(passage)?.[1];
     const label = paragraph ? `${item.label}(${paragraph})` : item.label;
@@ -83,7 +84,8 @@ function renderGenerated(claims, documents) {
   const list = element('ol');
   for (const claim of claims) {
     const item = element('li', claim.text + ' ');
-    item.append(sourceLink(passageLabel(claim.label, claim.quote), claim.url));
+    const label = claim.clause ? `${claim.label}(1)(${claim.clause})` : passageLabel(claim.label, claim.quote);
+    item.append(sourceLink(label, claim.url));
     const details = element('details');
     details.append(element('summary', 'Read supporting quote'), element('p', claim.quote));
     const provision = documents.get(claim.sourceId);

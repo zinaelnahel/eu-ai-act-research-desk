@@ -1,5 +1,6 @@
 import {readFileSync} from 'node:fs';
 import {createDesk} from '../public/eu-ai-act/search.mjs';
+import {gpaiPlacementDay} from '../public/eu-ai-act/gpai-cutoff.mjs';
 
 const corpus = JSON.parse(readFileSync(new URL('../public/eu-ai-act/corpus.json', import.meta.url), 'utf8'));
 const desk = createDesk(corpus);
@@ -29,13 +30,26 @@ const openSourceGuidance = ' For the open-source exemption use three short claim
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
 
 const legalRequirements = [
-  {id: 'art_25', paragraph: 1, when: context => context.some(item => item.id === 'art_25' && /otherwise allocated;$/.test(item.quote)),
+  {id: 'art_25', paragraph: 1, when: context => context.some(item => item.clause === 'a'),
     patterns: [/distributor/i, /trademark|own name/i, /already.{0,35}(?:market|service)/i, /contract/i, /allocat/i],
     guidance: ' State the distributor becomes a provider under the Act if it puts its name or trademark on an already marketed or commissioned high-risk system. Preserve the qualification for contractual allocation of obligations.'},
+  {id: 'art_25', paragraph: 1, when: context => context.some(item => item.clause === 'b'),
+    patterns: [/provid/i, /substantial/i, /already.{0,60}(?:market|service)/i, /remain|still/i, /high.risk/i],
+    guidance: ' Cover only the substantial modification route in point (b): an already marketed or commissioned high-risk system remains high-risk after the modification, and the modifying party becomes a provider.'},
+  {id: 'art_25', paragraph: 1, when: context => context.some(item => item.clause === 'c'),
+    patterns: [/provid/i, /intended purpose/i, /(?:not|non|previously).{0,50}high.risk/i, /becom.{0,20}high.risk/i, /market|service/i],
+    guidance: ' Cover only point (c): changing the intended purpose of an already marketed or commissioned system not previously classified as high-risk makes it high-risk, and the party becomes a provider. This route does not require rebranding.'},
   {id: 'art_27', paragraph: 2, patterns: [/deployer/i, /chang/i, /out.of.date|outdated|no longer up to date/i, /updat.{0,30}information/i],
     guidance: ' State the deployer must take the necessary steps to update the information when an assessment element changes or is no longer up to date during use.'},
-  {id: 'art_111', paragraph: 3, patterns: [/provid/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
+  {id: 'art_111', paragraph: 3, when: (context, question) => /\bbefore\b/i.test(question) || !gpaiPlacementDay(question),
+    patterns: [/provid/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
     guidance: ' State the transitional cutoff and compliance deadline clearly: providers of GPAI models placed on the market before 2 August 2025 must comply by 2 August 2027.'},
+  {id: 'art_111', paragraph: 3, when: (context, question) => !/\bbefore\b/i.test(question) && gpaiPlacementDay(question) === 1,
+    patterns: [/\byes\b|qualifi|falls within|applies/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
+    guidance: ' Answer yes to the placement date given because it is before the statutory cutoff. Give the cutoff and the compliance deadline. The date supplied in the question need not be repeated.'},
+  {id: 'art_111', paragraph: 3, when: (context, question) => !/\bbefore\b/i.test(question) && gpaiPlacementDay(question) >= 2,
+    patterns: [/\bno\b|does not apply|not (?:eligible|covered|qualify)|outside/i, /before (?:2 August|August 2)\s*,?\s*2025/i],
+    guidance: ' Answer no. The transitional rule applies only before 2 August 2025. The given date is on or after the cutoff. Avoid inferring a separate compliance date from this paragraph. The date supplied in the question need not be repeated.'},
   {id: 'art_74', paragraph: 13, patterns: [/reasoned request/i, /necessar/i, /conform/i, /exhausted|insufficient/i],
     guidance: ' Answer only with the reasoned request and two cumulative conditions in this paragraph, including conformity assessment and exhaustion or insufficiency of other testing, auditing or checks.'},
   {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /high.risk/i,
@@ -55,8 +69,8 @@ const legalRequirements = [
   guidance: ' For retention name the deployer, distinguish logs under its control from other logs, give the six-month minimum and preserve exceptions under applicable Union or national law.'},
 ];
 
-function requirementsFor(context) {
-  return legalRequirements.filter(rule => (!rule.when || rule.when(context)) &&
+function requirementsFor(context, question) {
+  return legalRequirements.filter(rule => (!rule.when || rule.when(context, question)) &&
     context.some(item => item.id === rule.id && (!rule.paragraph || item.quote.startsWith(rule.paragraph + '. '))));
 }
 
@@ -75,7 +89,8 @@ export function verifiedContext(retrieval, documents = desk.documents) {
     if (size + item.quote.length > MAX_CONTEXT_CHARS) continue;
     size += item.quote.length;
     seen.add(item.id);
-    result.push({id: item.id, sourceId: item.id, quote: item.quote, label: source.label, title: source.title, url: source.url});
+    result.push({id: item.id, sourceId: item.id, quote: item.quote, label: source.label, title: source.title, url: source.url,
+      ...(item.id === 'art_25' && /^[abc]$/.test(item.clause) && item.quote.includes(`(${item.clause}) `) ? {clause: item.clause} : {})});
     for (const quote of item.supporting || []) {
       const paragraph = /^([0-9]+)\. /.exec(quote)?.[1];
       if (!paragraph || quote === item.quote || !source.blocks.includes(quote) || size + quote.length > MAX_CONTEXT_CHARS) continue;
@@ -98,7 +113,7 @@ export function missingDisclosureSafeguards(claims) {
     !(/safeguard/i.test(text) && /public.{0,60}report/i.test(text));
 }
 
-function validateDraft(draft, context) {
+function validateDraft(draft, context, question) {
   if (!keysAre(draft, ['claims']) || !Array.isArray(draft.claims) ||
     draft.claims.length > MAX_CLAIMS) return null;
   const passages = new Map(context.map(item => [item.id, item]));
@@ -112,10 +127,12 @@ function validateDraft(draft, context) {
     if (source.id === 'art_5' && /\bexcept\b/i.test(source.quote) &&
         /\b(?:is|are) (?:allowed|permitted)\b[\s\S]*\b(?:except|unless)\b/i.test(claim.text)) return null;
     const evidenceNumbers = new Set(normalizedNumbers(source.quote));
-    if (normalizedNumbers(claim.text).some(number => !evidenceNumbers.has(number))) return null;
+    const day = source.id === 'art_111' ? gpaiPlacementDay(question) : null;
+    const claimedText = day ? claim.text.replace(new RegExp(`\\b(?:${day} August|August ${day}),? 2025\\b`, 'gi'), 'the stated date') : claim.text;
+    if (normalizedNumbers(claimedText).some(number => !evidenceNumbers.has(number))) return null;
     seen.add(claim.text.trim());
     claims.push({text: claim.text.trim(), passageId: source.id, sourceId: source.sourceId, quote: source.quote,
-      label: source.label, url: source.url});
+      label: source.label, url: source.url, ...(source.clause ? {clause: source.clause} : {})});
   }
   const directDuty = claims.filter(claim => claim.passageId === 'art_50').map(claim => claim.text).join(' ');
   return missingDisclosureSafeguards(claims) || (context.some(item => item.id === 'art_50_p5') && claims.length &&
@@ -154,14 +171,14 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
       ['art_53', 'art_55'].every(id => context.some(item => item.id === id));
     const gpaiGuidance = gpaiOverview ? ' Cite art_53 for general duties including technical and integrator documentation, copyright and training summary. Use a separate claim citing art_55 for additional systemic-risk duties, including evaluation, risk mitigation, serious incident reporting and cybersecurity.' : '';
     const draftInstructions = instructions.draft + guidance + timingGuidance + gpaiGuidance + complaintGuidance;
-    const requirements = requirementsFor(context);
+    const requirements = requirementsFor(context, question);
     const legalGuidance = requirements.map(rule => rule.guidance || '').join('');
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
       modelCalls++;
       const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters. Include dates or quantities supported by the excerpt, and omit unnecessary cross-references.' : '';
       const draft = await complete('draft', draftInstructions + legalGuidance + retry, {question, passages}, draftSchema);
-      const claims = validateDraft(draft, context);
+      const claims = validateDraft(draft, context, question);
       const missingLegalCondition = claims?.length && requirements.some(rule => {
         const text = claims.filter(claim => claim.passageId === rule.id).map(claim => claim.text).join(' ');
         return rule.patterns.some(pattern => !pattern.test(text));

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "distributor-substantial-modification",
+    "question": "Does a distributor become a provider if it substantially modifies an existing high-risk AI system that remains high-risk?",
+    "source": "art_25",
+    "phrases": ["provid", "substantial", "already", "remain|still", "high.risk"],
+    "draft": "A distributor becomes a provider if it substantially modifies a high-risk AI system already on the market or in service and the system remains high-risk."
+  },
+  {
+    "id": "distributor-intended-purpose",
+    "question": "Does a distributor become the provider if it changes the intended purpose so an existing system becomes high-risk, without rebranding?",
+    "source": "art_25",
+    "phrases": ["provid", "intended purpose", "not previously|previously non", "becom.{0,20}high.risk"],
+    "draft": "A distributor becomes a provider if it changes the intended purpose of an already marketed or commissioned system that was not previously classified as high-risk so that it becomes high-risk. Rebranding is unnecessary for this route."
+  },
+  {
+    "id": "gpai-day-before",
+    "question": "Does the transitional deadline apply to a GPAI model first placed on the market on 1 August 2025?",
+    "source": "art_111",
+    "paragraphPhrases": {"3": ["yes|qualifi|falls within|applies", "before 2 August 2025", "by 2 August 2027"]},
+    "draft": "Yes. A model placed on the market on 1 August 2025 was placed before 2 August 2025. Its provider must comply by 2 August 2027."
+  },
+  {
+    "id": "gpai-cutoff-date",
+    "question": "Does the transitional deadline apply to a GPAI model first placed on the market on 2 August 2025?",
+    "source": "art_111",
+    "paragraphPhrases": {"3": ["^no|does not apply|not (?:covered|eligible|qualify)|outside", "before 2 August 2025"]},
+    "draft": "No. A model first placed on the market on 2 August 2025 does not qualify for this transitional deadline, which applies only to models placed on the market before 2 August 2025."
+  },
+  {
+    "id": "gpai-day-after",
+    "question": "Does the transitional deadline apply to a GPAI model first placed on the market on 3 August 2025?",
+    "source": "art_111",
+    "paragraphPhrases": {"3": ["^no|does not apply|not (?:covered|eligible|qualify)|outside", "before 2 August 2025"]},
+    "draft": "No. A model first placed on the market on 3 August 2025 is outside this transitional rule, which applies only before 2 August 2025."
+  }
+]

@@ -1,3 +1,5 @@
+import {gpaiPlacementDay} from './gpai-cutoff.mjs';
+
 const STOP = new Set('a an and are as at be by can could do does for from had has have how i if in into is it its may me must of on or our shall should so than that the their them these this those to under use was we were what when where which who why will with would you your regulation act eu ai system systems'.split(' '));
 const ROMAN = ['','i','ii','iii','iv','v','vi','vii','viii','ix','x','xi','xii','xiii','xiv'];
 const TOPICS = [
@@ -27,9 +29,11 @@ const TOPICS = [
 const CURRENT = /\b(as of today|currently in force|latest (?:version|amendments?)|changed since .{0,10}2026)\b/i;
 const TIMING = /\b(application dates?|when (?:does|will|did) (?:the )?(?:eu ai act|ai act|act|regulation|rules?) (?:start|apply|enter)|(?:start|become) applicable|transition(?:al)? dates?)\b/i;
 const TARGETED_TOPICS = [
-  [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:trademark|own (?:name|brand))\b|\b(?:trademark|own (?:name|brand))\b.*\b(?:distributors?|importers?|deployers?)\b/i, [['art_25', 1]]],
+  [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:chang\w*|modif\w*).{0,25}intended purpose\b.*\bhigh.risk\b/i, [['art_25', 1, 'c']]],
+  [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\bsubstantial\w* (?:modif\w*|chang\w*)\b.*\bhigh.risk\b/i, [['art_25', 1, 'b']]],
+  [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:trademark|own (?:name|brand))\b|\b(?:trademark|own (?:name|brand))\b.*\b(?:distributors?|importers?|deployers?)\b/i, [['art_25', 1, 'a']]],
   [/\b(?:fundamental rights impact assessment|fria)\b.*\b(?:chang\w*|updat\w*|outdated|out of date)\b|\b(?:chang\w*|updat\w*|outdated)\b.*\b(?:fundamental rights impact assessment|fria)\b/i, [['art_27', 2]]],
-  [/\b(?:gpai|general.purpose ai models?)\b.*\b(?:already on the market|placed on the market before|on the market before)\b/i, [['art_111', 3]]],
+  [/\b(?:gpai|general.purpose ai models?)\b.*\b(?:already on the market|placed on the market|on the market before)\b/i, [['art_111', 3]]],
   [/\bmarket surveillance authorit\w*\b.*\bsource code\b|\bsource code\b.*\bmarket surveillance authorit\w*\b/i, [['art_74', 13]]],
   [/\binstructions (?:for|of) use\b.*\b(?:accuracy|robustness)\b|\b(?:accuracy|robustness)\b.*\binstructions (?:for|of) use\b/i, [['art_13', 3], ['art_15', 3]]],
   [/\bcomplaints?\b.*\bcompensation\b|\bcompensation\b.*\bcomplaints?\b/i, [['art_85']]],
@@ -117,14 +121,22 @@ export function createDesk(corpus) {
     }
     const targeted = TARGETED_TOPICS.find(([pattern]) => pattern.test(question));
     if (targeted) {
-      const evidence = targeted[1].flatMap(([id, paragraph]) => {
+      const evidence = targeted[1].flatMap(([id, paragraph, clause]) => {
         const doc = documents.get(id);
         const quote = paragraph ? doc?.blocks.find(block => block.startsWith(paragraph + '. ')) : doc?.blocks[0];
         if (!quote) return [];
-        const trademarkClause = id === 'art_25' ? quote.split(' (b)')[0] : quote;
-        return [citation(doc, trademarkClause)];
+        const focused = clause && quote.split(` (${clause}) `)[1]?.split(/ \([abc]\) /)[0];
+        return [{...citation(doc, clause === 'a' ? quote.split(' (b)')[0] : quote),
+          ...(focused ? {clause, focused: `(${clause}) ${focused}`} : {})}];
       });
-      if (evidence.length === targeted[1].length) return {kind: 'evidence', evidence};
+      if (evidence.length === targeted[1].length) {
+        const cutoffInEvidence = evidence[0].id === 'art_111' && /before 2 August 2025.+by 2 August 2027/.test(evidence[0].quote);
+        const day = cutoffInEvidence && !/\bbefore\b/i.test(question) ? gpaiPlacementDay(question) : null;
+        const summary = day === 1
+          ? '1 August 2025 is before the cutoff. Article 111(3) sets a compliance deadline of 2 August 2027 for those models.'
+          : day >= 2 ? `${day} August 2025 is ${day === 2 ? 'on' : 'after'} the cutoff. The Article 111(3) deadline does not apply because it covers only models placed on the market before 2 August 2025.` : undefined;
+        return {kind: 'evidence', summary, evidence};
+      }
     }
     if (TIMING.test(question)) {
       const dates = documents.get('art_113');

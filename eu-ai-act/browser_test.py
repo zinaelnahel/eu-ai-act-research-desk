@@ -7,6 +7,39 @@ def assert_no_page_overflow(page):
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
 
 
+def test_gpai_cutoff_and_distributor_routes_show_exact_fallback(open_page):
+    page = open_page(mobile=True)
+    page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))
+    field = page.get_by_role("searchbox", name="Your question")
+    answer = page.locator("#answer")
+    expect(page.get_by_role("button", name="Ask AI")).to_be_enabled()
+
+    for prompt, clause, text in [
+        ("When does a distributor become the provider by putting its own trademark on a high-risk AI system?",
+         "Article 25(1)(a)", "contractual arrangements"),
+        ("Does a distributor become a provider if it substantially modifies an existing high-risk AI system that remains high-risk?",
+         "Article 25(1)(b)", "it remains a high-risk AI system"),
+        ("Does a distributor become the provider if it changes the intended purpose so an existing system becomes high-risk, without rebranding?",
+         "Article 25(1)(c)", "has not been classified as high-risk"),
+    ]:
+        field.fill(prompt)
+        field.press("Enter")
+        expect(page.get_by_role("status")).to_contain_text("temporarily unavailable")
+        expect(answer.get_by_role("heading", name=clause, exact=False)).to_be_visible()
+        expect(answer.get_by_text(text, exact=False).first).to_be_visible()
+
+    field.fill("When must providers comply for GPAI models already on the market before 2 August 2025?")
+    field.press("Enter")
+    expect(answer.get_by_role("heading", name="Article 111(3)", exact=False)).to_be_visible()
+    for day, result in [(1, "before"), (2, "on"), (3, "after")]:
+        field.fill(f"What if it was first placed on the market on {day} August 2025?")
+        field.press("Enter")
+        expect(answer).to_contain_text("Following up on Article 111(3)")
+        expect(answer.get_by_role("heading", name="Article 111(3)", exact=False)).to_be_visible()
+        expect(answer).to_contain_text(f"{day} August 2025 is {result} the cutoff.")
+    assert_no_page_overflow(page)
+
+
 def test_ask_ai_greeting_from_library(open_page):
     page = open_page("/index.html#library", mobile=True)
     search = page.get_by_role("searchbox", name="Your question")
