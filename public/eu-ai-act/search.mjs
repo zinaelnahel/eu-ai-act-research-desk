@@ -181,6 +181,11 @@ export function createDesk(corpus) {
       const primary = evidence[0];
       let summary = NOTES[primary.id];
       if (primary.id === 'art_5') {
+        if (/^does the prohibition on ai emotion recognition also apply in schools\?$/i.test(question) &&
+          /infer emotions.+workplace and education institutions.+medical or safety reasons/i.test(primary.quote)) {
+          return {kind: 'evidence', answerMode: 'source-rule', evidence,
+            summary: 'Yes, the prohibition also applies in schools. The exception is for AI systems intended for medical or safety reasons.'};
+        }
         summary = 'The Act prohibits AI used to infer emotions in workplaces and educational institutions, with an exception for uses intended for medical or safety reasons.';
       }
       if (primary.id === 'art_50' && /interact directly/i.test(primary.quote)) {

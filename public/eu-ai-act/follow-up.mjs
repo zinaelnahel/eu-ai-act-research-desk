@@ -20,7 +20,7 @@ export function resolveFollowUp(question, previous) {
   const emotion = id === 'art_5' && /infer.{0,32}emotions|emotion recognition/i.test(previous.question);
   if (emotion &&
       /\b(?:schools?|education|pupils?|students?)\b/i.test(text)) {
-    return {question: 'Could a school use AI to infer pupils’ emotions?', reference: 'Article 5'};
+    return {question: 'Does the prohibition on AI emotion recognition also apply in schools?', reference: 'Article 5'};
   }
   if (/\bexceptions?\b/i.test(text)) {
     if (emotion) {

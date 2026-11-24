@@ -20,6 +20,15 @@ test('follow-ups resolve known references and clarify multi-source context', () 
   assert.deepEqual(resolveFollowUp('What is the exception?', {question: 'GPAI obligations', ids: ['art_53', 'art_55']}), {clarify: true});
   assert.deepEqual(resolveFollowUp('Who can file a complaint?', reference), {question: 'Who can file a complaint?'});
 });
+
+test('the schools follow-up preserves the polarity of the prohibition question', async () => {
+  const reference = {question: example.question, ids: ['art_5']};
+  const {question} = resolveFollowUp('Does that also apply in schools?', reference);
+  const result = await answerRag(question, {complete: () => assert.fail('Source rule must not call the model')});
+  assert.equal(result.answerMode, 'source-rule');
+  assert.equal(result.claims[0].sourceId, 'art_5');
+  assert.match(result.claims[0].text, /^Yes, the prohibition also applies in schools\..+medical or safety reasons\.$/);
+});
 function draftFor(fixture, passages) {
   const drafts = fixture.drafts || {[fixture.source]: fixture.draft};
   return {claims: Object.entries(drafts).map(([sourceId, text]) => {

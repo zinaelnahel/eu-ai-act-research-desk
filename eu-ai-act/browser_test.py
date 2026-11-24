@@ -216,15 +216,18 @@ def test_conversation_keeps_citations_and_requires_clear_context(open_page):
     search.fill("Is emotion recognition allowed at work?")
     search.press("Enter")
     expect(page.locator("#answer .generated-answer")).to_be_visible()
-    search.fill("Does that also apply to schools?")
-    search.press("Enter")
-    expect(page.locator("#answer")).to_contain_text("Following up on Article 5")
-    expect(page.locator("#answer .generated-answer")).to_be_visible()
-    assert "Could a school use AI to infer" in submitted[-1]
     quote = page.locator("#answer .generated-answer").get_by_text("Read supporting quote")
     quote.click()
     page.locator("#answer").get_by_text("Read the surrounding provision").first.click()
     expect(page.locator("#answer").get_by_text("The following AI practices shall be prohibited", exact=False).first).to_be_visible()
+    search.fill("Does that also apply in schools?")
+    search.press("Enter")
+    expect(page.locator("#answer")).to_contain_text("Following up on Article 5")
+    expect(page.locator("#answer > p").nth(1)).to_have_text(
+        "Yes, the prohibition also applies in schools. The exception is for AI systems intended for medical or safety reasons."
+    )
+    expect(page.locator("#answer").get_by_role("link", name="Read the consolidated provision")).to_have_attribute("href", url)
+    assert submitted == ["Is emotion recognition allowed at work?"]
     history = page.get_by_role("region", name="Previous questions and answers")
     history.get_by_text("Is emotion recognition allowed at work?", exact=True).click()
     expect(history.get_by_role("link", name="Article 5", exact=True)).to_be_visible()

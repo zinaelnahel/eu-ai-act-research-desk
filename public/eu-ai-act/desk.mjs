@@ -207,7 +207,9 @@ try {
       answer.prepend(prompt);
       if (next.reference) prompt.append(element('span', ` · Following up on ${next.reference}`));
       if (result.answerMode === 'source-rule') {
-        status.textContent = 'Answer from the date rule in Article 111(3).';
+        status.textContent = result.evidence[0].id === 'art_111'
+          ? 'Answer from the date rule in Article 111(3).'
+          : 'Answer from Article 5.';
       } else {
         void requestGeneratedAnswer(next.question, desk.documents);
       }
