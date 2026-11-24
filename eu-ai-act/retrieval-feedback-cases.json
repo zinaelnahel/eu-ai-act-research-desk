@@ -1,0 +1,56 @@
+[
+  {
+    "id": "distributor-trademark",
+    "question": "When does a distributor become the provider by putting its own trademark on a high-risk AI system?",
+    "source": "art_25",
+    "paragraphPhrases": {"1": ["distributor", "provider", "trademark", "already", "contract", "allocat"]},
+    "draft": "A distributor is treated as a provider if it puts its own name or trademark on a high-risk AI system already placed on the market or put into service, without prejudice to contractual arrangements allocating those obligations differently."
+  },
+  {
+    "id": "accuracy-instructions",
+    "question": "What accuracy and robustness information belongs in the instructions for use?",
+    "sources": ["art_13", "art_15"],
+    "sourcePhrases": {"art_13": ["robust", "tested", "validat", "circumstances"], "art_15": ["accuracy", "metric"]},
+    "drafts": {
+      "art_13": "Instructions must state the expected levels of accuracy, robustness and cybersecurity against which the system was tested and validated, and known or foreseeable circumstances that can affect those levels.",
+      "art_15": "Declare the accuracy levels and relevant accuracy metrics in the accompanying instructions for use."
+    }
+  },
+  {
+    "id": "fria-update",
+    "question": "What happens to a fundamental rights impact assessment if relevant facts change during use?",
+    "source": "art_27",
+    "paragraphPhrases": {"2": ["deployer", "chang", "outdated|no longer up to date|out.of.date", "updat.{0,30}information"]},
+    "draft": "During use, if an assessment element changes or is no longer up to date, the deployer must take the necessary steps to update the information."
+  },
+  {
+    "id": "request-source-code",
+    "question": "When can a market surveillance authority request source code?",
+    "source": "art_74",
+    "paragraphPhrases": {"13": ["reasoned request", "necessar", "conform", "exhausted|insufficient"]},
+    "forbidden": ["real.world testing"],
+    "draft": "A market surveillance authority needs a reasoned request. Access must be necessary to assess conformity, and testing, auditing and verification using provider data and documentation must have been exhausted or proved insufficient."
+  },
+  {
+    "id": "lodge-complaint",
+    "question": "Who can lodge an AI Act complaint?",
+    "source": "art_85",
+    "phrases": ["natural or legal person|person or organi[sz]ation", "grounds", "market surveillance authorit"],
+    "draft": "Any natural or legal person with grounds to believe the Act was infringed can complain to the relevant market surveillance authority."
+  },
+  {
+    "id": "complaint-compensation",
+    "question": "Is filing an AI Act complaint the same as seeking compensation?",
+    "source": "art_85",
+    "phrases": ["compensation", "market surveillance authorit", "remed"],
+    "forbidden": ["automatically entitles", "guarantees compensation"],
+    "draft": "A complaint is submitted to a market surveillance authority. It is not itself a claim for compensation, and the provision leaves other administrative and judicial remedies available."
+  },
+  {
+    "id": "gpai-transition-cutoff",
+    "question": "When must providers comply for GPAI models already on the market before 2 August 2025?",
+    "source": "art_111",
+    "paragraphPhrases": {"3": ["provid", "before (?:2 August|August 2),? +2025", "by (?:2 August|August 2),? +2027"]},
+    "draft": "Providers of GPAI models placed on the market before 2 August 2025 must comply with the Act's obligations by 2 August 2027."
+  }
+]

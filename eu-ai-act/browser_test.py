@@ -59,6 +59,41 @@ def test_incident_fallback_shows_answering_paragraph_and_handles_followup(open_p
     assert_no_page_overflow(page)
 
 
+def test_plain_language_fallback_and_complaint_followup(open_page):
+    page = open_page(mobile=True)
+    page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))
+    search = page.get_by_role("searchbox", name="Your question")
+    expect(page.get_by_role("button", name="Ask AI")).to_be_enabled()
+    answer = page.locator("#answer")
+
+    for prompt, provision, wording in [
+        ("When does a distributor become the provider by putting its own trademark on a high-risk AI system?",
+         "Article 25(1)(a)", "contractual arrangements stipulating that the obligations are otherwise allocated"),
+        ("What happens to a fundamental rights impact assessment if relevant facts change during use?",
+         "Article 27(2)", "update the information"),
+        ("When must providers comply for GPAI models already on the market before 2 August 2025?",
+         "Article 111(3)", "2 August 2027"),
+    ]:
+        search.fill(prompt)
+        search.press("Enter")
+        expect(page.get_by_role("status")).to_contain_text("temporarily unavailable")
+        expect(answer.get_by_role("heading", name=provision, exact=False)).to_be_visible()
+        expect(answer.get_by_text(wording, exact=False).first).to_be_visible()
+
+    search.fill("What does Article 25(1)(a) say about a distributor’s trademark?")
+    search.press("Enter")
+    expect(page.get_by_role("status")).to_have_text("Requested source")
+    expect(answer.get_by_text("they put their name or trademark", exact=False).first).to_be_visible()
+    search.fill("Who can lodge an AI Act complaint?")
+    search.press("Enter")
+    expect(answer.get_by_role("heading", name="Article 85", exact=False)).to_be_visible()
+    search.fill("Is that the same as asking for compensation?")
+    search.press("Enter")
+    expect(answer).to_contain_text("Following up on Article 85")
+    expect(answer.get_by_text("Without prejudice to other administrative or judicial remedies", exact=False).first).to_be_visible()
+    assert_no_page_overflow(page)
+
+
 def test_new_legal_records_show_review_notice_and_official_link(open_page):
     page = open_page("/index.html#library", mobile=True)
     page.route("**/api/source-status", lambda route: route.fulfill(json={

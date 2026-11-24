@@ -26,6 +26,14 @@ const TOPICS = [
 ];
 const CURRENT = /\b(as of today|currently in force|latest (?:version|amendments?)|changed since .{0,10}2026)\b/i;
 const TIMING = /\b(application dates?|when (?:does|will|did) (?:the )?(?:eu ai act|ai act|act|regulation|rules?) (?:start|apply|enter)|(?:start|become) applicable|transition(?:al)? dates?)\b/i;
+const TARGETED_TOPICS = [
+  [/\b(?:distributors?|importers?|deployers?|third.part(?:y|ies))\b.*\b(?:trademark|own (?:name|brand))\b|\b(?:trademark|own (?:name|brand))\b.*\b(?:distributors?|importers?|deployers?)\b/i, [['art_25', 1]]],
+  [/\b(?:fundamental rights impact assessment|fria)\b.*\b(?:chang\w*|updat\w*|outdated|out of date)\b|\b(?:chang\w*|updat\w*|outdated)\b.*\b(?:fundamental rights impact assessment|fria)\b/i, [['art_27', 2]]],
+  [/\b(?:gpai|general.purpose ai models?)\b.*\b(?:already on the market|placed on the market before|on the market before)\b/i, [['art_111', 3]]],
+  [/\bmarket surveillance authorit\w*\b.*\bsource code\b|\bsource code\b.*\bmarket surveillance authorit\w*\b/i, [['art_74', 13]]],
+  [/\binstructions (?:for|of) use\b.*\b(?:accuracy|robustness)\b|\b(?:accuracy|robustness)\b.*\binstructions (?:for|of) use\b/i, [['art_13', 3], ['art_15', 3]]],
+  [/\bcomplaints?\b.*\bcompensation\b|\bcompensation\b.*\bcomplaints?\b/i, [['art_85']]],
+];
 const NOTES = {
   art_4: 'Providers and deployers must take measures to support AI literacy. The measures should reflect staff experience, training, and the context of use. Article 4(1) does not require them to guarantee a specific level of literacy for each person.',
   art_53: 'Article 53 sets documentation, downstream information, copyright policy, and training-content summary obligations. The open-source exception covers some documentation duties and does not apply to models with systemic risk. Article 55 adds duties for systemic-risk models.',
@@ -106,6 +114,17 @@ export function createDesk(corpus) {
         ranked.sort((a, b) => b[1] - a[1]);
         return citation(doc, ranked[0][1] > 0 ? ranked[0][0] : doc.blocks.join('\n\n'));
       })};
+    }
+    const targeted = TARGETED_TOPICS.find(([pattern]) => pattern.test(question));
+    if (targeted) {
+      const evidence = targeted[1].flatMap(([id, paragraph]) => {
+        const doc = documents.get(id);
+        const quote = paragraph ? doc?.blocks.find(block => block.startsWith(paragraph + '. ')) : doc?.blocks[0];
+        if (!quote) return [];
+        const trademarkClause = id === 'art_25' ? quote.split(' (b)')[0] : quote;
+        return [citation(doc, trademarkClause)];
+      });
+      if (evidence.length === targeted[1].length) return {kind: 'evidence', evidence};
     }
     if (TIMING.test(question)) {
       const dates = documents.get('art_113');

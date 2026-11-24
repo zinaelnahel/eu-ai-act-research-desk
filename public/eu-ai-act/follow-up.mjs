@@ -5,6 +5,9 @@ export function resolveFollowUp(question, previous) {
   }
   if (previous?.ids.length !== 1) return {clarify: true};
   const [id] = previous.ids;
+  if (id === 'art_85' && /\bcompensation\b/i.test(text)) {
+    return {question: 'Is filing an AI Act complaint the same as seeking compensation?', reference: 'Article 85'};
+  }
   if (id === 'art_73' && /\bcritical infrastructure\b/i.test(text)) {
     return {question: 'What is the reporting deadline if a serious incident disrupts critical infrastructure?', reference: 'Article 73'};
   }

@@ -29,6 +29,15 @@ const openSourceGuidance = ' For the open-source exemption use three short claim
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
 
 const legalRequirements = [
+  {id: 'art_25', paragraph: 1, when: context => context.some(item => item.id === 'art_25' && /otherwise allocated;$/.test(item.quote)),
+    patterns: [/distributor/i, /trademark|own name/i, /already.{0,35}(?:market|service)/i, /contract/i, /allocat/i],
+    guidance: ' State the distributor becomes a provider under the Act if it puts its name or trademark on an already marketed or commissioned high-risk system. Preserve the qualification for contractual allocation of obligations.'},
+  {id: 'art_27', paragraph: 2, patterns: [/deployer/i, /chang/i, /out.of.date|outdated|no longer up to date/i, /updat.{0,30}information/i],
+    guidance: ' State the deployer must take the necessary steps to update the information when an assessment element changes or is no longer up to date during use.'},
+  {id: 'art_111', paragraph: 3, patterns: [/provid/i, /before (?:2 August|August 2)\s*,?\s*2025/i, /by (?:2 August|August 2)\s*,?\s*2027/i],
+    guidance: ' State the transitional cutoff and compliance deadline clearly: providers of GPAI models placed on the market before 2 August 2025 must comply by 2 August 2027.'},
+  {id: 'art_74', paragraph: 13, patterns: [/reasoned request/i, /necessar/i, /conform/i, /exhausted|insufficient/i],
+    guidance: ' Answer only with the reasoned request and two cumulative conditions in this paragraph, including conformity assessment and exhaustion or insufficiency of other testing, auditing or checks.'},
   {id: 'art_86', paragraph: 1, patterns: [/deployer/i, /annex\s+iii/i, /high.risk/i,
     /(?:exclu|except|does not (?:include|cover|apply)).{0,40}(?:point|section|item)\s*(?:2|two)\b|(?:point|section|item)\s*(?:2|two)\b.{0,30}(?:excluded|exception)/i,
     /legal effects?/i, /similarly significant/i, /adverse|negativ/i, /health/i, /safety/i, /fundamental rights/i],
@@ -137,16 +146,19 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
     const timingGuidance = context.some(item => item.id === 'art_50_p5')
       ? ' Use three short claims: (one) art_50: Providers must tell people interacting directly with AI unless it is obvious in context. (two) art_50: Explain the exception for legally authorised criminal-offence systems with third-party safeguards and the limitation for systems available for public reporting. (three) art_50_p5: State that clear, distinguishable and accessible notice must be given by the first interaction.'
       : '';
+    const complaintGuidance = context.some(item => item.id === 'art_85') && /\bcompensation\b/i.test(question)
+      ? ' Distinguish a complaint to the market surveillance authority from seeking compensation. The provision preserves other administrative or judicial remedies; do not assert eligibility for compensation or describe a procedure not in the excerpt.'
+      : '';
     const gpaiOverview = /obligations? for (?:gpai|general.purpose ai)(?: model)? providers?/i.test(question) &&
       ['art_53', 'art_55'].every(id => context.some(item => item.id === id));
     const gpaiGuidance = gpaiOverview ? ' Cite art_53 for general duties including technical and integrator documentation, copyright and training summary. Use a separate claim citing art_55 for additional systemic-risk duties, including evaluation, risk mitigation, serious incident reporting and cybersecurity.' : '';
-    const draftInstructions = instructions.draft + guidance + timingGuidance + gpaiGuidance;
+    const draftInstructions = instructions.draft + guidance + timingGuidance + gpaiGuidance + complaintGuidance;
     const requirements = requirementsFor(context);
     const legalGuidance = requirements.map(rule => rule.guidance || '').join('');
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
       modelCalls++;
-      const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters without digits or cross-references.' : '';
+      const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters. Include dates or quantities supported by the excerpt, and omit unnecessary cross-references.' : '';
       const draft = await complete('draft', draftInstructions + legalGuidance + retry, {question, passages}, draftSchema);
       const claims = validateDraft(draft, context);
       const missingLegalCondition = claims?.length && requirements.some(rule => {

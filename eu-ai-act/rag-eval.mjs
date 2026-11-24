@@ -6,6 +6,7 @@ import {desk} from './evaluate.mjs';
 
 export const cases = JSON.parse(readFileSync(new URL('./rag-cases.json', import.meta.url), 'utf8'));
 export const feedbackCases = JSON.parse(readFileSync(new URL('./feedback-cases.json', import.meta.url), 'utf8'));
+export const retrievalFeedbackCases = JSON.parse(readFileSync(new URL('./retrieval-feedback-cases.json', import.meta.url), 'utf8'));
 
 export function scoreRag(fixture, result) {
   const {status, claims, retrievedIds, metrics} = result;
@@ -81,7 +82,8 @@ async function main() {
     throw new Error('Start Ollama and set EU_AI_ACT_OLLAMA_MODEL before running the local evaluation.');
   }
   const starterIds = new Set(['workplace-exception', 'chatbot-disclosure', 'gpai-obligations']);
-  const fixtures = process.argv.includes('--feedback') ? feedbackCases
+  const fixtures = process.argv.includes('--retrieval-feedback') ? retrievalFeedbackCases
+    : process.argv.includes('--feedback') ? feedbackCases
     : process.argv.includes('--starters') ? cases.filter(item => starterIds.has(item.id)) : cases;
   const results = hosted ? await runHosted(fixtures) : await runLive(complete);
   const report = {mode: hosted ? 'production-http' : 'local-ollama', model: hosted ? undefined : process.env.EU_AI_ACT_OLLAMA_MODEL,

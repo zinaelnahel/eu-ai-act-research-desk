@@ -52,6 +52,7 @@ function sourceLink(text, url) {
 }
 
 function passageLabel(label, quote) {
+  if (label === 'Article 25' && /^1\. .+\(a\).+otherwise allocated;$/s.test(quote)) return 'Article 25(1)(a)';
   const paragraph = /^(\d+)\.\s/.exec(quote)?.[1];
   return paragraph && /^Article /.test(label) ? `${label}(${paragraph})` : label;
 }
