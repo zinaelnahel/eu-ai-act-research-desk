@@ -2,7 +2,7 @@
 
 [Open the desk](https://eu-ai-act-research-desk.vercel.app/) · [Try learning mode](https://eu-ai-act-research-desk.vercel.app/learn.html) · [Read the evaluation](https://eu-ai-act-research-desk.vercel.app/evaluation.html)
 
-Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. Direct lookups resolve provision IDs, common questions use reviewed mappings, and other questions use weighted passage retrieval. The evidence view runs in the browser. With a model configured, the desk can also draft a cited answer from retrieved passages.
+Ask a question about Regulation (EU) 2024/1689 or browse its articles, annexes and recitals. Direct lookups resolve provision IDs, reviewed mappings select answer-bearing paragraphs for common questions, and weighted passage retrieval handles other wording. The live Ask AI flow generates cited answers with OpenAI and keeps the supporting text available when generation falls back.
 
 Learning mode has 12 topics spanning the Act’s chapters, 27 sourced scenarios and a mixed challenge. Read the explanation and linked provision after each decision. Chapter completions, best scores and XP are saved in browser storage on the current device.
 
@@ -12,6 +12,8 @@ Learning mode has 12 topics spanning the Act’s chapters, 27 sourced scenarios 
 - [Original Official Journal edition](https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng) and [2026 amending regulation](https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng), which supply 227 recitals.
 
 The snapshot is pinned. Questions about newer versions are redirected to EUR-Lex. The consolidated edition is a documentation tool without legal effect. The authentic texts are published in the Official Journal. The desk supplies evidence for research and leaves determinations about individual systems to qualified professionals.
+
+Search and answers use the English corpus. The Legal sources panel also links to the German and Spanish Official Journal texts.
 
 ## Cited answer generation
 
@@ -23,7 +25,9 @@ If the first draft fails validation or review, the server attempts one shorter d
 
 [Starter prompt checks](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml) run the three built-in questions against the live deployment weekly. Each run records outcomes, fallback reasons and citations. These checks use the configured hosted model.
 
-Ask AI keeps a short conversation on the current page. For example, ask about workplace emotion recognition, then ask whether the rule also applies to schools. The desk shows the provision it carried forward and asks for clarification when the topic is unclear. Expand an earlier question to revisit its answer, or select Start a new conversation to clear the page's history. The model receives a standalone question for each turn.
+Ask AI keeps a short conversation on the current page. It shows the provision carried forward and asks for clarification when the reference is ambiguous. Expand an earlier question to revisit its answer, or select Start a new conversation to clear the page's history. For generated answers, the model receives a standalone question.
+
+Two narrow cases use direct source-based answers: whether the Article 5 workplace prohibition also applies in schools, and whether a placement date falls before the Article 111(3) GPAI cutoff. The school follow-up opens with “Yes, the prohibition also applies in schools” and keeps the medical or safety exception. The cutoff comparison uses the date stated in the pinned provision. Both flows display the supporting excerpt and make zero model calls.
 
 With Ollama running locally and the model installed, run these commands from the repository root:
 
@@ -60,6 +64,7 @@ python -m http.server --directory public 8000
 # Open http://localhost:8000/eu-ai-act/index.html
 node --test eu-ai-act/*.test.mjs
 node eu-ai-act/evaluate.mjs --write
+node eu-ai-act/challenge-eval.mjs challenge-results.json --gate
 ```
 
 The 43 labeled cases check first-ranked provisions, required supporting sources, verbatim evidence, exceptions and abstention. Irrelevant and duplicate provisions fail the case even when every required source is present. Optional sources require a documented rationale. The report shows micro-averaged provision precision across returned citations and marks abstentions separately. The suite checks direct lookup for all 360 corpus entries and verifies that the report matches a fresh run.
@@ -73,6 +78,15 @@ python -m pytest eu-ai-act -v --junitxml=pytest-results.xml
 ```
 
 Pytest runs every labeled question through the same JavaScript search engine the browser uses. It checks ranking, citation text, required phrases, irrelevant or duplicate sources, and abstention. The Playwright fixtures serve the deployed files over an ephemeral local HTTP server and cover desktop and mobile navigation, keyboard interaction, source links, quiz progress persistence, and the report. GitHub Actions runs both suites and uploads the JUnit XML alongside the public benchmark report. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE` to use an existing Chromium installation or `EU_AI_ACT_NODE` to point to a Node executable outside your PATH.
+
+Run hosted tests separately from the offline suite. They use the deployed model for generation cases, and score the GPAI date comparisons as source-based answers:
+
+```sh
+node eu-ai-act/rag-eval.mjs --hosted hosted-results.json
+node eu-ai-act/rag-eval.mjs --hosted boundary-results.json --boundary-feedback
+```
+
+See the [recorded runs](RAG_EVALUATION.md#production-verification) for the browser-feedback, paragraph-selection and boundary cases, including observed fallbacks. Independent legal review is pending.
 
 ## LangSmith, DeepEval, Promptfoo and Ragas
 
@@ -101,7 +115,7 @@ GitHub Actions uploads the per-case results as `eu-ai-act-framework-results`. Th
 
 The [model safety tests](eu-ai-act/test_model_security.py) use the same retrieval engine as the Research Desk. They simulate instruction-bearing draft text, restricted records, unexpected model responses and insufficient evidence. The model adapter sends only excerpts that match the pinned corpus and accepts one approved source ID. Eight deterministic checks run in CI with mocked model responses.
 
-The optional Ollama run tests citation selection behind that boundary. It includes four questions with approved sources and two abstentions. Each scenario runs twice. The public site uses deterministic retrieval.
+The optional Ollama run tests citation selection behind that boundary. It includes four questions with approved sources and two abstentions. Each scenario runs twice. The deployed Ask AI generation pipeline has its own [regression suite and hosted results](RAG_EVALUATION.md).
 
 To reproduce the local run, start Ollama with `qwen3:4b` installed and run:
 
@@ -115,7 +129,7 @@ In PowerShell, set `$env:EU_AI_ACT_OLLAMA_MODEL = 'qwen3:4b'` before running the
 
 The [CI workflow](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/eu-ai-act.yml) uploads `eu-ai-act-quality-evidence` with viewport screenshots, pixel diffs, and a k6 summary and JSON report.
 
-- Playwright captures the desktop research desk and mobile quiz from the candidate and its Git baseline in the same Chromium session. CI uses the pull request base commit, or the pinned release commit on pushes. Intentional design changes require reviewing the screenshots before updating the pinned baseline. To run locally, set `EU_AI_ACT_VISUAL_BASELINE` to an extracted baseline's `public/eu-ai-act` directory and run `python -m pytest eu-ai-act/test_visual.py -v`.
+- Playwright captures the desktop research desk, desktop evaluation report and mobile quiz from the candidate and its Git baseline in the same Chromium session. CI uses the pull request base commit, or the pinned release commit on pushes. Intentional design changes require reviewing the screenshots before updating the pinned baseline. To run locally, set `EU_AI_ACT_VISUAL_BASELINE` to an extracted baseline's `public/eu-ai-act` directory and run `python -m pytest eu-ai-act/test_visual.py -v`.
 - k6 sends 144 asset requests across four virtual users to a loopback server. It checks response status, expected contents, and p95 request duration. The results describe the test runner's static file delivery and provide a bounded regression check.
 
 ## Rebuild the corpus
