@@ -29,12 +29,15 @@ const openSourceGuidance = ' For the open-source exemption use three short claim
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
 
 const obviousCondition = String.raw`\b(?:if|when|where)\b(?:(?!\b(?:not|never)\b)[^.!?]){0,80}\bobvious\b`;
-const disclosureWaiver = String.raw`\b(?:no (?:disclosure|notice|notification) (?:is|need be) required|(?:disclosure|notice|notification) is not required)\b`;
+const disclosureWaiver = [
+  String.raw`\b(?:no (?:disclosure|notice|notification) (?:is|need be) required|(?:disclosure|notice|notification) is not required)\b`,
+  String.raw`\b(?:this|that|the) (?:disclosure )?(?:duty|obligation|requirement) does not apply\b`,
+].join('|');
 const obviousnessException = new RegExp([
   String.raw`\b(?:unless|except)\b(?:(?!\b(?:not|never)\b)[^.!?]){0,80}\bobvious\b`,
   String.raw`\b(?:if|when|where)\b[^.!?]{0,80}\bnot (?:already )?obvious\b`,
-  disclosureWaiver + String.raw`\s+` + obviousCondition,
-  obviousCondition + '[^.!?]{0,80}' + disclosureWaiver,
+  '(?:' + disclosureWaiver + ')' + String.raw`\s+` + obviousCondition,
+  obviousCondition + '[^.!?]{0,80}(?:' + disclosureWaiver + ')',
 ].join('|'), 'i');
 
 const legalRequirements = [

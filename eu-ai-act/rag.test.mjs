@@ -227,13 +227,16 @@ test('chatbot disclosure requires a timing claim and presents it separately to r
   assert.match(result.claims[1].quote, /^5\. /);
 });
 
-test('chatbot disclosure accepts the obviousness exception in a separate sentence', async () => {
+for (const exception of [
+  'Disclosure is not required if it is obvious from the context.',
+  'This duty does not apply when that is obvious in context.',
+]) test('chatbot disclosure accepts a separate exception: ' + exception, async () => {
   const fixture = cases.find(item => item.id === 'chatbot-disclosure');
   const result = await answerRag(fixture.question, {complete: async (stage, _, data) => {
     if (stage === 'review') return {approved: true};
     const draft = draftFor(fixture, data.passages);
     draft.claims[0].text = 'Providers must tell people directly interacting with AI that they are doing so. ' +
-      'Disclosure is not required if it is obvious from the context.';
+      exception;
     return draft;
   }});
   assert.equal(result.status, 'answered');
