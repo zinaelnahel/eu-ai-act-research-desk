@@ -36,6 +36,7 @@
       <h3 id="generated-answer-evaluation">Generated answer evaluation</h3>
       <p>The separate RAG benchmark checks six questions with expected provisions and legal qualifiers, plus six abstention cases. Contract tests check canonical citations, invalid drafts and evidence fallback. Playwright checks a keyboard-operated answer and its expandable quotation on mobile.</p>
       <p>The local Qwen3 4B run passed 10 of 12 cases: four of six answerable cases and six of six abstentions. The complaint answer omitted the authority and the deepfake question fell back to the evidence.</p>
+      <p>The deployed OpenAI model passed 10 of 12 cases: four of six answerable questions, five of five abstentions and empty input validation. Hiring and deepfake disclosure fell back to the evidence. A live mobile browser check verified generation, the official citation link and its supporting quotation.</p>
       <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/RAG_EVALUATION.md">Read the generated-answer findings and reproduction steps</a></p>
       <h3>Visual regression and static delivery</h3>
       <p>Playwright compares baseline and candidate screenshots of the desktop desk and mobile quiz. k6 checks static asset responses and request latency on a local server in CI.</p>

@@ -1,0 +1,179 @@
+{
+  "mode": "production-http",
+  "passed": 10,
+  "total": 12,
+  "results": [
+    {
+      "case": "workplace-exception",
+      "expectedSource": "art_5",
+      "status": "answered",
+      "sourceIds": [
+        "art_5"
+      ],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2165,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Baseline rule: AI systems used to infer a natural person’s emotions are prohibited in workplace areas.",
+        "Exception: this is allowed only where the AI system is intended to be placed on the market or put into service for medical or safety reasons."
+      ],
+      "http": 200
+    },
+    {
+      "case": "chatbot-disclosure",
+      "expectedSource": "art_50",
+      "status": "answered",
+      "sourceIds": [
+        "art_50"
+      ],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2201,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "A chatbot that is intended to interact directly with natural persons must inform them that they are interacting with an AI system, unless that is obvious to a reasonably well-informed, observant and circumspect person in the given circumstances and context of use.",
+        "This disclosure obligation does not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, but only where appropriate safeguards protect the rights and freedoms of third parties.",
+        "That exemption does not apply if those criminal-offence systems are available for the public to report a criminal offence."
+      ],
+      "http": 200
+    },
+    {
+      "case": "literacy-level",
+      "expectedSource": "art_4",
+      "status": "answered",
+      "sourceIds": [
+        "art_4"
+      ],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1668,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "No. Providers and deployers must support AI literacy for staff and other persons using or operating AI systems on their behalf, but the obligation does not require them to guarantee any specific level of AI literacy for any individual."
+      ],
+      "http": 200
+    },
+    {
+      "case": "complaints",
+      "expectedSource": "art_85",
+      "status": "answered",
+      "sourceIds": [
+        "art_85"
+      ],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 1474,
+      "modelCalls": 2,
+      "generatedClaims": [
+        "Any natural or legal person who has grounds to consider that there has been an infringement of the Regulation may file a complaint with the relevant market surveillance authority."
+      ],
+      "http": 200
+    },
+    {
+      "case": "hiring",
+      "expectedSource": "anx_III",
+      "status": "rejected",
+      "sourceIds": [],
+      "missing": [
+        "recruit|employment|candidate"
+      ],
+      "invalidCitations": 0,
+      "passed": false,
+      "latencyMs": 1232,
+      "modelCalls": 1,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "deepfake",
+      "expectedSource": "art_50",
+      "status": "rejected",
+      "sourceIds": [],
+      "missing": [
+        "disclos",
+        "artistic|satiri|creative"
+      ],
+      "invalidCitations": 0,
+      "passed": false,
+      "latencyMs": 1852,
+      "modelCalls": 1,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "out-of-scope",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 4,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "edition",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 0,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "unknown-provision",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 0,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "browse",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "individual-verdict",
+      "expectedSource": null,
+      "status": "abstained",
+      "sourceIds": [],
+      "missing": [],
+      "invalidCitations": 0,
+      "passed": true,
+      "latencyMs": 2,
+      "modelCalls": 0,
+      "generatedClaims": [],
+      "http": 200
+    },
+    {
+      "case": "empty",
+      "passed": true,
+      "http": 400
+    }
+  ]
+}
