@@ -51,6 +51,25 @@ function sourceLink(text, url) {
   return link;
 }
 
+const answerTerms = [
+  [/\bproviders?\b/i, 'Provider', 'A person or organisation that develops an AI system or general-purpose AI model, or has it developed, and markets it or puts the system into service under its own name or trademark.'],
+  [/\bdeployers?\b/i, 'Deployer', 'A person or organisation using an AI system under its authority, apart from personal, non-professional use.'],
+  [/\b(?:plac\w+|puts?|putting) (?:it |them )?on the market\b/i, 'Placed on the market', 'Made available on the EU market for the first time.'],
+];
+
+function renderTerms(text, documents) {
+  const entries = answerTerms.filter(([pattern]) => pattern.test(text));
+  if (!entries.length) return;
+  const details = element('details', '', 'answer-terms');
+  const definitions = element('dl');
+  for (const [, term, meaning] of entries) {
+    definitions.append(element('dt', term), element('dd', meaning));
+  }
+  details.append(element('summary', 'Terms in this answer'), definitions,
+    sourceLink('Read the definitions in Article 3', documents.get('art_3').url));
+  answer.prepend(details);
+}
+
 function passageLabel(label, quote) {
   if (label === 'Article 25' && /^1\. .+\(a\).+otherwise allocated;$/s.test(quote)) return 'Article 25(1)(a)';
   const paragraph = /^(\d+)\.\s/.exec(quote)?.[1];
@@ -196,6 +215,7 @@ try {
     }[result.kind];
     if (result.summary) answer.append(element('p', result.summary));
     for (const item of result.evidence) renderEvidence(item, desk.documents.get(item.id));
+    renderTerms([result.summary, ...result.evidence.map(item => item.quote)].join(' '), desk.documents);
     if (result.kind === 'version') answer.append(sourceLink('Check for current versions on EUR-Lex', 'https://eur-lex.europa.eu/eli/reg/2024/1689'));
     byId('answer-title').focus();
     if (event.submitter !== evidenceOnly && ['evidence', 'matches'].includes(result.kind)) {

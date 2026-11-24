@@ -21,6 +21,28 @@ def test_risk_guide_examples_and_overlapping_duties(open_page):
     assert_no_page_overflow(page)
 
 
+def test_guided_situations_and_definitions(open_page):
+    page = open_page("/learn.html#situations", mobile=True)
+    situations = page.get_by_role("region", name="Start with your situation")
+    cards = situations.locator("details")
+    expect(cards).to_have_count(3)
+    cards.nth(2).locator("summary").press("Enter")
+    expect(cards.nth(2)).to_contain_text("legal or similarly significant effects")
+    expect(cards.nth(2).get_by_role("link", name="Article 86")).to_have_attribute(
+        "href", "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_86"
+    )
+    assert_no_page_overflow(page)
+    page.get_by_role("link", name="Ask AI", exact=True).click()
+    field = page.get_by_role("searchbox", name="Your question")
+    expect(page.get_by_role("button", name="Find evidence only")).to_be_enabled()
+    field.fill("When must a chatbot disclose it is AI?")
+    page.get_by_role("button", name="Find evidence only").click()
+    terms = page.locator(".answer-terms")
+    terms.locator("summary").press("Enter")
+    expect(terms.get_by_text("Provider", exact=True)).to_be_visible()
+    expect(terms.get_by_role("link", name="Read the definitions in Article 3")).to_be_visible()
+
+
 def test_gpai_cutoff_and_distributor_routes_show_exact_fallback(open_page):
     page = open_page(mobile=True)
     page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))

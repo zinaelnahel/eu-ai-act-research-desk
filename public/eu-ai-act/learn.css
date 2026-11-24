@@ -61,6 +61,12 @@
 .risk-detail a, .risk-model a { display: inline-block; margin-inline-end: 12px; font-weight: 650; }
 .risk-model { margin-top: 14px; border-radius: 14px; background: var(--desk-tint); border-color: var(--desk-border); padding: 16px; }
 .risk-model h3 { font-size: 1.05rem; }
+.situation-card { padding: 12px 16px; background: var(--desk-tint); border: 1px solid var(--desk-border); border-radius: 12px; }
+.situation-card:last-child { margin-bottom: 0; }
+.situation-card summary { padding-block: 6px; }
+.situation-card dt { font-weight: 700; }
+.situation-card dd { margin: 3px 0 12px; }
+.situation-card a { display: inline-block; margin-inline-end: 12px; }
 @media (max-width: 820px) { .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) {
   .learn-hero, .topic-grid, .risk-grid { grid-template-columns: 1fr; }
