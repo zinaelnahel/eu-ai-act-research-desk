@@ -44,6 +44,9 @@ const semanticPairs = [
   ['chatbot-disclosure', 'provider replaced with deployer', 'art_50', 'Providers', 'Deployers'],
   ['chatbot-disclosure', 'obviousness changed from an exception to a prerequisite', 'art_50', 'unless that is obvious', 'only when it is obvious'],
   ['chatbot-disclosure', 'notice allowed during first interaction', 'art_50_p5', 'by the first', 'during the first'],
+  ['chatbot-disclosure', 'end-of-interaction notice with a negated on-time phrase', 'art_50_p5',
+    'by the first interaction, in line with applicable accessibility requirements.',
+    'by the end of the first interaction. Notice does not have to be provided at the first interaction. Follow applicable accessibility requirements.'],
   ['chatbot-disclosure', 'notice after first interaction', 'art_50_p5', 'by the first', 'after the first'],
   ['chatbot-disclosure', 'timing attached to the wrong paragraph', 'art_50_p5', '', 'art_50'],
   ['chatbot-disclosure-safeguards', 'omitted third-party safeguards', 'art_50', ' subject to safeguards for third parties', ''],
@@ -222,6 +225,19 @@ test('chatbot disclosure requires a timing claim and presents it separately to r
   const result = await answerRag(fixture.question, {complete});
   assert.deepEqual(result.claims.map(claim => claim.sourceId), ['art_50', 'art_50']);
   assert.match(result.claims[1].quote, /^5\. /);
+});
+
+test('chatbot disclosure accepts the obviousness exception in a separate sentence', async () => {
+  const fixture = cases.find(item => item.id === 'chatbot-disclosure');
+  const result = await answerRag(fixture.question, {complete: async (stage, _, data) => {
+    if (stage === 'review') return {approved: true};
+    const draft = draftFor(fixture, data.passages);
+    draft.claims[0].text = 'Providers must tell people directly interacting with AI that they are doing so. ' +
+      'Disclosure is not required if it is obvious from the context.';
+    return draft;
+  }});
+  assert.equal(result.status, 'answered');
+  assert.ok(scoreRag(fixture, result).passed);
 });
 
 test('rejects an overbroad explanation right even with a valid Article 86 citation', async () => {

@@ -28,17 +28,27 @@ const instructions = {
 const openSourceGuidance = ' For the open-source exemption use three short claims grounded in the exemption provision: qualifying licences and public model information; both technical and integrator documentation duties covered by the exemption; copyright and training-summary duties retained, and no exemption for systemic-risk models. Keep references to paragraph numbers out of the answer. Apply only where the passage supports these details.';
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
 
+const obviousCondition = String.raw`\b(?:if|when|where)\b(?:(?!\b(?:not|never)\b)[^.!?]){0,80}\bobvious\b`;
+const disclosureWaiver = String.raw`\b(?:no (?:disclosure|notice|notification) (?:is|need be) required|(?:disclosure|notice|notification) is not required)\b`;
+const obviousnessException = new RegExp([
+  String.raw`\b(?:unless|except)\b(?:(?!\b(?:not|never)\b)[^.!?]){0,80}\bobvious\b`,
+  String.raw`\b(?:if|when|where)\b[^.!?]{0,80}\bnot (?:already )?obvious\b`,
+  disclosureWaiver + String.raw`\s+` + obviousCondition,
+  obviousCondition + '[^.!?]{0,80}' + disclosureWaiver,
+].join('|'), 'i');
+
 const legalRequirements = [
   {id: 'art_5', when: context => context.some(item => item.id === 'art_5' && /^\(f\) /.test(item.quote)),
     patterns: [/prohibit|\bban|not (?:allowed|permitted)|may not be used/i, /medical/i, /safety/i],
     forbidden: [/\b(?:is|are) (?:allowed|permitted)\b[\s\S]*\b(?:except|unless)\b/i]},
   {id: 'art_50', paragraph: 1, when: context => context.some(item => item.id === 'art_50_p5'),
-    patterns: [/\bproviders?\b/i, /\b(?:must|shall|required|obliged|have to)\b/i,
-      /\b(?:(?:unless|except (?:if|when|where))\b(?:(?!\b(?:not|never)\b)[^.!?]){0,80}\bobvious|(?:if|when|where)\b[^.!?]{0,80}\bnot (?:already )?obvious)\b/i],
-    forbidden: [/\bproviders?\b.{0,35}\b(?:need not|must not|are not required to)\b.{0,25}(?:inform|disclos|notif)/i,
+    patterns: [/\bproviders?\b/i, /\b(?:must|shall|required|obliged|have to)\b/i, obviousnessException],
+    forbidden: [/\bproviders?\b[^.!?]{0,35}\b(?:need not|must not|are not required to)\b[^.!?]{0,25}(?:inform|disclos|notif)/i,
       /\bonly (?:if|when|where)\b(?:(?!\b(?:not|never)\b)[^.!?]){0,80}\bobvious\b/i]},
   {id: 'art_50_p5', paragraph: 5, patterns: [/\b(?:by|at|before|prior to|no later than) (?:(?:the|their) )?(?:time of (?:the )?)?first interaction\b/i,
-    /accessib/i, /clear/i], forbidden: [/\bafter (?:the )?first interaction\b/i]},
+    /accessib/i, /clear/i],
+    forbidden: [/\b(?:after|by the end of|before the end of|at the end of|no later than the end of) (?:(?:the|their) )?first interaction\b/i,
+      /\b(?:does not have to|need not|is not required to)\b[^.!?]{0,55}\b(?:by|at|before) (?:(?:the|their) )?first interaction\b/i]},
   {id: 'art_50', paragraph: 4, patterns: [/\bdeployers?\b/i],
     forbidden: [/\bdeployers?\b.{0,35}\b(?:need not|must not|are not required to)\b.{0,25}disclos/i]},
   {id: 'art_25', paragraph: 1, when: context => context.some(item => item.clause === 'a'),

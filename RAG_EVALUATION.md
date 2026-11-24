@@ -66,7 +66,7 @@ The first run also caught a workplace emotion recognition answer that reversed a
 
 ## What the automated checks cover
 
-The Node RAG suite tests 22 supported and altered answer pairs with valid citations. The deterministic draft checks reject actor swaps, reversed rules, missing conditions and safeguards, and timing or paragraph changes before model review. The hosted smoke workflow reuses those checks on selected provisions and cases. The blind legal review remains a separate assessment of completeness and correctness on unseen questions.
+The Node RAG suite tests 23 supported and altered answer pairs with valid citations. The deterministic draft checks reject actor swaps, reversed rules, missing conditions and safeguards, and timing or paragraph changes before model review. The hosted smoke workflow reuses those checks on selected provisions and cases. The blind legal review remains a separate assessment of completeness and correctness on unseen questions.
 
 ```sh
 node eu-ai-act/rag-eval.mjs --hosted starter-smoke.json --weekly-smoke
