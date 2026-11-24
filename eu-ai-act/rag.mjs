@@ -27,6 +27,13 @@ const instructions = {
 
 const openSourceGuidance = ' For the open-source exemption use three short claims grounded in the exemption provision: qualifying licences and public model information; both technical and integrator documentation duties covered by the exemption; copyright and training-summary duties retained, and no exemption for systemic-risk models. Keep references to paragraph numbers out of the answer. Apply only where the passage supports these details.';
 const emotionGuidance = ' In the workplace or education emotion-inference clause, give the baseline prohibition before the medical or safety exception. The clause is an item in the list of prohibited uses and the word "except" narrows that prohibition.';
+const retryGuidance = ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters. Include dates or quantities supported by the excerpt, and omit unnecessary cross-references.';
+const retryByCode = new Map([
+  ['art_50-missing-public-reporting-limit',
+    ' Revise the claim citing art_50: for legally authorised criminal-offence systems, retain the safeguards for the rights and freedoms of third parties and state that the exception does not apply when the system is available for the public to report a criminal offence.'],
+  ['art_50_p5-missing-required-wording',
+    ' Revise the claim citing art_50_p5: say explicitly that the notice must be clear, distinguishable and meet applicable accessibility requirements, and must be given no later than the first interaction.'],
+]);
 
 const obviousCondition = String.raw`\b(?:if|when|where)\b(?:(?!\b(?:not|never)\b)[^.!?]){0,80}\bobvious\b`;
 const disclosureWaiver = [
@@ -224,10 +231,11 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
     const legalGuidance = requirements.map(rule => rule.guidance || '').join('');
     let reason;
     for (let attempt = 0; attempt < 2; attempt++) {
+      const previousCodes = attempts.at(-1)?.codes ?? [];
+      const retry = attempt ? retryGuidance + previousCodes.map(code => retryByCode.get(code)).join('') : '';
       const diagnostic = {outcome: 'draft-provider-error'};
       attempts.push(diagnostic);
       modelCalls++;
-      const retry = attempt ? ' The previous draft could not be verified. Use only the supplied excerpts, preserve the baseline rule and exceptions, and keep each claim below 300 characters. Include dates or quantities supported by the excerpt, and omit unnecessary cross-references.' : '';
       const draft = await complete('draft', draftInstructions + legalGuidance + retry, {question, passages}, draftSchema);
       const {claims, code} = validateDraft(draft, context);
       const codes = code ? [code] : claims.length ? legalViolations(claims, requirements) : [];

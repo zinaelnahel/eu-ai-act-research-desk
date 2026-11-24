@@ -164,6 +164,38 @@ test('safeguards diagnostics distinguish recovery and fallback without draft tex
   });
 });
 
+test('Article 50 retries address only the previous draft’s matching reason codes', async () => {
+  const fixture = semanticCases.find(item => item.id === 'chatbot-disclosure-safeguards');
+  const targeted = [
+    {source: 'art_50', remove: ' and only if they are not available for public reporting',
+      code: 'art_50-missing-public-reporting-limit', marker: 'Revise the claim citing art_50:'},
+    {source: 'art_50_p5', remove: ', in line with applicable accessibility requirements',
+      code: 'art_50_p5-missing-required-wording', marker: 'Revise the claim citing art_50_p5:'},
+  ];
+  for (const issue of targeted) {
+    const prompts = [];
+    const result = await answerRag(fixture.question, {complete: async (stage, prompt, data) => {
+      if (stage === 'review') return {approved: true};
+      prompts.push(prompt);
+      const draft = draftFor(fixture, data.passages);
+      if (prompts.length === 1) {
+        const claim = draft.claims.find(item => item.sourceId === issue.source);
+        assert.ok(claim.text.includes(issue.remove));
+        claim.text = claim.text.replace(issue.remove, '');
+      }
+      return draft;
+    }});
+    assert.deepEqual(result.metrics.attempts, [
+      {outcome: 'invalid-draft', codes: [issue.code]}, {outcome: 'approved'},
+    ]);
+    assert.ok(scoreRag(fixture, result).passed);
+    for (const {marker} of targeted) {
+      assert.equal(prompts[0].includes(marker), false);
+      assert.equal(prompts[1].includes(marker), marker === issue.marker);
+    }
+  }
+});
+
 test('accepts multiple supported claims from different provisions', async () => {
   const result = await answerRag('What are the obligations for GPAI providers?', {complete: async (stage, _, data) => {
     if (stage === 'review') return {approved: true};
