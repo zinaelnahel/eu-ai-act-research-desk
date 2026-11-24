@@ -7,6 +7,20 @@ def assert_no_page_overflow(page):
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
 
 
+def test_risk_guide_examples_and_overlapping_duties(open_page):
+    page = open_page(mobile=True)
+    page.get_by_role("link", name="Understand AI risk").click()
+    guide = page.get_by_role("region", name="Understand AI risk")
+    expect(guide.locator("details")).to_have_count(4)
+    guide.get_by_text("High risk", exact=True).press("Enter")
+    expect(guide.get_by_role("link", name="Read Annex III")).to_be_visible()
+    expect(guide.get_by_text("both sets of rules can apply", exact=False)).to_be_visible()
+    expect(guide.get_by_role("link", name="Chatbot disclosure")).to_have_attribute(
+        "href", "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_50"
+    )
+    assert_no_page_overflow(page)
+
+
 def test_gpai_cutoff_and_distributor_routes_show_exact_fallback(open_page):
     page = open_page(mobile=True)
     page.route("**/api/answer", lambda route: route.fulfill(status=503, json={"error": "Unavailable"}))
