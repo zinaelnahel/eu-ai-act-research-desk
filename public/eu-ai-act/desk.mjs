@@ -7,6 +7,7 @@ const question = byId('question');
 const status = byId('status');
 const answer = byId('answer');
 const history = byId('conversation-history');
+const previousTurns = byId('previous-turns');
 const reset = byId('reset-conversation');
 const ask = byId('ask');
 const evidenceOnly = byId('evidence-only');
@@ -169,7 +170,7 @@ try {
     modelRequest?.abort();
     modelRequest = previous = activeQuestion = undefined;
     answer.replaceChildren();
-    history.replaceChildren();
+    previousTurns.replaceChildren();
     history.hidden = reset.hidden = true;
     question.value = '';
     provision.value = '';
@@ -195,20 +196,23 @@ try {
       return;
     }
     const next = event.submitter === evidenceOnly ? {question: question.value} : resolveFollowUp(question.value, previous);
+    const submittedQuestion = question.value.trim();
+    if (activeQuestion && (next.clarify || activeQuestion !== submittedQuestion)) {
+      const turn = element('details', '', 'evidence conversation-turn');
+      const summary = activeQuestion.length > 100 ? activeQuestion.slice(0, 100).trimEnd() + '…' : activeQuestion;
+      turn.append(element('summary', summary), ...answer.childNodes);
+      previousTurns.querySelectorAll('details[open]').forEach(turn => { turn.open = false; });
+      previousTurns.prepend(turn);
+      if (previousTurns.children.length > 5) previousTurns.lastElementChild.remove();
+      history.hidden = reset.hidden = false;
+    }
+    answer.replaceChildren();
+    activeQuestion = undefined;
     if (next.clarify) {
       status.textContent = 'Which topic or provision do you mean? Name it in your question so I can find the right evidence.';
       byId('answer-title').focus();
       return;
     }
-    if (activeQuestion && activeQuestion !== question.value.trim()) {
-      const turn = element('details', '', 'evidence conversation-turn');
-      turn.append(element('summary', activeQuestion), ...answer.childNodes);
-      history.prepend(turn);
-      if (history.children.length > 5) history.lastElementChild.remove();
-      history.hidden = false;
-    }
-    answer.replaceChildren();
-    activeQuestion = undefined;
     const result = desk.ask(next.question);
     status.textContent = result.reason || {
       lookup: 'Requested source',
@@ -219,9 +223,9 @@ try {
     for (const item of result.evidence) renderEvidence(item, desk.documents.get(item.id));
     renderTerms([result.summary, ...result.evidence.map(item => item.quote)].join(' '), desk.documents);
     if (result.kind === 'version') answer.append(sourceLink('Check for current versions on EUR-Lex', 'https://eur-lex.europa.eu/eli/reg/2024/1689'));
+    if (answer.hasChildNodes()) activeQuestion = submittedQuestion;
     byId('answer-title').focus();
     if (event.submitter !== evidenceOnly && ['evidence', 'matches'].includes(result.kind)) {
-      activeQuestion = question.value.trim();
       previous = {question: next.question, ids: result.evidence.map(item => item.id)};
       reset.hidden = false;
       const prompt = element('p', '', 'asked-question');

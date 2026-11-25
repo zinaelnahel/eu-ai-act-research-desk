@@ -434,3 +434,12 @@ test('provider is opt-in and sends secrets only to the configured server API', a
   });
   assert.deepEqual(await complete('review', 'instruction', {claims: []}, {}), {approved: true});
 });
+
+test('website inspection prose abstains before generation while Article 112 remains available', async () => {
+  const inspection = "I'll take a look at that tool for you. The page loaded, but it appears to be a JavaScript app so I only got the shell. Let me dig deeper into its structure and evaluation report. The search results are about other AI Act resources, not this specific tool. Since the app is JavaScript-rendered, let me probe its structure — the homepage mentions an evaluation report, so I'll look for its routes and any API endpoints. The routes aren't obvious. Let me try a few more likely paths for the evaluation report mentioned on the homepage. Let me try a couple of final possibilities — static files and hash-";
+  const result = await answerRag(inspection, {complete: () => assert.fail('Unexpected model call')});
+  assert.equal(result.status, 'abstained');
+  assert.equal(result.metrics.modelCalls, 0);
+  assert.deepEqual(result.retrievedIds, []);
+  assert.equal(desk.ask('When must the Commission submit its report on the evaluation and review of the AI Act?').evidence[0].id, 'art_112');
+});
