@@ -1,20 +1,34 @@
 const metrics = document.getElementById('metrics');
 const hostedSmoke = document.getElementById('hosted-smoke');
-fetch('/api/smoke-status', {signal: AbortSignal.timeout(6000)})
-  .then(async response => {
-    if (!response.ok) return;
-    const {latest} = await response.json();
-    if (!latest) {
-      hostedSmoke.textContent = 'Weekly hosted smoke · awaiting first expanded run';
-      return;
-    }
-    const date = new Intl.DateTimeFormat('en', {dateStyle: 'medium', timeZone: 'UTC'}).format(new Date(latest.date));
-    const {conclusion} = latest;
-    const outcome = conclusion === 'success' ? 'Passed' : conclusion === 'failure' ? 'Failed' : conclusion.replaceAll('_', ' ');
-    hostedSmoke.href = latest.url;
-    hostedSmoke.textContent = 'Weekly hosted smoke · ' + date + ' · ' + outcome;
-  })
-  .catch(() => {/* The workflow link remains available. */});
+async function smokeStatus(url) {
+  try {
+    const response = await fetch(url, {signal: AbortSignal.timeout(6000)});
+    if (response.ok) return (await response.json()).latest;
+  } catch {
+    // Keep the workflow link available when the results cannot be loaded.
+  }
+  return null;
+}
+
+async function showHostedSmoke() {
+  const [recorded, weekly] = await Promise.all([
+    smokeStatus('./hosted-smoke.json'),
+    smokeStatus('/api/smoke-status'),
+  ]);
+  const latest = [weekly, recorded].filter(run => Number.isFinite(Date.parse(run?.date)))
+    .sort((left, right) => Date.parse(right.date) - Date.parse(left.date))[0];
+  if (!latest) return;
+  const date = new Intl.DateTimeFormat('en', {dateStyle: 'medium', timeZone: 'UTC'}).format(new Date(latest.date));
+  const weeklyRun = latest === weekly;
+  const conclusion = latest.conclusion;
+  const outcome = weeklyRun
+    ? (conclusion === 'success' ? 'Passed' : conclusion === 'failure' ? 'Failed' : conclusion.replaceAll('_', ' '))
+    : latest.passed + ' of ' + latest.total + ' passed';
+  hostedSmoke.href = weeklyRun ? latest.url : './hosted-smoke.json';
+  hostedSmoke.textContent = (weeklyRun ? 'Weekly hosted smoke' : 'Recorded hosted smoke') + ' · ' + date + ' · ' + outcome;
+}
+
+void showHostedSmoke();
 const formatPrecision = value => value === null ? '—' : new Intl.NumberFormat('en', {style: 'percent', maximumFractionDigits: 1}).format(value);
 try {
   const response = await fetch('./evaluation.json');

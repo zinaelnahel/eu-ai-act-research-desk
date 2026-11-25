@@ -53,6 +53,9 @@ const semanticPairs = [
   ['chatbot-disclosure-safeguards', 'omitted public reporting limitation', 'art_50', ' and only if they are not available for public reporting', ''],
   ['chatbot-disclosure-safeguards', 'negated third-party safeguards', 'art_50', 'subject to safeguards', 'without safeguards'],
   ['chatbot-disclosure-safeguards', 'inverted public reporting limitation', 'art_50', 'are not available for public reporting', 'are available for public reporting'],
+  ['chatbot-disclosure-safeguards', 'reversed subject of the law enforcement exception', 'art_50',
+    'Legally authorised criminal-offence systems are exempt subject to safeguards for third parties',
+    'The exception does not apply to AI systems authorised by law to investigate criminal offences unless they have appropriate safeguards for third parties'],
   ['deepfake', 'deployer replaced with provider', 'art_50', 'Deployers', 'Providers'],
   ['deployer-logs', 'minimum changed to maximum', 'art_26', 'at least', 'at most'],
   ['incident-death', 'wrong reporting deadline', 'art_73', 'ten days', 'fifteen days'],
@@ -100,11 +103,18 @@ for (const [id, name, sourceId, from, to] of semanticPairs) {
 for (const fixture of [...cases, ...feedbackCases, ...retrievalFeedbackCases, ...boundaryFeedbackCases, ...starterCases,
   semanticCases.find(item => item.id === 'chatbot-disclosure-safeguards')]) {
   test('RAG contract: ' + fixture.question, async () => {
-    const complete = async (stage, _, data) => stage === 'draft'
-      ? draftFor(fixture, data.passages) : {approved: true};
+    const complete = async (stage, _, data) => {
+      assert.notEqual(fixture.answerMode, 'reviewed', 'The reviewed starter must not call the model');
+      return stage === 'draft' ? draftFor(fixture, data.passages) : {approved: true};
+    };
     const result = await answerRag(fixture.question, {complete});
     const report = scoreRag(fixture, result);
     assert.ok(report.passed, JSON.stringify(report));
+    if (fixture.answerMode === 'reviewed') {
+      assert.match(result.claims[1].text, /^The disclosure obligation does not apply .*subject to appropriate safeguards/);
+      assert.match(result.claims[1].text, /Disclosure is still required if .* available for the public to report a criminal offence/);
+      assert.match(result.claims[2].quote, /^5\. /);
+    }
     for (const claim of result.claims) {
       const source = desk.documents.get(claim.sourceId);
       assert.ok(source.blocks.join('\n\n').includes(claim.quote));

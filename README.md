@@ -25,11 +25,13 @@ If the first draft fails validation or review, the server attempts one shorter d
 
 The home page starts with three everyday questions under **At work**, **Using a chatbot**, and **A decision about me**. **Help me find a question** opens the guided situations. If retrieval comes up short, the desk suggests describing who uses the AI, what it does, and how it affects you. The evidence view explains terms such as provider and deployer when they appear in the passages.
 
-The weekly hosted smoke workflow runs the same three starter questions alongside legal boundary cases. Each run records outcomes, fallback reasons and citations. The testing evidence page links to the latest completed expanded run and shows its date and result. [Hosted smoke workflow](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml)
+The weekly hosted smoke workflow runs the same three starter questions alongside legal boundary cases. Each run records outcomes, fallback reasons and citations. The testing evidence page shows the newest available hosted result alongside the offline retrieval score, using the recorded result when the weekly workflow has no newer run. [Hosted smoke workflow](https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml)
 
 Ask AI keeps a short conversation on the current page. It shows the provision carried forward and asks for clarification when the reference is ambiguous. Expand an earlier question to revisit its answer, or select Start a new conversation to clear the page's history. For generated answers, the model receives a standalone question.
 
 Two narrow cases use direct source-based answers: whether the Article 5 workplace prohibition also applies in schools, and whether a placement date falls before the Article 111(3) GPAI cutoff. The school follow-up opens with “Yes, the prohibition also applies in schools” and keeps the medical or safety exception. The cutoff comparison uses the date stated in the pinned provision. Both flows display the supporting excerpt and make zero model calls.
+
+The chatbot starter uses reviewed wording verified against the pinned Article 50(1) and (5) passages. It distinguishes the disclosure duty, the qualified law-enforcement exception and the public reporting limit. The separate safeguards probe continues to test generated answers.
 
 With Ollama running locally and the model installed, run these commands from the repository root:
 

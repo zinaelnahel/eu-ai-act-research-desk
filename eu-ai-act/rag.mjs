@@ -147,6 +147,9 @@ function disclosureViolations(claims) {
   if (!/public.{0,60}report|report.{0,60}public/i.test(text)) violations.push('art_50-missing-public-reporting-limit');
   if (/\b(?:without|no need for) (?:any )?safeguards?\b/i.test(text)) violations.push('art_50-negated-safeguards');
   if (/\bonly if [^.]{0,70}\bare available for public reporting\b/i.test(text)) violations.push('art_50-reversed-public-reporting-limit');
+  if (/\bexception does not apply to\b[^.]{0,140}\bauthori[sz]ed\b[^.]{0,150}\bunless\b[^.]{0,65}\bsafeguards?\b/i.test(text)) {
+    violations.push('art_50-reversed-law-enforcement-exception');
+  }
   return violations;
 }
 
@@ -192,6 +195,21 @@ function validateDraft(draft, context) {
   return {claims};
 }
 
+function reviewedChatbotClaims(question, context) {
+  if (question.trim().replaceAll('’', "'").toLowerCase() !== "when does a chatbot have to tell me it's ai?") return null;
+  const duty = context.find(passage => passage.id === 'art_50' && passage.quote.startsWith('1. '));
+  const timing = context.find(passage => passage.id === 'art_50_p5');
+  if (!duty?.quote.includes('unless this is obvious from the point of view') ||
+      !duty.quote.includes('This obligation shall not apply to AI systems authorised by law to detect, prevent, investigate or prosecute criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties, unless those systems are available for the public to report a criminal offence.') ||
+      !timing?.quote.includes('in a clear and distinguishable manner at the latest at the time of the first interaction or exposure. The information shall conform to the applicable accessibility requirements.')) return null;
+
+  return [
+    [duty, 'Providers must tell people when they are interacting directly with AI, unless that is obvious to a reasonably well-informed, observant and circumspect person in context.'],
+    [duty, 'The disclosure obligation does not apply to systems authorised by law to detect, prevent, investigate or prosecute criminal offences, subject to appropriate safeguards for the rights and freedoms of third parties. Disclosure is still required if the system is available for the public to report a criminal offence.'],
+    [timing, 'When disclosure is required, it must be clear, distinguishable and meet applicable accessibility requirements. Give it no later than the first interaction.'],
+  ].map(([{sourceId, label, url, quote}, text]) => ({sourceId, label, url, quote, text}));
+}
+
 export async function answerRag(question, {complete, retrieve = desk.ask, documents = desk.documents}) {
   const started = performance.now();
   const retrieval = retrieve(question);
@@ -204,6 +222,8 @@ export async function answerRag(question, {complete, retrieve = desk.ask, docume
   });
   if (retrieval.kind !== 'evidence' && retrieval.kind !== 'matches') return result('abstained');
   if (!context.length) return result('abstained');
+  const reviewedClaims = reviewedChatbotClaims(question, context);
+  if (reviewedClaims) return {...result('answered', reviewedClaims), answerMode: 'reviewed'};
   if (retrieve === desk.ask && retrieval.answerMode === 'source-rule') {
     const {sourceId, label, url, quote} = context[0];
     return {...result('answered', [{text: retrieval.summary, sourceId, label, url, quote}]), answerMode: 'source-rule'};

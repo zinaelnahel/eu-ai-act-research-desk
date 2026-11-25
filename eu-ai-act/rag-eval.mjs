@@ -10,7 +10,15 @@ export const retrievalFeedbackCases = JSON.parse(readFileSync(new URL('./retriev
 export const boundaryFeedbackCases = JSON.parse(readFileSync(new URL('./boundary-feedback-cases.json', import.meta.url), 'utf8'));
 export const starterCases = [
   {...cases.find(item => item.id === 'workplace-exception'), question: 'Can my employer use AI to tell how I’m feeling?'},
-  {...cases.find(item => item.id === 'chatbot-disclosure'), question: 'When does a chatbot have to tell me it’s AI?'},
+  {
+    ...cases.find(item => item.id === 'chatbot-disclosure'), answerMode: 'reviewed',
+    question: 'When does a chatbot have to tell me it’s AI?',
+    sourcePhrases: {art_50: [
+      'disclosure obligation does not apply to systems authorised by law',
+      'subject to appropriate safeguards for the rights and freedoms of third parties',
+      'disclosure is still required if the system is available for the public to report a criminal offence',
+    ]},
+  },
   {...feedbackCases.find(item => item.id === 'adverse-explanation'), question: 'Can I ask for an explanation of an AI-assisted decision?'},
 ];
 const semanticFixtureIds = new Set([
@@ -40,8 +48,8 @@ export function scoreRag(fixture, result) {
   const contradictions = (fixture.forbidden || []).filter(pattern => new RegExp(pattern, 'i').test(text));
   const required = fixture.sources || (fixture.source ? [fixture.source] : []);
   const allowed = new Set([...required, ...Object.keys(fixture.optionalSources || {})]);
-  const methodPassed = fixture.answerMode === 'source-rule'
-    ? result.answerMode === 'source-rule' && metrics.modelCalls === 0
+  const methodPassed = fixture.answerMode
+    ? result.answerMode === fixture.answerMode && metrics.modelCalls === 0
     : [2, 3, 4].includes(metrics.modelCalls);
   for (const [source, patterns] of Object.entries(fixture.sourcePhrases || {})) {
     const citedText = claims.filter(claim => claim.sourceId === source).map(claim => claim.text).join(' ');

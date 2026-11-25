@@ -17,6 +17,9 @@ def screenshot(page, path, mobile):
         page.locator("#quiz").screenshot(path=path, animations="disabled")
     else:
         if page.locator("#metrics").count():
+            for url in ("**/hosted-smoke.json", "**/api/smoke-status"):
+                page.route(url, lambda route: route.fulfill(json={"latest": None}))
+            page.reload()
             expect(page.locator("#metrics")).to_contain_text("scenarios passed")
         else:
             expect(page.get_by_role("button", name="Ask AI", exact=True)).to_be_enabled()

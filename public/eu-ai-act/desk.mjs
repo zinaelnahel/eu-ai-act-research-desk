@@ -97,9 +97,9 @@ function renderEvidence(item, doc, showContext = true) {
   answer.append(section);
 }
 
-function renderGenerated(claims, documents) {
+function renderCitedAnswer(claims, documents, reviewed) {
   const section = element('section', '', 'generated-answer');
-  section.append(element('h3', 'AI-generated research answer'));
+  section.append(element('h3', reviewed ? 'Source-based research answer' : 'AI-generated research answer'));
   const list = element('ol');
   for (const claim of claims) {
     const item = element('li', claim.text + ' ');
@@ -138,11 +138,13 @@ async function requestGeneratedAnswer(text, documents) {
     const result = await response.json();
     if (modelRequest !== controller) return;
     if (result.status === 'answered' && result.claims.length) {
-      renderGenerated(result.claims, documents);
+      const reviewed = result.answerMode === 'reviewed';
+      renderCitedAnswer(result.claims, documents, reviewed);
       if (previous) {
         previous.ids = [...new Set(result.claims.map(claim => claim.sourceId).filter(id => documents.has(id)))];
       }
-      status.textContent = 'Generated answer with supporting citations. Check the official wording before relying on it.';
+      status.textContent = (reviewed ? 'Source-based answer' : 'Generated answer') +
+        ' with supporting citations. Check the official wording before relying on it.';
     } else {
       status.textContent = 'A supported generated answer was unavailable. Review the retrieved evidence below.';
     }

@@ -375,6 +375,8 @@ def test_mobile_report_scrolls_without_overflowing_the_page(open_page):
     expect(nav.get_by_role("link", name="Testing evidence")).to_have_attribute("aria-current", "page")
     nav.get_by_role("link", name="Learn").focus()
     page.keyboard.press("Tab")
+    expect(page.locator("#hosted-smoke")).to_be_focused()
+    page.keyboard.press("Tab")
     expect(region).to_be_focused()
     assert region.evaluate("(el) => el.scrollWidth > el.clientWidth")
     assert_no_page_overflow(page)
@@ -383,6 +385,9 @@ def test_mobile_report_scrolls_without_overflowing_the_page(open_page):
 def test_evaluation_links_to_latest_hosted_smoke_run(open_page):
     page = open_page("/evaluation.html", mobile=True)
     run_url = "https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/runs/4"
+    page.route("**/hosted-smoke.json", lambda route: route.fulfill(json={"latest": {
+        "date": "2026-11-23T08:43:00Z", "passed": 19, "total": 19,
+    }}))
     page.route("**/api/smoke-status", lambda route: route.fulfill(json={"latest": {
         "date": "2026-11-24T08:43:00Z", "conclusion": "failure", "url": run_url,
     }}))
@@ -390,3 +395,15 @@ def test_evaluation_links_to_latest_hosted_smoke_run(open_page):
     link = page.get_by_role("link", name="Weekly hosted smoke · Nov 24, 2026 · Failed")
     expect(link).to_have_attribute("href", run_url)
     assert_no_page_overflow(page)
+
+
+def test_evaluation_shows_recorded_hosted_result_without_a_weekly_run(open_page):
+    page = open_page("/evaluation.html")
+    page.route("**/api/smoke-status", lambda route: route.fulfill(json={"latest": None}))
+    page.route("**/hosted-smoke.json", lambda route: route.fulfill(json={"latest": {
+        "date": "2026-11-25T08:43:00Z", "passed": 18, "total": 19,
+    }}))
+    page.reload()
+    expect(page.get_by_role("region", name="Labeled scenarios").get_by_role(
+        "link", name="Recorded hosted smoke · Nov 25, 2026 · 18 of 19 passed"
+    )).to_have_attribute("href", "./hosted-smoke.json")

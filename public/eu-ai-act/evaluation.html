@@ -20,6 +20,7 @@
       <h2 id="results">Labeled scenarios</h2>
       <p id="metrics" role="status">Loading report…</p>
       <p id="precision"></p>
+      <p><a id="hosted-smoke" href="https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml">Hosted answer checks · view run history</a></p>
       <p>Each case checks the expected first provision, required supporting sources, verbatim evidence and specified qualifiers. Unexpected or duplicate provisions fail the case. Optional sources are allowed only where the benchmark records why they are relevant. Abstentions have no precision score because they return no sources.</p>
       <div class="table-wrap" role="region" aria-label="Evaluation results" tabindex="0"><table><thead><tr><th scope="col">Question</th><th scope="col">Required</th><th scope="col">Returned</th><th scope="col">Precision</th><th scope="col">Outcome</th></tr></thead><tbody id="cases"></tbody></table></div>
       <p class="legal-note">These results describe this benchmark and edition. They do not establish accuracy across all possible questions.</p>
@@ -45,7 +46,7 @@
       <p>The RAG benchmark checks nine answerable questions and six out-of-scope, abstention or validation inputs. It checks legal qualifiers and required citations, including claims that must be supported by different provisions. Playwright exercises a keyboard-operated answer, its expandable quotation and the evidence fallback.</p>
       <p>The local Qwen3 4B run passed 10 of 12 cases: four of six answerable cases and six of six abstentions. The complaint answer omitted the authority and the deepfake question fell back to the evidence.</p>
       <p>The three current plain-language starter questions passed the recorded hosted smoke check. In the separate 15-case timing benchmark, 14 passed. The open-source exemption question fell back to its retrieved evidence after review.</p>
-      <p><a id="hosted-smoke" href="https://github.com/zinaelnahel/eu-ai-act-research-desk/actions/workflows/starter-smoke.yml">Weekly live starter checks</a> · <a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/eu-ai-act/rag-plain-starters-report.json">Current starter results</a> · <a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/eu-ai-act/rag-starter-report.json">15-case timing results</a></p>
+      <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/eu-ai-act/rag-plain-starters-report.json">Earlier starter results</a> · <a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/eu-ai-act/rag-starter-report.json">15-case timing results</a></p>
       <p><a href="https://github.com/zinaelnahel/eu-ai-act-research-desk/blob/main/RAG_EVALUATION.md">Read the generated-answer findings and reproduction steps</a></p>
       <p><a href="./architecture.html">See the architecture infographic</a> · <a href="./architecture.pdf" download>Download the one-page PDF</a></p>
       <h3>Visual regression and static delivery</h3>
