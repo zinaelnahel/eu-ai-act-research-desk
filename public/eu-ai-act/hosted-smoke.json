@@ -1,0 +1,29 @@
+{
+  "latest": {
+    "date": "2026-11-25T09:45:56.602Z",
+    "commit": "cb685e8",
+    "suite": "expanded-hosted-smoke",
+    "passed": 17,
+    "total": 19,
+    "generatedCases": {
+      "passed": 13,
+      "total": 15
+    },
+    "sourceBasedCases": {
+      "passed": 4,
+      "total": 4
+    },
+    "fallbacks": [
+      {
+        "case": "adverse-explanation",
+        "reason": "invalid-draft",
+        "validationCode": "art_86_p1-missing-required-wording"
+      },
+      {
+        "case": "incident-death",
+        "reason": "invalid-draft",
+        "validationCode": "unsupported-number"
+      }
+    ]
+  }
+}
